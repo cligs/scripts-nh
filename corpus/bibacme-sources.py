@@ -74,4 +74,26 @@ def sources_shares():
 	fig.show()
 
 
-sources_shares()
+def sources_inclusion():
+	"""
+	A pie chart showing how many bibliographic entries were included into Bib-ACMé and why the rest was discarded
+	"""
+	
+	sources = pd.read_csv(join("/home/ulrike/Git/bibacme/app/data/entries-sources.csv"), header=0)
+	colors = ["rgb(31, 119, 180)", "rgb(255, 127, 14)", "rgb(44, 160, 44)", "rgb(214, 39, 40)"]
+	
+	included = sources.loc[sources["bibacme-work-id"] != "-"]
+	excluded_missing_info = sources.loc[(sources["bibacme-work-id"] == "-") & ((sources["earliest-publication-date"] == "unknown") | (sources[">82p"] == "unknown"))]
+	excluded_short = sources.loc[(sources["bibacme-work-id"] == "-") & ((sources[">82p"] == "no") | (sources[">15,500w"] == "no")) & (sources["earliest-publication-date"] != "unknown")]
+	excluded_other = sources.loc[(sources["bibacme-work-id"] == "-") & (sources["earliest-publication-date"] != "unknown") & (sources[">82p"] != "unknown") & (sources[">82p"] != "no") & (sources[">15,500w"] != "no")]
+	
+	labels = ['included','missing info','too short','excluded for other reason']
+	values = [len(included), len(excluded_missing_info), len(excluded_short), len(excluded_other)]
+	
+	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise")])
+	fig.update_layout(autosize=False,width=700,height=500,legend=dict(font=dict(size=16)))
+	fig.show()
+
+
+# sources_shares()
+sources_inclusion()
