@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # Filename: bibacme-sources.py
 
+"""
+@author: Ulrike Henny-Krahmer
+"""
 
 import pandas as pd
 from os.path import join
@@ -13,7 +16,7 @@ from plotly.subplots import make_subplots
 def sources_shares():
 	"""
 	A group of charts showing how many bibliographic entries were checked for BibACMé
-	and how many were included (by source)
+	and how many were included (by source)	
 	"""
 
 	sources = pd.read_csv(join("/home/ulrike/Git/bibacme/app/data/entries-sources.csv"), header=0)
@@ -87,7 +90,7 @@ def sources_inclusion():
 	excluded_short = sources.loc[(sources["bibacme-work-id"] == "-") & ((sources[">82p"] == "no") | (sources[">15,500w"] == "no")) & (sources["earliest-publication-date"] != "unknown")]
 	excluded_other = sources.loc[(sources["bibacme-work-id"] == "-") & (sources["earliest-publication-date"] != "unknown") & (sources[">82p"] != "unknown") & (sources[">82p"] != "no") & (sources[">15,500w"] != "no")]
 	
-	labels = ['included','missing info','too short','excluded for other reason']
+	labels = ['included','missing information','too short','excluded for other reason']
 	values = [len(included), len(excluded_missing_info), len(excluded_short), len(excluded_other)]
 	
 	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise")])
