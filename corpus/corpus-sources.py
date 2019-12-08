@@ -100,7 +100,7 @@ def plot_sources(source_info):
 	Donut charts showing how many texts were included from which type of source.
 	
 	Arguments:
-	source_info (str): which kind of source information to plot. Possible values: "sources_medium", "sources_filetype", "sources_institution", "sources_edition"
+	source_info (str): which kind of source information to plot. Possible values: "sources_medium", "sources_filetype", "sources_institution", "sources_edition", "institution_type"
 	"""
 
 	corpus_dir = "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
@@ -111,11 +111,55 @@ def plot_sources(source_info):
 	labels, values = get_data_to_plot(data, source_info)
 
 	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise", hole=.4)])
-	fig.update_layout(autosize=False,width=600,height=500,legend=dict(font=dict(size=16)))
+	fig.update_layout(autosize=False,width=600,height=500,legend=dict(font=dict(size=16))) # 600, 500, 16 | 1000, 1000, 14
 	fig.show()
 	
 
+def plot_sources_hierarchical(source_info_1, source_info_2):
+	"""
+	Create a sunburst chart combining different kinds of information about the sources, e.g. the kinds of editions and the type of institution
+	or the filetypes and the sources.
+	
+	Arguments:
+	source_info_1 (str): which kind of source information to plot as the inner circle / parents. Possible values: "sources_medium", "sources_filetype", 
+	"sources_institution", "sources_edition", "institution_type"
+	
+	source_info_2 (str): which kind of source information to plot as the outer circle / parents. Possible values are the same as for source_info_1.
+	"""
+	
+	corpus_dir = "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
+	data = pd.read_csv(join(corpus_dir, "metadata_sources.csv"), index_col=0)
+	
+	data_grouped_level_1 = data.groupby([source_info_1, source_info_2]).size()
+	data_grouped_level_0 = data_grouped_level_1.sum(level=0)
+	labels_level_0_set = list(data_grouped_level_1.keys().levels[0])
+	labels_level_0_all = list(data_grouped_level_1.index.get_level_values(0))
+	labels_level_1 = list(data_grouped_level_1.index.get_level_values(1))
+	
+	labels = labels_level_0_set + labels_level_1
+	values = list(data_grouped_level_0) + list(data_grouped_level_1)
+	ids = labels_level_0_set + [str(i[0]) + "-" + str(i[1]) for i in zip(labels_level_0_all, labels_level_1)]
+	parents = ["" for i in range(len(labels_level_0_set))] + labels_level_0_all 
+	
+	colors = ["rgb(31, 119, 180)", "rgb(255, 127, 14)"] #"rgb(44, 160, 44)", "rgb(214, 39, 40)"
+	
+	fig = go.Figure(go.Sunburst(
+	ids=ids,
+	labels=labels,
+	parents=parents,
+	values=values,
+	marker=dict(colors = colors),
+	branchvalues="total",
+	textinfo="label+percent entry",
+	textfont=dict(size = 16)
+	))
+	
+	fig.update_layout(autosize=False,width=900,height=900) # 700, 700
+	fig.show()
+	
 
 #get_sources_metadata()
 
-plot_sources("sources_edition")
+#plot_sources("sources_edition")
+
+plot_sources_hierarchical("sources_filetype", "sources_institution")
