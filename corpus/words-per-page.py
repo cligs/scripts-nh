@@ -84,13 +84,9 @@ def get_words_per_page(wdir, infile):
 		pagetext = page.xpath(".//text()")
 		pagetext = "\r".join(pagetext)
 		
-		tokens = re.split(r"\W", pagetext, flags=re.MULTILINE)
-		words = []
-		for t in tokens:
-			m = re.match(r"\w", t)
-			if m:
-				words.append(t)
-		num_words = len(words)
+		tokens = re.split(r"\W+", pagetext, flags=re.MULTILINE)
+		
+		num_words = len(tokens)
 		words_per_page.append(num_words)
 		
 	# draw chart
