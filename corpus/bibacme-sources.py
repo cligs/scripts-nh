@@ -51,12 +51,12 @@ def sources_shares():
 	fig = make_subplots(rows=2, cols=2, specs=[[{"type" : "domain"}, {"type" : "domain"}],[{"type" : "xy"}, {"type" : "xy"}]])
 
 	fig.add_trace(
-		go.Pie(labels=labels, values=values_all, marker=dict(colors = colors),  direction="clockwise"),
+		go.Pie(labels=labels, values=values_all, marker=dict(colors = colors),  direction="clockwise", hole=.4),
 		row=1, col=1
 	)
 
 	fig.add_trace(
-		go.Pie(labels=labels, values=values_rest, marker=dict(colors = colors), direction="clockwise"),
+		go.Pie(labels=labels, values=values_rest, marker=dict(colors = colors), direction="clockwise", hole=.4),
 		row=1, col=2
 	)
 
@@ -84,11 +84,13 @@ def sources_inclusion():
 	
 	sources = pd.read_csv(join("/home/ulrike/Git/bibacme/app/data/entries-sources.csv"), header=0)
 	colors = ["rgb(31, 119, 180)", "rgb(255, 127, 14)", "rgb(44, 160, 44)", "rgb(214, 39, 40)"]
+	min_page = ">=84p"
+	min_words = ">=16,000w"
 	
 	included = sources.loc[sources["bibacme-work-id"] != "-"]
-	excluded_missing_info = sources.loc[(sources["bibacme-work-id"] == "-") & ((sources["earliest-publication-date"] == "unknown") | (sources[">82p"] == "unknown"))]
-	excluded_short = sources.loc[(sources["bibacme-work-id"] == "-") & ((sources[">82p"] == "no") | (sources[">15,500w"] == "no")) & (sources["earliest-publication-date"] != "unknown")]
-	excluded_other = sources.loc[(sources["bibacme-work-id"] == "-") & (sources["earliest-publication-date"] != "unknown") & (sources[">82p"] != "unknown") & (sources[">82p"] != "no") & (sources[">15,500w"] != "no")]
+	excluded_missing_info = sources.loc[(sources["bibacme-work-id"] == "-") & ((sources["earliest-publication-date"] == "unknown") | (sources[min_page] == "unknown"))]
+	excluded_short = sources.loc[(sources["bibacme-work-id"] == "-") & ((sources[min_page] == "no") | (sources[min_words] == "no")) & (sources["earliest-publication-date"] != "unknown")]
+	excluded_other = sources.loc[(sources["bibacme-work-id"] == "-") & (sources["earliest-publication-date"] != "unknown") & (sources[min_page] != "unknown") & (sources[min_page] != "no") & (sources[min_words] != "no")]
 	
 	labels = ['included','missing information','too short','excluded for other reason']
 	values = [len(included), len(excluded_missing_info), len(excluded_short), len(excluded_other)]
