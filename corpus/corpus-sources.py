@@ -80,14 +80,27 @@ def get_sources_metadata():
 	print("done")
 	
 	
-def get_data_to_plot(data, source_info):
+def get_data_to_plot(data, source_info, **kwargs):
 	"""
 	Get the data to plot.
 	
 	Arguments:
 	data (data frame)
 	source_info (str): possible values: "sources_medium", "sources_filetype", "sources_institution", "sources_edition"
+	
+	further optional arguments:
+	drop_source_info (str): kind of source info for which rows with a certain value should be dropped, e.g. "sources_filetype"
+	drop_source_value (str): rows with which value for the kind of source info to drop, e.g. "text"
 	"""
+	
+	drop_source_info = kwargs.get("drop_source_info", None)
+	drop_value = kwargs.get("drop_value", None)
+
+	# optional: drop rows with certain column values (when only a subset of the data should be charted, e.g. only the institutions of texts obtained from image files (or text files))
+	if drop_source_info and drop_value:
+		rows_to_drop = data.loc[data[drop_source_info] == drop_value].index
+		data = data.drop(rows_to_drop)
+	
 	data_grouped = data.groupby(source_info).count()
 	data_grouped = data_grouped.sort_values(data_grouped.columns[0], ascending=False)
 	labels = data_grouped.index.values
@@ -111,7 +124,35 @@ def plot_sources(source_info):
 	labels, values = get_data_to_plot(data, source_info)
 
 	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise", hole=.4)])
-	fig.update_layout(autosize=False,width=600,height=500,legend=dict(font=dict(size=16))) # 600, 500, 16 | 1000, 1000, 14
+	fig.update_layout(autosize=False,width=600,height=500,legend=dict(font=dict(size=16))) # 600, 500, 16 | 1000, 1000, 14 for sources_institution
+	fig.show()
+	
+	
+def plot_sources_scalegroup(source_info, drop_source_info, drop_group_1, drop_group_2):
+	"""
+	Creates two donut charts showing how many texts were included from which type of source. For each of the charts, another subgroup is dropped,
+	e.g. for the sources by institution, one chart is created for full text sources and the other for image sources. The size of the donut charts
+	is proportional to the total size of the data (if there are less texts from full text sources, that donut chart will be smaller than the other one).
+	
+	Arguments:
+	source_info (str): which kind of source information to plot. E.g. "sources_institution"
+	drop_source_info (str): from which kind of source info should values be dropped? e.g. "sources_filetype"
+	drop_group_1 (str): rows with which value to drop for the first group, e.g. "text" if the subplot is for "image" 
+	drop_group_2 (str): rows with which value to drop for the second group, e.g. "image" if the subplot is for "text"
+	"""
+	corpus_dir = "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
+	data = pd.read_csv(join(corpus_dir, "metadata_sources.csv"), index_col=0)
+	
+	colors = ["rgb(31, 119, 180)", "rgb(255, 127, 14)", "rgb(44, 160, 44)", "rgb(214, 39, 40)"]
+	
+	labels_1, values_1 = get_data_to_plot(data, source_info, drop_source_info=drop_source_info, drop_value=drop_group_1)
+	labels_2, values_2 = get_data_to_plot(data, source_info, drop_source_info=drop_source_info, drop_value=drop_group_2)
+	
+	fig = make_subplots(2, 1, specs=[[{'type':'domain'}], [{'type':'domain'}]], subplot_titles=[drop_group_2, drop_group_1], vertical_spacing=0.05)
+	fig.add_trace(go.Pie(labels=labels_1, values=values_1, scalegroup='one', name=drop_group_2, direction="clockwise", hole=.4), 1, 1)
+	fig.add_trace(go.Pie(labels=labels_2, values=values_2, scalegroup='one', name=drop_group_1, direction="clockwise", hole=.4), 2, 1)
+	fig.update_layout(autosize=False,width=1000,height=900,legend=dict(font=dict(size=14)))
+	fig.update_traces(textposition="inside")
 	fig.show()
 	
 
@@ -141,7 +182,7 @@ def plot_sources_hierarchical(source_info_1, source_info_2):
 	ids = labels_level_0_set + [str(i[0]) + "-" + str(i[1]) for i in zip(labels_level_0_all, labels_level_1)]
 	parents = ["" for i in range(len(labels_level_0_set))] + labels_level_0_all 
 	
-	colors = ["rgb(31, 119, 180)", "rgb(255, 127, 14)"] #"rgb(44, 160, 44)", "rgb(214, 39, 40)"
+	colors = ["rgb(31, 119, 180)", "rgb(255, 127, 14)", "rgb(44, 160, 44)", "rgb(214, 39, 40)"] #"rgb(44, 160, 44)", "rgb(214, 39, 40)"
 	
 	fig = go.Figure(go.Sunburst(
 	ids=ids,
@@ -162,4 +203,6 @@ def plot_sources_hierarchical(source_info_1, source_info_2):
 
 #plot_sources("sources_edition")
 
-plot_sources_hierarchical("sources_filetype", "sources_institution")
+plot_sources_hierarchical("sources_edition", "institution_type")
+
+#plot_sources_scalegroup("sources_institution", "sources_filetype", "text", "image")
