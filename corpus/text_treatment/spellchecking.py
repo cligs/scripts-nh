@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 @author: Ulrike Henny-Krahmer, Christof Schöch
 @filename: spellchecking.py
@@ -7,6 +9,11 @@ Submodule for checking the orthography of a text collection. The expected input 
 
 To install further dictionaries: sudo apt-get install myspell-es (etc.)
 See https://pyenchant.github.io/pyenchant/ for more information about the spellchecking library used
+
+How to call the script (example):
+
+import spellchecking
+spellchecking.check_collection(wdir, "txt/nh0092.txt", "spellcheck.csv", "es", [])
 """
 
 import enchant
@@ -15,10 +22,13 @@ from enchant.tokenize import get_tokenizer
 import collections
 import pandas as pd
 import os
+from os.path import join
 import glob
 import sys
 import re
 import csv
+import plotly.graph_objects as go
+import numpy as np
 
 
 ##########################################################################
@@ -135,6 +145,65 @@ def correct_words(errFolder, corrFolder, substFile):
 
 
 ##########################################################################
+
+def plot_error_distribution(wdir, spellcheck_file, **kwargs):
+	"""
+	Visualizes the distribution of errors (how many errors occur how frequently?)
+
+	@author: Ulrike Henny-Krahmer
+	
+	Arguments:
+	
+	wdir (str): path to the working directory, e.g. "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
+	spellcheck_file (str): name of the csv file containing the spellcheck results, e.g. "spellcheck.csv"
+	log (str): optional argument; should the x-axis be logarithmic? "yes" or "no"; defaults to "no"
+	"""
+	
+	log = kwargs.get("log", "no")
+
+	data = pd.read_csv(join(wdir, spellcheck_file), index_col=0, header=0)
+
+	x = np.arange(len(data))
+	y = list(data["sum"])
+
+	fig = go.Figure(data=go.Scatter(x=x, y=y, mode="markers"))
+	if log == "yes":
+		xaxis_type="log"
+	else:
+		xaxis_type="linear"
+		
+	fig.update_layout(autosize=False,width=900,height=500,xaxis_type=xaxis_type)
+	fig.show()
+
+
+def plot_top_errors(wdir, spellcheck_file, num_errors):
+	"""
+	Visualizes the top errors as a bar chart (which top error words occur how frequently?)
+	
+	@author: Ulrike Henny-Krahmer
+	
+	Arguments:
+	wdir (str): path to the working directory, e.g. "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
+	spellcheck_file (str): name of the csv file containing the spellcheck results, e.g. "spellcheck.csv"
+	num_errors (int): number of top errors to plot
+	"""
+	
+	data = pd.read_csv(join(wdir, spellcheck_file), index_col=0, header=0)
+	data = data.head(num_errors)
+	
+	x = list(data.index)
+	y = list(data["sum"])
+
+	fig = go.Figure([go.Bar(x=x, y=y)])
+	fig.update_layout(autosize=False,width=1000,height=600)
+	fig.update_xaxes(tickangle=270)
+	fig.show()
+	
+
+
+##########################################################################
+
+"""
 def main(inpath, outpath, lang, wordFiles, errFolder, corrFolder, substFile):
     check_collection(inpath, outpath, lang, wordFiles)
     correct_words(errFolder, corrFolder, substFile)
@@ -142,5 +211,5 @@ def main(inpath, outpath, lang, wordFiles, errFolder, corrFolder, substFile):
 if __name__ == "__main__":
     check_collection(int(sys.argv[1]))
     correct_words(int(sys.argv[1]))
-
+"""
 

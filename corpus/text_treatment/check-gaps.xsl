@@ -9,7 +9,7 @@
     <!-- With this script, the gaps contained in the TEI files of the corpus are analyzed. -->
     
     <!-- How to call the script: 
-    java -jar saxon9he.jar "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/nh0001.xml"  "/home/ulrike/Git/scripts-nh/corpus/text-treatment/gaps.xsl" > "/home/ulrike/Git/data-nh/corpus/text-treatment/gaps.txt"-->
+    java -jar saxon9he.jar "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/nh0001.xml"  "/home/ulrike/Git/scripts-nh/corpus/text_treatment/gaps.xsl" > "/home/ulrike/Git/data-nh/corpus/text-treatment/gaps.txt"-->
     
     <xsl:output method="text" encoding="UTF-8"/>
     
