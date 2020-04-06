@@ -14,6 +14,7 @@ from os.path import join
 sys.path.append(os.path.abspath("/home/ulrike/Git/scripts-nh/corpus"))
 
 from corpus.text_treatment import spellchecking
+from corpus.metadata_encoding import corpus_copyright
 from features import bow
 
 ### spell checking ###
@@ -28,7 +29,7 @@ join(exdir, "../exceptions-archaic.txt"), join(exdir, "../exceptions-other.txt")
 
 #spellchecking.check_collection(wdir, "txt/*.txt", "spellcheck_exc.csv", "es", ex_lists)
 
-spellchecking.check_collection(wdir, "txt/nh0215.txt", "spellcheck_nh0215.csv", "es", ex_lists)
+#spellchecking.check_collection(wdir, "txt/nh0215.txt", "spellcheck_nh0215.csv", "es", ex_lists)
 
 #spellchecking.plot_error_distribution(wdir_2, "spellcheck_exc.csv") # log="yes"
 #spellchecking.plot_top_errors(wdir_2, "spellcheck_exc.csv", 30)
@@ -51,6 +52,15 @@ spellchecking.plot_errors_covered_exceptions(wdir_2, "spellcheck.csv", ["excepti
 #spellchecking.generate_exception_list(wdir, join(exdir, "diminutive-patterns-es.txt"), join(wdir, "spellcheck.csv"), "exceptions-diminutives.txt", "ending")
 #spellchecking.interprete_exception_list(wdir, join(exdir, "../exceptions-archaic.txt"), join(exdir, "../exceptions-archaic.txt"), join(wdir, "spellcheck.csv"))
 
+
+### copyright ###
+
+wdir = "/home/ulrike/Git/data-nh/corpus/metadata-encoding/"
+#corpus_copyright.plot_author_death_years(wdir, "../metadata_copyright.csv", "authors-death-years.html")
+corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "base-publication-years.html", "base")
+
+
+### other ###
 
 #bow.create_bow_model(wdir, "txt", "bow.csv")
 
