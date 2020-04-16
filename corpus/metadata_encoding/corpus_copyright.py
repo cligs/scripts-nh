@@ -13,6 +13,29 @@ import pandas as pd
 from os.path import join
 import plotly.graph_objects as go
 
+def plot_copyright_status(wdir, md_file, outfile):
+	"""
+	Creates a donut chart showing the share of novels of different copyright statuses.
+	
+	Arguments:
+	wdir (str): path to the working directory, e.g. "/home/ulrike/Git/data-nh/corpus/metadata-encoding/"
+	md_file (str): relative path to the metadata file containing the information needed, e.g. "../metadata_copyright.csv"
+	outfile (str): relative path to the output HTML file
+	"""
+	md = pd.read_csv(join(wdir, md_file), index_col=0, header=0)
+	md = md["copyright"].value_counts()
+	
+	labels = ["general", "ancillary", "open domain"]
+	values = [md.get("general"), md.get("ancillary"), md.get("open domain")]
+
+	fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.4, direction="clockwise")])
+	fig.update_layout(autosize=False,width=500,height=500)
+	
+	fig.write_html(join(wdir, outfile))
+	
+	print("done: saved figure")
+	
+
 def plot_edition_years(wdir, md_file, outfile, edition_type):
 	"""
 	Creates a bar chart displaying the edition years.
