@@ -46,10 +46,10 @@
             </xsl:choose>
             <xsl:choose>
                 <xsl:when test=".//term[contains(@type,'text.genre.subgenre.summary.current')][@cligs:importance]">
-                    <xsl:text>"</xsl:text><xsl:value-of select=".//term[contains(@type,'text.genre.subgenre.summary.current')][@cligs:importance='2']/normalize-space(.)"/><xsl:text>",</xsl:text>
+                    <xsl:text>"</xsl:text><xsl:value-of select=".//term[contains(@type,'text.genre.subgenre.summary.current')][@cligs:importance='2']/normalize-space(.)"/><xsl:text>"</xsl:text>
                 </xsl:when>
                 <xsl:when test=".//term[contains(@type,'text.genre.subgenre.summary.current')]">
-                    <xsl:text>"</xsl:text><xsl:value-of select=".//term[contains(@type,'text.genre.subgenre.summary.current')]/normalize-space(.)"/><xsl:text>",</xsl:text>
+                    <xsl:text>"</xsl:text><xsl:value-of select=".//term[contains(@type,'text.genre.subgenre.summary.current')]/normalize-space(.)"/><xsl:text>"</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:text>unknown</xsl:text>
