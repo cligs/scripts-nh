@@ -30,7 +30,7 @@ def create_bow_model(wdir, corpusdir, outfile, **kwargs):
 	
 	wdir (str): path to the working directory
 	corpusdir (str): relative path to the input directory (the collection of text files)
-	outfile (str): relative path to the output file (the distance matrix)
+	outfile (str): relative path to the output file (the bow matrix)
 	
 	optional:
 	mfw (int): how many of the most frequent terms to use, if this is 0, all the terms are used 

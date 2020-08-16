@@ -1,99 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.tei-c.org/ns/1.0"
     exclude-result-prefixes="xs" xpath-default-namespace="http://www.tei-c.org/ns/1.0"
     version="2.0">
     
     <!-- 
         @author: Ulrike Henny-Krahmer
         
-        With this script, the encoding of direct speech in the novels is prepared as far as possible.
+        With this script, the encoding of direct speech in the novels is prepared,
+        relying on typographical speech signs.
         
-        How to call the script (for an individual file):
-        java -jar saxon9he.jar /home/ulrike/Git/conha19/tei/nh0001.xml /home/ulrike/Git/scripts-nh/corpus/metadata_encoding/copy-all-but-said.xsl > /home/ulrike/Git/conha19/out.xml
+        The script differentiates between single and double speech marks. Speech is encoded on 
+        a paragraph basis. For single marks, only paragraphs beginning with them are marked 
+        as direct speech. For double marks, all stretches surrounded by them are marked as 
+        speech, independently of their position in the paragraph. Only one principal speech sign 
+        is evaluated per novel.
+        
+        How to call the script 
+        - for an individual file:
+        java -jar /home/ulrike/Programme/saxon/saxon9he.jar /home/ulrike/Git/conha19/tei/nh0001.xml /home/ulrike/Git/scripts-nh/corpus/metadata_encoding/copy-all-but-said.xsl > /home/ulrike/Git/conha19/tei_ds/nh0025.xml
+        - for a whole collection of files:
+        java -jar /home/ulrike/Programme/saxon/saxon9he.jar -s:/home/ulrike/Git/conha19/tei -o:/home/ulrike/Git/conha19/tei_new -xsl:/home/ulrike/Git/scripts-nh/corpus/metadata_encoding/copy-all-but-said.xsl
     -->
     
     <xsl:output method="xml" encoding="UTF-8"/>
     
+    <!-- get the main speech sign of this novel -->
+    <xsl:variable name="speech-sign" select="//term[@type='text.speech.sign']"/>
+    <!-- opening speech sign -->
+    <xsl:variable name="sp_op">
+        <xsl:choose>
+            <xsl:when test="$speech-sign = '—'">—</xsl:when>
+            <xsl:when test="$speech-sign = '«'">«</xsl:when>
+        </xsl:choose>
+    </xsl:variable>
+    <!-- closing speech sign -->
+    <xsl:variable name="sp_cl">
+        <xsl:choose>
+            <xsl:when test="$speech-sign = '—'">—</xsl:when>
+            <xsl:when test="$speech-sign = '«'">»</xsl:when>
+        </xsl:choose>
+    </xsl:variable>
+    
+    <!-- call different templates depending of the speech sign -->
     <xsl:template match="/">
-        <!-- apply templates of the different modes ("first" marks all paragraphs beginning with a speech sign as direct speech, 
-            "second-a" refines the encoding, "second-b" is a variant doing the same, and so on) -->
-        <xsl:apply-templates mode="second-b" select="."/>
+        <xsl:choose>
+            <xsl:when test="$speech-sign = '—'">
+                <xsl:apply-templates mode="single" select="."/>
+            </xsl:when>
+            <xsl:when test="$speech-sign = '«'">
+                <xsl:apply-templates mode="double" select="."/>
+            </xsl:when>
+        </xsl:choose>
     </xsl:template>
     
     
-    <!-- copy everything from the source document to the output document,
-    change the mode to the current one here, as well -->
-    <xsl:template match="node() | @* | comment() | processing-instruction()" mode="second-b">
+    <!-- copy everything from the source document to the output document -->
+    <xsl:template match="node() | @* | comment() | processing-instruction()" mode="single">
         <xsl:copy>
-            <xsl:apply-templates select="node() | @* | comment() | processing-instruction()" mode="second-b"/>
+            <xsl:apply-templates select="node() | @* | comment() | processing-instruction()" mode="single"/>
         </xsl:copy>
     </xsl:template>
     
-    <!-- all paragraphs beginning with a speech sign are marked as direct speech -->
-    <xsl:template match="p[not(said)][starts-with(.,'—')]" mode="first"><!-- the sign indicating speech may have to be changed from novel to novel -->
-        <p xmlns="http://www.tei-c.org/ns/1.0">
-            <said xmlns="http://www.tei-c.org/ns/1.0">
-                <xsl:apply-templates/>
-            </said>
-        </p>
+    <xsl:template match="node() | @* | comment() | processing-instruction()" mode="double">
+        <xsl:copy>
+            <xsl:apply-templates select="node() | @* | comment() | processing-instruction()" mode="double"/>
+        </xsl:copy>
     </xsl:template>
     
-    <!-- ##### second a ##### -->
+    <!-- ##################### single marks ###################### -->
     
-    <!-- covers cases like:
-        <p><said>—¡Qué linda! ¡qué linda!—repetí embelesado.</said></p>
-        
-        Works only if there are no further child nodes inside of <said>.
-    -->
-    <xsl:template match="p/said[not(child::*)][matches(.,'^—[^—]+—[^—]+$')]" mode="second-a">
-        <said xmlns="http://www.tei-c.org/ns/1.0"><xsl:value-of select="replace(.,'(^—[^—]+)—[^—]+$','$1')"/></said><xsl:value-of select="replace(.,'^—[^—]+(—[^—]+$)','$1')"/>
-    </xsl:template>
-    
-    
-    
-    <!-- covers cases like:
-        <p><said>—¡Quién sabe...! — suspiró. — ¿Quieres creer una cosa, Daniel? No sé por
-                        qué me figuro que yo no he nacido para ser feliz.</said></p>
-                        
-         Works only if there are no further child nodes inside of <said>.
-    -->
-    <xsl:template match="p/said[not(child::*)][matches(.,'^—[^—]+—[^—]+—[^—]+$')]" mode="second-a">
-        <said xmlns="http://www.tei-c.org/ns/1.0"><xsl:value-of select="replace(.,'(^—[^—]+)—[^—]+—[^—]+$','$1')"/></said><xsl:value-of select="replace(.,'^—[^—]+(—[^—]+)—[^—]+$','$1')"/><said xmlns="http://www.tei-c.org/ns/1.0"><xsl:value-of select="replace(.,'^—[^—]+—[^—]+(—[^—]+$)','$1')"/></said>
-    </xsl:template>
-    
-    
-    <!-- covers cases like:
-        <p><said>—¡Ay! sí—exclamó Adoración lanzando un suspiro.—¡Hemos llorado tanto...!
-                        Pero bien, escucha.—Me tomó las manos y empezó a hablarme muy bajito, con
-                        aquel acento cariñoso y dulce que aún recuerdo hoy con lágrimas en los
-                        ojos.</said></p>
-                        
-         Works only if there are no further child nodes inside of <said>.
-    -->
-    <xsl:template match="p/said[not(child::*)][matches(.,'^—[^—]+—[^—]+—[^—]+—[^—]+$')]" mode="second-a">
-        <said xmlns="http://www.tei-c.org/ns/1.0"><xsl:value-of select="replace(.,'(^—[^—]+)—[^—]+—[^—]+—[^—]+$','$1')"/></said><xsl:value-of select="replace(.,'^—[^—]+(—[^—]+)—[^—]+—[^—]+$','$1')"/><said xmlns="http://www.tei-c.org/ns/1.0"><xsl:value-of select="replace(.,'^—[^—]+—[^—]+(—[^—]+)—[^—]+$','$1')"/></said><xsl:value-of select="replace(.,'^—[^—]+—[^—]+—[^—]+(—[^—]+$)','$1')"/>
+    <xsl:template match="p[matches(.,concat('^(',$speech-sign,'[^',$speech-sign,']+)+$'))]" mode="single">
+        <xsl:variable name="num-parts" select="count(tokenize(.,$speech-sign))"/>
+        <p><xsl:for-each select="tokenize(.,$speech-sign)">
+                <xsl:choose>
+                    <!-- speech part -->
+                    <xsl:when test="position() = 1"/>
+                    <xsl:when test="position() = 2">
+                        <said><xsl:value-of select="$speech-sign"/><xsl:copy-of select="."/></said>
+                    </xsl:when>
+                    <xsl:when test="(position() > 2) and (position() mod 2 = 0)">
+                        <said><xsl:copy-of select="."/></said>
+                    </xsl:when>
+                    <!-- narrative part -->
+                    <xsl:when test="(position() > 2) and (position() mod 2 != 0) and (position() &lt; $num-parts)">
+                        <xsl:value-of select="$speech-sign"/><xsl:copy-of select="."/><xsl:value-of select="$speech-sign"/>
+                    </xsl:when>
+                    <xsl:when test="(position() > 2) and (position() mod 2 != 0) and (position() = $num-parts)">
+                        <xsl:value-of select="$speech-sign"/><xsl:copy-of select="."/>
+                    </xsl:when>
+                    <xsl:otherwise>ERROR</xsl:otherwise>
+                </xsl:choose>
+        </xsl:for-each></p>
     </xsl:template>
     
     
+    <!-- ##################### double marks ###################### -->
     
-    <!-- ##### second b ##### -->
-    
-    <!-- covers cases like:
-        <p>
-            <said>—¿Ha venido ya? preguntóle en voz baja.</said>
-        </p>
-        <p>
-            <said>—Aún no, contestó el criado con una respetuosa cortesía.</said>
-        </p>
-        
-        Works only if there are no further child nodes inside of <said>.
-    -->
-    
-    <xsl:template match="p/said[not(child::*)][matches(.,'^—[^—]+\s(agregó|añadió|concluyó|contestó|continuó|dijo|exclamó|gimió|gritó|insinuó|insistió|interpuso|interrumpió|murmuró|observó|pensó|preguntó|prorrumpió|prosiguió|refunfuñó|repitió|replicó|repuso|respondió|siguió|suplicó)[^—]+$')]" mode="second-b">
-        <said xmlns="http://www.tei-c.org/ns/1.0"><xsl:value-of select="replace(.,'(^—[^—]+)\s(agregró|añadió|concluyó|contestó|continuó|dijo|exclamó|gimió|gritó|insinuó|insistió|interpuso|interrumpió|murmuró|observó|pensó|preguntó|prorrumpió|prosiguió|refunfuñó|repitió|replicó|repuso|respondió|siguió|suplicó)[^—]+$','$1')"/></said>
-        <xsl:value-of select="replace(.,'^—[^—]+(\s(agregó|añadió|concluyó|contestó|continuó|dijo|exclamó|gimió|gritó|insinuó|insistió|interpuso|interrumpió|murmuró|observó|pensó|preguntó|prorrumpió|prosiguió|refunfuñó|repitió|replicó|repuso|respondió|siguió|suplicó)[^—]+$)','$1')"/>
+    <xsl:template match="p[matches(.,concat('^([^',$sp_op,$sp_cl,']+)?(',$sp_op,'[^',$sp_op,$sp_cl,']+',$sp_cl,'([^',$sp_op,$sp_cl,']+)?)+$'))]" mode="double">
+        <p><xsl:copy-of select="replace(.,concat('^([^',$sp_op,$sp_cl,']+)?(',$sp_op,'[^',$sp_op,$sp_cl,']+',$sp_cl,'([^',$sp_op,$sp_cl,']+)?)+$'),'$1')"/><xsl:for-each select="tokenize(.,$sp_op)">
+            <xsl:if test="position() != 1">
+                <said><xsl:value-of select="$sp_op"/><xsl:copy-of select="replace(.,concat('(^[^',$sp_op,$sp_cl,']+',$sp_cl,')([^',$sp_op,$sp_cl,']+)?'),'$1')"/></said><xsl:copy-of select="replace(.,concat('^[^',$sp_op,$sp_cl,']+',$sp_cl,'([^',$sp_op,$sp_cl,']+)?'),'$1')"/>
+            </xsl:if>
+            </xsl:for-each></p>
     </xsl:template>
+    
     
     
 </xsl:stylesheet>
