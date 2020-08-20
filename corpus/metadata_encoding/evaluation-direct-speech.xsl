@@ -53,9 +53,9 @@
         
         <!--<xsl:call-template name="csv-f1"/>-->
         
-        <!--<xsl:call-template name="box-f1"/>-->
+        <xsl:call-template name="box-f1"/>
         
-        <xsl:call-template name="box-f1-edition-type"/>
+        <!--<xsl:call-template name="box-f1-edition-type"/>-->
         
         <!--<xsl:call-template name="box-f1-speech-sign"/>-->
         
@@ -213,9 +213,10 @@
                         ];
                         
                         var layout = {
-                        yaxis: {
-                        range: [0,1]
-                        }
+                            yaxis: {
+                                range: [0,1],
+                                title: { text: 'F1 score'}
+                            }
                         };
                         
                         Plotly.newPlot('myDiv', data, layout);
