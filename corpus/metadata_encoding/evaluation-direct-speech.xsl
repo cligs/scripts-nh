@@ -7,6 +7,8 @@
     version="2.0">
     
     <!-- 
+        TO DO: <said ana="#narration"> ignorieren oder berücksichtigen
+        
         @author: Ulrike Henny-Krahmer
         
         This script produces:
