@@ -7,8 +7,6 @@
     version="2.0">
     
     <!-- 
-        TO DO: <said ana="#narration"> ignorieren oder berücksichtigen
-        
         @author: Ulrike Henny-Krahmer
         
         This script produces:
@@ -51,11 +49,15 @@
     <xsl:template match="/">
         <!-- choose what to do here -->
         
-        <!--<xsl:call-template name="stand-off"/>-->
+        <xsl:call-template name="stand-off">
+            <xsl:with-param name="narr_speech">off</xsl:with-param>
+            <!-- The parameter "narr_speech" determines if "narrative speech" should be ignored ("off") or 
+            included ("on") into the direct speech annnotation. -->
+        </xsl:call-template>
         
         <!--<xsl:call-template name="csv-f1"/>-->
         
-        <xsl:call-template name="box-f1"/>
+        <!--<xsl:call-template name="box-f1"/>-->
         
         <!--<xsl:call-template name="box-f1-edition-type"/>-->
         
@@ -319,7 +321,10 @@
     <xsl:template name="stand-off">
         <!-- for each TEI file with annotated direct speech: create a TEI export with tokenized text
         and token identifiers, to which the annotation DS vs. NARR is added for the gold standard
-        and for regular expression-based annotations -->
+        and for regular expression-based annotations.
+        The parameter "narr_speech" determines if "narrative speech" should be ignored ("off") or 
+        included ("on") into the direct speech annnotation. -->
+        <xsl:param name="narr_speech"/>
         <xsl:for-each select="collection($path_TEI_collection)//TEI[.//said]">
             
             <xsl:if test=".//idno[@type='cligs'][.='nh0002']">
@@ -336,7 +341,7 @@
                                 <div>
                                     <p>
                                         <!-- tokenize -->
-                                        <xsl:for-each select="text/body//(p|l)">
+                                        <xsl:for-each select="text/body//(p|l|head[not(parent::div[@type=('part','subpart','chapter','subchapter')])])">
                                             <xsl:variable name="p_pos" select="position()"/>
                                             <!-- get the words of the current paragraph / verse line -->
                                             <xsl:variable name="words" select="cligs:get-words(.)"/>
@@ -354,12 +359,14 @@
                                         <linkGrp type="DS_gold">
                                             <xsl:call-template name="ds_standoff">
                                                 <xsl:with-param name="context" select="."/>
+                                                <xsl:with-param name="narr_speech" select="$narr_speech"/>
                                             </xsl:call-template>
                                         </linkGrp>
                                         <!-- store regex direct speech annotation -->
                                         <linkGrp type="DS_reg">
                                             <xsl:call-template name="ds_standoff">
                                                 <xsl:with-param name="context" select="doc(concat($path_TEI_collection_ds, $filename))/TEI"/>
+                                                <xsl:with-param name="narr_speech" select="$narr_speech"/>
                                             </xsl:call-template>
                                         </linkGrp>
                                     </p>
@@ -386,11 +393,13 @@
     <!-- add stand off annotation of direct speech vs. narrated text -->
     <xsl:template name="ds_standoff">
         <xsl:param name="context"/>
-        <xsl:for-each select="$context/text/body//(p|l)">
+        <xsl:param name="narr_speech"/>
+        <xsl:for-each select="$context/text/body//(p|l|head[not(parent::div[@type=('part','subpart','chapter','subchapter')])])">
             <xsl:variable name="p_pos" select="position()"/>
             <xsl:variable name="words">
                 <xsl:call-template name="get-words-DS-NARR">
                     <xsl:with-param name="context" select="."/>
+                    <xsl:with-param name="narr_speech" select="$narr_speech"/>
                 </xsl:call-template>
             </xsl:variable>
             <xsl:for-each select="$words//word">
@@ -402,12 +411,23 @@
     <!-- get the words of the current paragraph / verse line plus DS vs. NARR information -->
     <xsl:template name="get-words-DS-NARR">
         <xsl:param name="context"/>
+        <xsl:param name="narr_speech"/>
         <words>
             <xsl:for-each select="$context//text()[matches(.,'\S')]">
                 <xsl:variable name="DS">
                     <xsl:choose>
-                        <xsl:when test="ancestor::said or (ancestor::sp and not(ancestor::speaker) and not(ancestor::stage))">DS</xsl:when>
-                        <xsl:otherwise>NARR</xsl:otherwise>
+                        <xsl:when test="$narr_speech = 'off'">
+                            <xsl:choose>
+                                <xsl:when test="ancestor::said[not(@ana='#narration')] or (ancestor::sp and not(ancestor::speaker) and not(ancestor::stage))">DS</xsl:when>
+                                <xsl:otherwise>NARR</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:choose>
+                                <xsl:when test="ancestor::said or (ancestor::sp and not(ancestor::speaker) and not(ancestor::stage))">DS</xsl:when>
+                                <xsl:otherwise>NARR</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
                 <xsl:for-each select="tokenize(replace(.,'(\W)',' $1 '),'\s+')">

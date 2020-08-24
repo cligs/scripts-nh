@@ -15,7 +15,7 @@
    
     -->
     
-    <xsl:output method="text" encoding="UTF-8"/>
+    <xsl:output method="text" media-type="text/plain" encoding="UTF-8"/>
     
     <!-- ### COPY ### -->
    
@@ -44,12 +44,7 @@
 </xsl:text>
     </xsl:template>
     
-    <!-- copy performance speeches (that are not structured into paragraphs) -->
-    <xsl:template match="sp[not(p)]">
-        <xsl:copy-of select="normalize-space(.)"/><xsl:text>
-            
-</xsl:text>
-    </xsl:template>
+    
     
     
     <!-- ### IGNORE ### -->
