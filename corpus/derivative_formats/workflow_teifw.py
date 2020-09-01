@@ -49,8 +49,8 @@ start_time = time.time()
 # by default, it should be enough to change the options above and leave this as is
 
 #prepare_tei.prepare("split-p", infolder, outfolder)
-annotate_fw.annotate_fw(os.path.join(outfolder, "txt/*.txt"), os.path.join(outfolder, "fl/"), os.path.join(outfolder, "annotated_temp/"), lang, server)
-#prepare_tei.prepare("merge", outfolder, os.path.join(outfolder, "annotated"))
+#annotate_fw.annotate_fw(os.path.join(outfolder, "txt/*.txt"), os.path.join(outfolder, "fl/"), os.path.join(outfolder, "annotated_temp/"), lang, server)
+prepare_tei.prepare("merge-p", outfolder, os.path.join(outfolder, "annotated"))
 
 print("--- %s seconds ---" % (time.time() - start_time))
 

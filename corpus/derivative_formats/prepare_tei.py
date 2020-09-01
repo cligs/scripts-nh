@@ -98,7 +98,7 @@ xslt_TEIwrapper_p = etree.XML('''\
 		
 		<xsl:template match="tei:p | tei:l | tei:head[not(parent::tei:div[@type='part' or @type='subpart' or @type='chapter' or @type='subchapter'])]">
 			<xsl:copy>
-				<xsl:attribute name="xml:id"><xsl:value-of select="$cligsID"/>_p<xsl:value-of select="count(preceding::tei:p[ancestor::tei:body] | preceding::tei:l[ancestor::tei:body] | tei:head[ancestor::tei:body][not(parent::tei:div[@type='part' or @type='subpart' or @type='chapter' or @type='subchapter'])]) + 1"/></xsl:attribute>
+				<xsl:attribute name="xml:id"><xsl:value-of select="$cligsID"/>_p<xsl:value-of select="count(preceding::tei:p[ancestor::tei:body] | preceding::tei:l[ancestor::tei:body] | preceding::tei:head[ancestor::tei:body][not(parent::tei:div[@type='part' or @type='subpart' or @type='chapter' or @type='subchapter'])]) + 1"/></xsl:attribute>
 			</xsl:copy>
 		</xsl:template>
 		
@@ -251,7 +251,7 @@ xslt_joinPs = '''\
 		<xsl:param name="annofolder"/>
 		<xsl:param name="mode"/>
 		
-		<xsl:output method="xml" encoding="UTF-8" indent="yes" />
+		<xsl:output method="xml" encoding="UTF-8" indent="no" />
 		
 		<xsl:template match="node() | @* | processing-instruction() | comment()">
 			<xsl:copy>
@@ -269,9 +269,13 @@ xslt_joinPs = '''\
 						</xsl:for-each>
 					</xsl:when>
 					<xsl:otherwise>
+						<xsl:text>
+</xsl:text>
 						<xsl:for-each select="document(concat($annofolder, @xml:id,'.xml'))//s">
 							<xsl:element name="{local-name()}" namespace="http://www.tei-c.org/ns/1.0">
 								<xsl:copy-of select="@*"/>
+								<xsl:text>
+</xsl:text>						
 								<xsl:for-each select="w">
 									<xsl:element name="{local-name()}" namespace="http://www.tei-c.org/ns/1.0">
 										<xsl:for-each select="@*">
@@ -292,6 +296,8 @@ xslt_joinPs = '''\
 										</xsl:for-each>
 										<xsl:value-of select="."/>
 									</xsl:element>
+									<xsl:text>
+</xsl:text>
 								</xsl:for-each>
 							</xsl:element>
 						</xsl:for-each>
@@ -467,7 +473,9 @@ def prepare(mode, infolder, outfolder):
 	elif mode == "split-p":
 		prepare_anno(infolder, outfolder, mode="split-p")
 	elif mode == "merge":
-		postpare_anno(infolder, outfolder)
+		postpare_anno(infolder, outfolder, mode="fl")
+	elif mode == "merge-p":
+		postpare_anno(infolder, outfolder, mode="fl-p")
 	elif mode == "merge-hdt":
 		postpare_anno(infolder, outfolder, mode="ht")
 	else:
