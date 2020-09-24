@@ -19,7 +19,7 @@ from corpus.metadata_encoding import validate_tei
 from features import bow
 
 ### spell checking ###
-wdir="/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
+wdir="/home/ulrike/Git/conha19/"
 wdir_2 = "/home/ulrike/Git/data-nh/corpus/text-treatment/"
 exdir = "/home/ulrike/Git/data-nh/corpus/text-treatment/exception-words/source-lists/" 
 
@@ -28,9 +28,11 @@ join(exdir, "../exceptions-diminutives.txt"), join(exdir, "../exceptions-superla
 join(exdir, "../exceptions-foreign.txt"), join(exdir, "../exceptions-oral.txt"), join(exdir, "../exceptions-places.txt"), join(exdir, "../exceptions-special.txt"),
 join(exdir, "../exceptions-archaic.txt"), join(exdir, "../exceptions-other.txt")]
 
-#spellchecking.check_collection(wdir, "txt/*.txt", "spellcheck_exc.csv", "es", ex_lists)
+#spellchecking.check_collection(wdir, "txt/*.txt", "spellcheck.csv", "es", ex_lists)
 
-#spellchecking.check_collection(wdir, "txt/nh0215.txt", "spellcheck_nh0215.csv", "es", ex_lists)
+for filename in os.listdir(join(wdir,"txt")):
+	idno = filename[:-4]
+	spellchecking.check_collection(wdir, join("txt", idno + ".txt"), "spellcheck_" + idno + ".csv", "es", ex_lists)
 
 #spellchecking.plot_error_distribution(wdir_2, "spellcheck_exc.csv") # log="yes"
 #spellchecking.plot_top_errors(wdir_2, "spellcheck_exc.csv", 30)
@@ -63,7 +65,7 @@ wdir = "/home/ulrike/Git/data-nh/corpus/metadata-encoding/"
 
 
 ### validation ###
-validate_tei.validate_RNG("/home/ulrike/Git/conha19/tei/*.xml", "/home/ulrike/Git/reference/tei/cligs.rng", "/home/ulrike/Git/conha19/schema/log-rng.txt")
+#validate_tei.validate_RNG("/home/ulrike/Git/conha19/tei/*.xml", "/home/ulrike/Git/reference/tei/cligs.rng", "/home/ulrike/Git/conha19/schema/log-rng.txt")
 
 
 ### other ###
