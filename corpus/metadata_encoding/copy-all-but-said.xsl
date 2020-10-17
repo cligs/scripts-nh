@@ -18,9 +18,9 @@
         
         How to call the script 
         - for an individual file:
-        java -jar /home/ulrike/Programme/saxon/saxon9he.jar /home/ulrike/Git/conha19/tei/nh0001.xml /home/ulrike/Git/scripts-nh/corpus/metadata_encoding/copy-all-but-said.xsl > /home/ulrike/Git/conha19/tei_ds/nh0025.xml
+        java -jar /home/ulrike/Programme/saxon/saxon9he.jar /home/ulrike/Git/conha19/tei/nh0001.xml /home/ulrike/Git/scripts-nh/corpus/metadata_encoding/copy-all-but-said.xsl > /home/ulrike/Git/conha19/tei_ds/nh0001.xml
         - for a whole collection of files:
-        java -jar /home/ulrike/Programme/saxon/saxon9he.jar -s:/home/ulrike/Git/conha19/tei -o:/home/ulrike/Git/conha19/tei_new -xsl:/home/ulrike/Git/scripts-nh/corpus/metadata_encoding/copy-all-but-said.xsl
+        java -jar /home/ulrike/Programme/saxon/saxon9he.jar -s:/home/ulrike/Git/conha19/tei_ns -o:/home/ulrike/Git/conha19/tei_ds -xsl:/home/ulrike/Git/scripts-nh/corpus/metadata_encoding/copy-all-but-said.xsl
     -->
     
     <xsl:output method="xml" encoding="UTF-8"/>

@@ -49,13 +49,13 @@
     <xsl:template match="/">
         <!-- choose what to do here -->
         
-        <xsl:call-template name="stand-off">
+        <!--<xsl:call-template name="stand-off">
             <xsl:with-param name="narr_speech">off</xsl:with-param>
-            <!-- The parameter "narr_speech" determines if "narrative speech" should be ignored ("off") or 
-            included ("on") into the direct speech annnotation. -->
-        </xsl:call-template>
+            <!-\- The parameter "narr_speech" determines if "narrative speech" should be ignored ("off") or 
+            included ("on") into the direct speech annnotation. -\->
+        </xsl:call-template>-->
         
-        <!--<xsl:call-template name="csv-f1"/>-->
+        <xsl:call-template name="csv-f1"/>
         
         <!--<xsl:call-template name="box-f1"/>-->
         
@@ -70,6 +70,8 @@
     <!--A box plot showing the F1 scores for speech recognition in all the novels that were checked for it, 
     differentiating by type of edition (modern, historical + first, unknown)-->
     <xsl:template name="box-f1-edition-type">
+        <xsl:variable name="scores" select="unparsed-text($out-csv-F1,'UTF-8')"/>
+        <xsl:variable name="TEIs" select="collection($path_TEI_out)//TEI"/>
         <xsl:result-document href="{$out-html-F1-edition-type}" method="html" encoding="UTF-8">
             <html>
                 <head>
@@ -82,10 +84,15 @@
                     <script>
                         var trace1 = 
                         {
-                        y: [<xsl:for-each select="collection($path_TEI_out)//TEI[.//term[@type='text.source.edition'][.=('first','historical')]]">
-                            <xsl:value-of select="cligs:get-f1(.)"/>
-                            <xsl:if test="position() != last()">,</xsl:if>
-                        </xsl:for-each>],
+                        y: [<xsl:variable name="idnos-hist" select="$TEIs[.//term[@type='text.source.edition'][.=('first','historical')]]//idno[@type='cligs']"/>
+                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                                <xsl:matching-substring>
+                                    <xsl:if test="regex-group(1)=$idnos-hist">
+                                        <xsl:value-of select="regex-group(2)"/>
+                                        <xsl:text>,</xsl:text>
+                                    </xsl:if>
+                                </xsl:matching-substring>
+                            </xsl:analyze-string>],
                         boxpoints: 'all',
                         jitter: 0.3,
                         pointpos: -1.8,
@@ -95,10 +102,15 @@
                         
                         var trace2 = 
                         {
-                        y: [<xsl:for-each select="collection($path_TEI_out)//TEI[.//term[@type='text.source.edition'][.='modern']]">
-                            <xsl:value-of select="cligs:get-f1(.)"/>
-                            <xsl:if test="position() != last()">,</xsl:if>
-                        </xsl:for-each>],
+                        y: [<xsl:variable name="idnos-modern" select="$TEIs[.//term[@type='text.source.edition'][.='modern']]//idno[@type='cligs']"/>
+                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                                <xsl:matching-substring>
+                                    <xsl:if test="regex-group(1)=$idnos-modern">
+                                        <xsl:value-of select="regex-group(2)"/>
+                                        <xsl:text>,</xsl:text>
+                                    </xsl:if>
+                                </xsl:matching-substring>
+                            </xsl:analyze-string>],
                         boxpoints: 'all',
                         jitter: 0.3,
                         pointpos: -1.8,
@@ -108,10 +120,15 @@
                         
                         var trace3 = 
                         {
-                        y: [<xsl:for-each select="collection($path_TEI_out)//TEI[.//term[@type='text.source.edition'][.='unknown']]">
-                            <xsl:value-of select="cligs:get-f1(.)"/>
-                            <xsl:if test="position() != last()">,</xsl:if>
-                        </xsl:for-each>],
+                        y: [<xsl:variable name="idnos-unknown" select="$TEIs[.//term[@type='text.source.edition'][.='unknown']]//idno[@type='cligs']"/>
+                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                                <xsl:matching-substring>
+                                    <xsl:if test="regex-group(1)=$idnos-unknown">
+                                        <xsl:value-of select="regex-group(2)"/>
+                                        <xsl:text>,</xsl:text>
+                                    </xsl:if>
+                                </xsl:matching-substring>
+                            </xsl:analyze-string>],
                         boxpoints: 'all',
                         jitter: 0.3,
                         pointpos: -1.8,
@@ -119,13 +136,14 @@
                         name: 'unknown'
                         };
                         
+                        
                         var layout = {
                         yaxis: {
                         range: [0,1]
                         }
                         };
                         
-                        var data = [trace1, trace2, trace3];
+                        var data = [trace1,trace2,trace3];
                         
                         Plotly.newPlot('myDiv', data, layout);
                     </script>
@@ -138,6 +156,8 @@
     <!-- A box plot showing the F1 scores for speech recognition in all the novels that were checked for it, 
     differentiating by type of speech sign (single, double) -->
     <xsl:template name="box-f1-speech-sign">
+        <xsl:variable name="scores" select="unparsed-text($out-csv-F1,'UTF-8')"/>
+        <xsl:variable name="TEIs" select="collection($path_TEI_out)//TEI"/>
         <xsl:result-document href="{$out-html-F1-speech-sign}" method="html" encoding="UTF-8">
             <html>
                 <head>
@@ -150,10 +170,15 @@
                     <script>
                         var trace1 = 
                         {
-                        y: [<xsl:for-each select="collection($path_TEI_out)//TEI[.//term[@type='text.speech.sign.type'][.='single']]">
-                            <xsl:value-of select="cligs:get-f1(.)"/>
-                            <xsl:if test="position() != last()">,</xsl:if>
-                        </xsl:for-each>],
+                        y: [<xsl:variable name="idnos-single" select="$TEIs[.//term[@type='text.speech.sign.type'][.='single']]//idno[@type='cligs']"/>
+                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                                <xsl:matching-substring>
+                                    <xsl:if test="regex-group(1)=$idnos-single">
+                                        <xsl:value-of select="regex-group(2)"/>
+                                        <xsl:text>,</xsl:text>
+                                    </xsl:if>
+                                </xsl:matching-substring>
+                            </xsl:analyze-string>],
                         boxpoints: 'all',
                         jitter: 0.3,
                         pointpos: -1.8,
@@ -163,10 +188,15 @@
                         
                         var trace2 = 
                         {
-                        y: [<xsl:for-each select="collection($path_TEI_out)//TEI[.//term[@type='text.speech.sign.type'][.='double']]">
-                            <xsl:value-of select="cligs:get-f1(.)"/>
-                            <xsl:if test="position() != last()">,</xsl:if>
-                        </xsl:for-each>],
+                        y: [<xsl:variable name="idnos-double" select="$TEIs[.//term[@type='text.speech.sign.type'][.='double']]//idno[@type='cligs']"/>
+                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                                <xsl:matching-substring>
+                                    <xsl:if test="regex-group(1)=$idnos-double">
+                                        <xsl:value-of select="regex-group(2)"/>
+                                        <xsl:text>,</xsl:text>
+                                    </xsl:if>
+                                </xsl:matching-substring>
+                            </xsl:analyze-string>],
                         boxpoints: 'all',
                         jitter: 0.3,
                         pointpos: -1.8,
@@ -200,14 +230,17 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 800px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 600px; height: 800px;"></div>
                     <script>
                         var data = [
                         {
-                        y: [<xsl:for-each select="collection($path_TEI_out)//TEI">
-                            <xsl:value-of select="cligs:get-f1(.)"/>
-                            <xsl:if test="position() != last()">,</xsl:if>
-                        </xsl:for-each>],
+                        y: [<xsl:variable name="scores" select="unparsed-text($out-csv-F1,'UTF-8')"/>
+                        <xsl:analyze-string select="$scores" regex="^nh\d+,[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                                <xsl:matching-substring>
+                                    <xsl:value-of select="regex-group(1)"/>
+                                    <xsl:text>,</xsl:text>
+                                </xsl:matching-substring>
+                            </xsl:analyze-string>],
                         boxpoints: 'all',
                         jitter: 0.3,
                         pointpos: -1.8,
@@ -220,7 +253,8 @@
                             yaxis: {
                                 range: [0,1],
                                 title: { text: 'F1 score'}
-                            }
+                            },
+                            font: {size: 16}
                         };
                         
                         Plotly.newPlot('myDiv', data, layout);
@@ -232,7 +266,7 @@
     
     
     <!-- get precision score for direct speech annotation for the current TEI file -->
-    <xsl:function name="cligs:get-precision">
+    <xsl:function name="cligs:get-precision" as="xs:float">
         <xsl:param name="context"/>
         <!-- precision: correctly identified direct speech tokens, 
                     divided by all tokens that were assumed to be direct speech in the regex approach -->
@@ -254,7 +288,7 @@
     
     
     <!-- get recall score for direct speech annotation for the current TEI file -->
-    <xsl:function name="cligs:get-recall">
+    <xsl:function name="cligs:get-recall" as="xs:float">
         <xsl:param name="context"/>
         <!-- recall: correctly identified direct speech tokens, 
                     divided by all actual direct speech tokens -->
@@ -277,7 +311,7 @@
     
     
     <!-- get F1 score for direct speech annotation for the current TEI file -->
-    <xsl:function name="cligs:get-f1">
+    <xsl:function name="cligs:get-f1" as="xs:float">
         <xsl:param name="context"/>
         <xsl:variable name="precision" select="cligs:get-precision($context)"/>
         <xsl:variable name="recall" select="cligs:get-recall($context)"/>
@@ -292,7 +326,7 @@
         <xsl:result-document href="{$out-csv-F1}" method="text" encoding="UTF-8">
             <xsl:text>idno,precision,recall,F1</xsl:text><xsl:text>
 </xsl:text>
-            <xsl:for-each select="collection($path_TEI_out)//TEI">
+            <xsl:for-each select="collection($path_TEI_out)//TEI"> <!-- [.//idno[@type='cligs']='nh0001'] -->
                 <xsl:variable name="idno" select=".//idno[@type='cligs']"/>
                 <xsl:variable name="filename" select="concat($idno,'.xml')"/>
                 
@@ -327,7 +361,7 @@
         <xsl:param name="narr_speech"/>
         <xsl:for-each select="collection($path_TEI_collection)//TEI[.//said]">
             
-            <xsl:if test=".//idno[@type='cligs'][.='nh0002']">
+            <!--<xsl:if test=".//idno[@type='cligs'][.='nh0079']">-->
                 <xsl:variable name="filename" select="tokenize(base-uri(.),'/')[last()]"/>
                 
                 <xsl:result-document href="{concat($path_TEI_out, $filename)}" method="xml" encoding="UTF-8" indent="yes">
@@ -375,7 +409,7 @@
                         </text>
                     </xsl:copy>
                 </xsl:result-document>
-            </xsl:if>
+            <!--</xsl:if>-->
             
         </xsl:for-each>
     </xsl:template>
