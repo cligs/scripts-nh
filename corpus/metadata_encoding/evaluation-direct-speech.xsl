@@ -55,9 +55,9 @@
             included ("on") into the direct speech annnotation. -\->
         </xsl:call-template>-->
         
-        <xsl:call-template name="csv-f1"/>
+        <!--<xsl:call-template name="csv-f1"/>-->
         
-        <!--<xsl:call-template name="box-f1"/>-->
+        <xsl:call-template name="box-f1"/>
         
         <!--<xsl:call-template name="box-f1-edition-type"/>-->
         
@@ -85,7 +85,7 @@
                         var trace1 = 
                         {
                         y: [<xsl:variable name="idnos-hist" select="$TEIs[.//term[@type='text.source.edition'][.=('first','historical')]]//idno[@type='cligs']"/>
-                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                        <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
                                 <xsl:matching-substring>
                                     <xsl:if test="regex-group(1)=$idnos-hist">
                                         <xsl:value-of select="regex-group(2)"/>
@@ -103,7 +103,7 @@
                         var trace2 = 
                         {
                         y: [<xsl:variable name="idnos-modern" select="$TEIs[.//term[@type='text.source.edition'][.='modern']]//idno[@type='cligs']"/>
-                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                        <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
                                 <xsl:matching-substring>
                                     <xsl:if test="regex-group(1)=$idnos-modern">
                                         <xsl:value-of select="regex-group(2)"/>
@@ -121,7 +121,7 @@
                         var trace3 = 
                         {
                         y: [<xsl:variable name="idnos-unknown" select="$TEIs[.//term[@type='text.source.edition'][.='unknown']]//idno[@type='cligs']"/>
-                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                        <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
                                 <xsl:matching-substring>
                                     <xsl:if test="regex-group(1)=$idnos-unknown">
                                         <xsl:value-of select="regex-group(2)"/>
@@ -139,7 +139,8 @@
                         
                         var layout = {
                         yaxis: {
-                        range: [0,1]
+                        range: [0,1],
+                        title: { text: 'F1 score'}
                         }
                         };
                         
@@ -166,12 +167,12 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 800px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 600px; height: 800px;"></div>
                     <script>
                         var trace1 = 
                         {
                         y: [<xsl:variable name="idnos-single" select="$TEIs[.//term[@type='text.speech.sign.type'][.='single']]//idno[@type='cligs']"/>
-                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                        <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
                                 <xsl:matching-substring>
                                     <xsl:if test="regex-group(1)=$idnos-single">
                                         <xsl:value-of select="regex-group(2)"/>
@@ -189,7 +190,7 @@
                         var trace2 = 
                         {
                         y: [<xsl:variable name="idnos-double" select="$TEIs[.//term[@type='text.speech.sign.type'][.='double']]//idno[@type='cligs']"/>
-                            <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                        <xsl:analyze-string select="$scores" regex="^(nh\d+),[\d\.]+,[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
                                 <xsl:matching-substring>
                                     <xsl:if test="regex-group(1)=$idnos-double">
                                         <xsl:value-of select="regex-group(2)"/>
@@ -206,7 +207,8 @@
                         
                         var layout = {
                         yaxis: {
-                        range: [0,1]
+                        range: [0,1],
+                        title: { text: 'F1 score'}
                         }
                         };
                         
@@ -222,6 +224,7 @@
     
     <!-- A box plot showing the F1 scores for speech recognition in all the novels that were checked for it. -->
     <xsl:template name="box-f1">
+        <xsl:variable name="scores" select="unparsed-text($out-csv-F1,'UTF-8')"/>
         <xsl:result-document href="{$out-html-F1}" method="html" encoding="UTF-8">
             <html>
                 <head>
@@ -230,12 +233,12 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 600px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 800px; height: 800px;"></div>
                     <script>
                         var data = [
                         {
-                        y: [<xsl:variable name="scores" select="unparsed-text($out-csv-F1,'UTF-8')"/>
-                        <xsl:analyze-string select="$scores" regex="^nh\d+,[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                        y: [
+                        <xsl:analyze-string select="$scores" regex="^nh\d+,([\d\.]+),[\d\.]+,[\d\.]+,[\d\.]+$" flags="m">
                                 <xsl:matching-substring>
                                     <xsl:value-of select="regex-group(1)"/>
                                     <xsl:text>,</xsl:text>
@@ -245,14 +248,56 @@
                         jitter: 0.3,
                         pointpos: -1.8,
                         type: 'box',
-                        name: 'novels'
+                        name: 'precision'
+                        },
+                        {
+                        y: [
+                        <xsl:analyze-string select="$scores" regex="^nh\d+,[\d\.]+,([\d\.]+),[\d\.]+,[\d\.]+$" flags="m">
+                            <xsl:matching-substring>
+                                <xsl:value-of select="regex-group(1)"/>
+                                <xsl:text>,</xsl:text>
+                            </xsl:matching-substring>
+                        </xsl:analyze-string>],
+                        boxpoints: 'all',
+                        jitter: 0.3,
+                        pointpos: -1.8,
+                        type: 'box',
+                        name: 'recall'
+                        },
+                        {
+                        y: [
+                        <xsl:analyze-string select="$scores" regex="^nh\d+,[\d\.]+,[\d\.]+,([\d\.]+),[\d\.]+$" flags="m">
+                            <xsl:matching-substring>
+                                <xsl:value-of select="regex-group(1)"/>
+                                <xsl:text>,</xsl:text>
+                            </xsl:matching-substring>
+                        </xsl:analyze-string>],
+                        boxpoints: 'all',
+                        jitter: 0.3,
+                        pointpos: -1.8,
+                        type: 'box',
+                        name: 'accuracy'
+                        },
+                        {
+                        y: [
+                        <xsl:analyze-string select="$scores" regex="^nh\d+,[\d\.]+,[\d\.]+,[\d\.]+,([\d\.]+)$" flags="m">
+                            <xsl:matching-substring>
+                                <xsl:value-of select="regex-group(1)"/>
+                                <xsl:text>,</xsl:text>
+                            </xsl:matching-substring>
+                        </xsl:analyze-string>],
+                        boxpoints: 'all',
+                        jitter: 0.3,
+                        pointpos: -1.8,
+                        type: 'box',
+                        name: 'F1'
                         }
                         ];
                         
                         var layout = {
                             yaxis: {
                                 range: [0,1],
-                                title: { text: 'F1 score'}
+                                title: { text: 'score'}
                             },
                             font: {size: 16}
                         };
@@ -265,56 +310,61 @@
     </xsl:template>
     
     
-    <!-- get precision score for direct speech annotation for the current TEI file -->
-    <xsl:function name="cligs:get-precision" as="xs:float">
+    <!-- get the number of true values (positives or negatives) -->
+    <xsl:function name="cligs:get-true-values" as="xs:integer">
         <xsl:param name="context"/>
-        <!-- precision: correctly identified direct speech tokens, 
-                    divided by all tokens that were assumed to be direct speech in the regex approach -->
-        <xsl:variable name="positives" select="$context//linkGrp[@type='DS_reg']/link[contains(@target,'#DS')]"/>
-        <!--<xsl:variable name="true-positives" select="$positives[@target = ./preceding::link/@target]"/>
+        <xsl:param name="values"/>
+        <!--<xsl:variable name="true-values" select="$values[@target = ./preceding::link/@target]"/>
         the previous line also works, but the following is more efficient: -->
-        <xsl:variable name="true-positives">
-            <xsl:for-each select="$positives">
+        <xsl:variable name="true-values" as="xs:boolean+">
+            <xsl:for-each select="$values">
                 <xsl:variable name="pos" select="count(./preceding-sibling::link) + 1"/>
                 <xsl:variable name="tar" select="@target"/>
                 <xsl:if test="$context//linkGrp[@type='DS_gold']/link[position() = $pos][@target=$tar]">
-                    <xsl:copy-of select="."/>
+                    <xsl:copy-of select="true()"/>
                 </xsl:if>
             </xsl:for-each>
         </xsl:variable>
-        <xsl:variable name="precision" select="count($true-positives//link) div count($positives)"/>
+        <xsl:value-of select="count($true-values)"/>
+    </xsl:function>
+    
+    
+    <!-- get precision score for direct speech annotation for the current TEI file -->
+    <xsl:function name="cligs:get-precision" as="xs:float">
+        <xsl:param name="positives"/>
+        <xsl:param name="num-true-positives"/>
+        <!-- precision: correctly identified direct speech tokens, 
+                    divided by all tokens that were assumed to be direct speech in the regex approach -->
+        <xsl:variable name="precision" select="$num-true-positives div count($positives)"/>
         <xsl:value-of select="$precision"/>
     </xsl:function>
     
     
     <!-- get recall score for direct speech annotation for the current TEI file -->
     <xsl:function name="cligs:get-recall" as="xs:float">
-        <xsl:param name="context"/>
+        <xsl:param name="all-ds"/>
+        <xsl:param name="num-true-positives"/>
         <!-- recall: correctly identified direct speech tokens, 
                     divided by all actual direct speech tokens -->
-        <xsl:variable name="positives" select="$context//linkGrp[@type='DS_reg']/link[contains(@target,'#DS')]"/>
-        <!--<xsl:variable name="true-positives" select="$positives[@target = ./preceding::link/@target]"/>
-        the previous line also works, but the following is more efficient: -->
-        <xsl:variable name="true-positives">
-            <xsl:for-each select="$positives">
-                <xsl:variable name="pos" select="count(./preceding-sibling::link) + 1"/>
-                <xsl:variable name="tar" select="@target"/>
-                <xsl:if test="$context//linkGrp[@type='DS_gold']/link[position() = $pos][@target=$tar]">
-                    <xsl:copy-of select="."/>
-                </xsl:if>
-            </xsl:for-each>
-        </xsl:variable>
-        <xsl:variable name="all-ds" select="$context//linkGrp[@type='DS_gold']/link[contains(@target,'#DS')]"/>
-        <xsl:variable name="recall" select="count($true-positives//link) div count($all-ds)"/>
+        <xsl:variable name="recall" select="$num-true-positives div count($all-ds)"/>
         <xsl:value-of select="$recall"/>
+    </xsl:function>
+    
+    
+    <!-- get accuracy score for direct speech annotation for the current TEI file -->
+    <xsl:function name="cligs:get-accuracy" as="xs:float">
+        <xsl:param name="num-all"/><!-- number of all items -->
+        <xsl:param name="num-true-positives"/>
+        <xsl:param name="num-true-negatives"/>
+        <xsl:variable name="accuracy" select="($num-true-positives + $num-true-negatives) div $num-all"/>
+        <xsl:value-of select="$accuracy"/>
     </xsl:function>
     
     
     <!-- get F1 score for direct speech annotation for the current TEI file -->
     <xsl:function name="cligs:get-f1" as="xs:float">
-        <xsl:param name="context"/>
-        <xsl:variable name="precision" select="cligs:get-precision($context)"/>
-        <xsl:variable name="recall" select="cligs:get-recall($context)"/>
+        <xsl:param name="precision"/>
+        <xsl:param name="recall"/>
         <xsl:variable name="F1" select="2 * (($precision * $recall) div ($precision + $recall))"/>
         <xsl:value-of select="$F1"/>
     </xsl:function>
@@ -324,7 +374,7 @@
         annotation, comparing it to the regular expression annotation. The results are stored as a CSV file -->
     <xsl:template name="csv-f1">
         <xsl:result-document href="{$out-csv-F1}" method="text" encoding="UTF-8">
-            <xsl:text>idno,precision,recall,F1</xsl:text><xsl:text>
+            <xsl:text>idno,precision,recall,accuracy,F1</xsl:text><xsl:text>
 </xsl:text>
             <xsl:for-each select="collection($path_TEI_out)//TEI"> <!-- [.//idno[@type='cligs']='nh0001'] -->
                 <xsl:variable name="idno" select=".//idno[@type='cligs']"/>
@@ -332,16 +382,27 @@
                 
                 <xsl:value-of select="$idno"/><xsl:text>,</xsl:text>
                 
+                <xsl:variable name="positives" select=".//linkGrp[@type='DS_reg']/link[ends-with(@target,'#DS')]"/>
+                <xsl:variable name="all-ds" select=".//linkGrp[@type='DS_gold']/link[ends-with(@target,'#DS')]"/>
+                <xsl:variable name="num-true-positives" select="cligs:get-true-values(.,$positives)"/>
                 <!-- precision: correctly identified direct speech tokens, 
                     divided by all tokens that were assumed to be direct speech in the regex approach -->
-                <xsl:value-of select="cligs:get-precision(.)"/><xsl:text>,</xsl:text>
+                <xsl:variable name="precision" select="cligs:get-precision($positives,$num-true-positives)"/>
+                <xsl:copy-of select="$precision"/><xsl:text>,</xsl:text>
                 
                 <!-- recall: correctly identified direct speech tokens, 
                     divided by all actual direct speech tokens -->
-                <xsl:value-of select="cligs:get-recall(.)"/><xsl:text>,</xsl:text>
+                <xsl:variable name="recall" select="cligs:get-recall($all-ds,$num-true-positives)"/>
+                <xsl:copy-of select="$recall"/><xsl:text>,</xsl:text>
+                
+                <!-- accuracy: (true positives + true negatives) / all cases -->
+                <xsl:variable name="num-all" select="count(.//linkGrp[@type='DS_gold']/link)"/>
+                <xsl:variable name="negatives" select=".//linkGrp[@type='DS_reg']/link[ends-with(@target,'#NARR')]"/>
+                <xsl:variable name="num-true-negatives" select="cligs:get-true-values(.,$negatives)"/>
+                <xsl:copy-of select="cligs:get-accuracy($num-all,$num-true-positives,$num-true-negatives)"/><xsl:text>,</xsl:text>
                 
                 <!-- F1 score:  -->
-                <xsl:value-of select="cligs:get-f1(.)"/>
+                <xsl:copy-of select="cligs:get-f1($precision,$recall)"/>
                 <xsl:if test="position() != last()">
                     <xsl:text>
 </xsl:text>

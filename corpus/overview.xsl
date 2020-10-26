@@ -15,6 +15,7 @@
     -->
     
     <xsl:variable name="output-dir">/home/ulrike/Git/data-nh/corpus/overview/</xsl:variable>
+    <xsl:variable name="plotly-source">/home/ulrike/Git/scripts-nh/plotly/plotly-latest.min.js</xsl:variable>
     <xsl:variable name="bibacme-authors" select="doc('/home/ulrike/Git/bibacme/app/data/authors.xml')//person"/>
     <xsl:variable name="bibacme-works" select="doc('/home/ulrike/Git/bibacme/app/data/works.xml')//bibl"/>
     <xsl:variable name="bibacme-editions" select="doc('/home/ulrike/Git/bibacme/app/data/editions.xml')//biblStruct"/>
@@ -233,7 +234,7 @@
         <!--<xsl:call-template name="plot-primary-current-setting-time-period"/>-->
         <!--<xsl:call-template name="plot-primary-current-length"/>-->
         
-        <xsl:call-template name="plot-multiple-current"/>
+        <!--<xsl:call-template name="plot-multiple-current"/>-->
         <!--<xsl:call-template name="plot-multiple-current-by-country"/>-->
         <!--<xsl:call-template name="plot-multiple-current-by-decade-bib"/>-->
         <!--<xsl:call-template name="plot-multiple-current-by-decade-corp"/>-->
@@ -255,8 +256,42 @@
         <!--<xsl:call-template name="plot-novelas-narrative-perspective"/>-->
         <!--<xsl:call-template name="plot-novelas-setting-continent"/>-->
         <!--<xsl:call-template name="plot-novelas-setting-time-period"/>-->
+        <!--<xsl:call-template name="list-novelas-recent-other"/>-->
         <!--<xsl:call-template name="plot-novelas-length"/>-->
         
+        <!--<xsl:call-template name="plot-novelas-originales"/>-->
+        <!--<xsl:call-template name="plot-novelas-americanas"/>-->
+        <!--<xsl:call-template name="plot-novelas-nacionales"/>-->
+        <!--<xsl:call-template name="plot-novelas-originales-by-country"/>-->
+        <!--<xsl:call-template name="plot-novelas-americanas-by-country"/>-->
+        <!--<xsl:call-template name="plot-novelas-nacionales-by-country"/>-->
+        <!--<xsl:call-template name="plot-novelas-originales-by-decade-bib"/>
+        <xsl:call-template name="plot-novelas-originales-by-decade-corp"/>
+        <xsl:call-template name="plot-novelas-originales-1880-bib"/>
+        <xsl:call-template name="plot-novelas-originales-1880-corp"/>
+        <xsl:call-template name="plot-novelas-americanas-by-decade-bib"/>
+        <xsl:call-template name="plot-novelas-americanas-by-decade-corp"/>
+        <xsl:call-template name="plot-novelas-americanas-1880-bib"/>
+        <xsl:call-template name="plot-novelas-americanas-1880-corp"/>
+        <xsl:call-template name="plot-novelas-nacionales-by-decade-bib"/>
+        <xsl:call-template name="plot-novelas-nacionales-by-decade-corp"/>
+        <xsl:call-template name="plot-novelas-nacionales-1880-bib"/>
+        <xsl:call-template name="plot-novelas-nacionales-1880-corp"/>-->
+        <!--<xsl:call-template name="plot-novelas-originales-prestige"/>-->
+        <!--<xsl:call-template name="plot-novelas-americanas-prestige"/>-->
+        <!--<xsl:call-template name="plot-novelas-nacionales-prestige"/>-->
+        <!--<xsl:call-template name="plot-novelas-originales-narrative-perspective"/>-->
+        <!--<xsl:call-template name="plot-novelas-americanas-narrative-perspective"/>-->
+        <!--<xsl:call-template name="plot-novelas-nacionales-narrative-perspective"/>-->
+        <!--<xsl:call-template name="plot-novelas-originales-setting-continent"/>-->
+        <!--<xsl:call-template name="plot-novelas-americanas-setting-continent"/>-->
+        <xsl:call-template name="plot-novelas-nacionales-setting-continent"/>
+        <!--<xsl:call-template name="plot-novelas-originales-setting-time-period"/>-->
+        <!--<xsl:call-template name="plot-novelas-americanas-setting-time-period"/>-->
+        <xsl:call-template name="plot-novelas-nacionales-setting-time-period"/>
+        <!--<xsl:call-template name="plot-novelas-originales-length"/>-->
+        <!--<xsl:call-template name="plot-novelas-americanas-length"/>-->
+        <!--<xsl:call-template name="plot-novelas-nacionales-length"/>-->
     </xsl:template>
     
     <!-- ########### TEMPLATES ############ -->
@@ -12058,7 +12093,7 @@
             <html>
                 <head>
                     <!-- Plotly.js -->
-                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                    <script src="{$plotly-source}"></script>
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
@@ -12111,11 +12146,11 @@
                         }];
                         
                         var layout = {
-                        font: {size: 32}, //12
-                        legend: {font: {size: 36}}, //14
+                        font: {size: 12}, //32
+                        legend: {font: {size: 14}}, //36
                         barmode: "group",
-                        xaxis: {title: "subgenres", font: {size: 36}, automargin: true}, //14
-                        yaxis: {title: "number of works", font: {size: 36}, automargin: true}, //14
+                        xaxis: {title: "subgenres", font: {size: 14}, automargin: true}, //36
+                        yaxis: {title: "number of works", font: {size: 14}, automargin: true}, //36
                         annotations: [<xsl:for-each select="$labels">
                             <xsl:variable name="num-bib">
                                 <xsl:choose>
@@ -12150,7 +12185,7 @@
                             showarrow: false,
                             xanchor: "right",
                             yanchor: "bottom",
-                            font: {size: 32} //12
+                            font: {size: 12} //32
                             },
                             {
                             x: <xsl:value-of select="position() - 1"/>,
@@ -12159,14 +12194,14 @@
                             showarrow: false,
                             xanchor: "left",
                             yanchor: "bottom",
-                            font: {size: 32} //12
+                            font: {size: 12} //32
                             }
                             <xsl:if test="position() != last()">,</xsl:if>
                         </xsl:for-each>
                         ]
                         };
                         
-                        Plotly.newPlot("myDiv", data, layout).then(
+                        Plotly.newPlot("myDiv", data, layout)<!--.then(
                         function(gd)
                         {
                         Plotly.toImage(gd,{width:1654,height:1034})
@@ -12176,7 +12211,7 @@
                         img_png.attr("src", url);
                         }
                         )
-                        });
+                        })-->;
                         
                     </script>
                 </body>
@@ -12194,12 +12229,17 @@
             <html>
                 <head>
                     <!-- Plotly.js -->
-                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                    <script src="{$plotly-source}"></script>
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
                     <div id="myDiv" style="width: 900px; height: 1200px;"></div>
+                    <!-- Plotly chart will be exported to this tag -->
+                    <img id="png-export"/>
                     <script>
+                        var d3 = Plotly.d3;
+                        var img_png= d3.select('#png-export');
+                        
                         var trace1 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="multiple-current-labels-bib-MX" select="cligs:get-multiple-labels($bibacme-works[country='México'],'current')"/>
@@ -12347,9 +12387,9 @@
                         var data = [trace1, trace2, trace3, trace4, trace5, trace6];
                         var layout = {
                         grid: {rows: 3, columns: 1},
-                        font: {size: 12},
+                        font: {size: 12}, //32
                         barmode: "group",
-                        legend: {font: {size: 14}},
+                        legend: {font: {size: 14}}, //36
                         xaxis: {title: "subgenres", automargin: true},
                         xaxis2: {anchor: "y2", title: "subgenres", automargin: true},
                         xaxis3: {anchor: "y3", title: "subgenres", automargin: true},
@@ -12396,7 +12436,7 @@
                                 xanchor: "right",
                                 yanchor: "bottom",
                                 yref: "y<xsl:value-of select="$curr-pos"/>",
-                                font: {size: 12}
+                                font: {size: 12} //32
                                 },
                                 {
                                 x: <xsl:value-of select="position() - 1"/>,
@@ -12406,14 +12446,24 @@
                                 xanchor: "left",
                                 yanchor: "bottom",
                                 yref: "y<xsl:value-of select="$curr-pos"/>",
-                                font: {size: 12}
+                                font: {size: 12} //32
                                 }
                                 <xsl:if test="position() != last()">,</xsl:if>
                             </xsl:for-each>
                             <xsl:if test="position() != last()">,</xsl:if>
                         </xsl:for-each>]
                         };
-                        Plotly.newPlot('myDiv', data, layout);
+                        Plotly.newPlot('myDiv', data, layout)<!--.then(
+                        function(gd)
+                        {
+                        Plotly.toImage(gd,{width:1890,height:2520})
+                        .then(
+                        function(url)
+                        {
+                        img_png.attr("src", url);
+                        }
+                        )
+                        })-->;
                     </script>
                 </body>
             </html>
@@ -12441,7 +12491,7 @@
                             name: "<xsl:value-of select="."/>",
                             x: [<xsl:value-of select="string-join($decades,',')"/>],
                             <!-- get the works with a certain subgenre  -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($bibacme-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($bibacme-works,'current',$labels,.)"/>
                             <!-- get the years of the first editions of these works -->
                             <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
                             y: [<xsl:value-of select="cligs:get-num-decades($decades, $work-publication-years)"/>]
@@ -12458,7 +12508,7 @@
                         yaxis: {title: "number of works"},
                         legend: {font: {size: 14}},
                         font: {size: 16},
-                        colorway: ["rgb(31, 119, 180)","rgb(214, 39, 40)","rgb(140, 86, 75)","rgb(255, 127, 14)","rgb(44, 160, 44)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        colorway: ["rgb(214, 39, 40)","rgb(31, 119, 180)","rgb(44, 160, 44)","rgb(148, 103, 189)","rgb(227, 119, 194)"],
                         };
                         Plotly.newPlot("myDiv", data, layout);
                     </script>
@@ -12488,7 +12538,7 @@
                             name: "<xsl:value-of select="."/>",
                             x: [<xsl:value-of select="string-join($decades,',')"/>],
                             <!-- get the works with a certain subgenre  -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'current',$labels,.)"/>
                             <!-- get the years of the first editions of these works -->
                             <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
                             y: [<xsl:value-of select="cligs:get-num-decades($decades, $work-publication-years)"/>]
@@ -12505,7 +12555,7 @@
                         yaxis: {title: "number of works"},
                         legend: {font: {size: 14}},
                         font: {size: 16},
-                        colorway: ["rgb(31, 119, 180)","rgb(214, 39, 40)","rgb(140, 86, 75)","rgb(255, 127, 14)","rgb(44, 160, 44)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        colorway: ["rgb(214, 39, 40)","rgb(31, 119, 180)","rgb(44, 160, 44)","rgb(148, 103, 189)","rgb(227, 119, 194)"],
                         };
                         Plotly.newPlot("myDiv", data, layout);
                     </script>
@@ -12527,7 +12577,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 1000px; height: 600px;"></div>
+                    <div id="myDiv" style="width: 800px; height: 600px;"></div>
                     <script>
                         var trace1 = {
                         type: "bar",
@@ -12535,7 +12585,7 @@
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         y: [<xsl:for-each select="$labels">
                             <!-- get the works with a certain subgenre  -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($bibacme-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($bibacme-works,'current',$labels,.)"/>
                             <!-- get the years of the first editions of these works -->
                             <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
                             <!-- of these, get the number of works published before 1880 -->
@@ -12550,7 +12600,7 @@
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         y: [<xsl:for-each select="$labels">
                             <!-- get the works with a certain subgenre  -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($bibacme-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($bibacme-works,'current',$labels,.)"/>
                             <!-- get the years of the first editions of these works -->
                             <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
                             <!-- of these, get the number of works published after 1880 -->
@@ -12573,7 +12623,7 @@
                         <xsl:variable name="num-all-works-after-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'after')"/>
                         annotations: [<xsl:for-each select="$labels">
                             <!-- get the works with a certain subgenre  -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($bibacme-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($bibacme-works,'current',$labels,.)"/>
                             <!-- get the years of the first editions of these works -->
                             <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
                             <!-- of these, get the number of works published before 1880 -->
@@ -12622,7 +12672,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 900px; height: 600px;"></div>
+                    <div id="myDiv" style="width: 800px; height: 600px;"></div>
                     <script>
                         var trace1 = {
                         type: "bar",
@@ -12630,7 +12680,7 @@
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         y: [<xsl:for-each select="$labels">
                             <!-- get the works with a certain subgenre  -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'current',$labels,.)"/>
                             <!-- get the years of the first editions of these works -->
                             <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
                             <!-- of these, get the number of works published before 1880 -->
@@ -12645,7 +12695,7 @@
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         y: [<xsl:for-each select="$labels">
                             <!-- get the works with a certain subgenre  -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'current',$labels,.)"/>
                             <!-- get the years of the first editions of these works -->
                             <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
                             <!-- of these, get the number of works published after 1880 -->
@@ -12668,7 +12718,7 @@
                         <xsl:variable name="num-all-works-after-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'after')"/>
                         annotations: [<xsl:for-each select="$labels">
                             <!-- get the works with a certain subgenre  -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'current',$labels,.)"/>
                             <!-- get the years of the first editions of these works -->
                             <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
                             <!-- of these, get the number of works published before 1880 -->
@@ -12722,14 +12772,14 @@
                         var trace1 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-high-prestige" select="$corpus[.//term[@type='text.prestige'] = 'high']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-high" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-high-prestige],'theme')"/>
+                        <xsl:variable name="current-labels-high" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-high-prestige],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-high[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-high[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-high,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-high,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -12740,14 +12790,14 @@
                         var trace2 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-low-prestige" select="$corpus[.//term[@type='text.prestige'] = 'low']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-low" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-low-prestige],'theme')"/>
+                        <xsl:variable name="current-labels-low" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-low-prestige],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-low[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-low[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-low,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-low,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -12767,20 +12817,20 @@
                             <xsl:variable name="num-high">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-high[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-high[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-high,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-high,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
                             <xsl:variable name="num-low">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-low[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-low[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-low,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-low,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
@@ -12831,14 +12881,14 @@
                         var trace1 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-third-person" select="$corpus[.//term[@type='text.narration.narrator.person'] = 'third person']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-third" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-third-person],'theme')"/>
+                        <xsl:variable name="current-labels-third" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-third-person],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-third[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-third[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-third,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-third,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -12849,14 +12899,14 @@
                         var trace2 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-first-person" select="$corpus[.//term[@type='text.narration.narrator.person'] = 'first person']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-first" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-first-person],'theme')"/>
+                        <xsl:variable name="current-labels-first" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-first-person],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-first[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-first[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-first,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-first,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -12876,20 +12926,20 @@
                             <xsl:variable name="num-third">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-third[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-third[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-third,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-third,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
                             <xsl:variable name="num-first">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-first[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-first[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-first,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-first,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
@@ -12940,14 +12990,14 @@
                         var trace1 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-America" select="$corpus[.//term[@type='text.setting.continent'] = 'America']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-America" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-America],'theme')"/>
+                        <xsl:variable name="current-labels-America" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-America],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-America[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-America[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-America,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-America,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -12958,14 +13008,14 @@
                         var trace2 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-Europe" select="$corpus[.//term[@type='text.setting.continent'] = 'Europe']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-Europe" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-Europe],'theme')"/>
+                        <xsl:variable name="current-labels-Europe" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-Europe],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-Europe[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-Europe[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-Europe,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-Europe,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -12985,20 +13035,20 @@
                             <xsl:variable name="num-America">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-America[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-America[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-America,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-America,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
                             <xsl:variable name="num-Europe">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-Europe[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-Europe[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-Europe,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-Europe,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
@@ -13049,14 +13099,14 @@
                         var trace1 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-contemp" select="$corpus[.//term[@type='text.time.period.publication'] = 'contemporary']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-contemp" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-contemp],'theme')"/>
+                        <xsl:variable name="current-labels-contemp" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-contemp],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-contemp[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-contemp[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-contemp,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-contemp,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -13067,14 +13117,14 @@
                         var trace2 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-past" select="$corpus[.//term[@type='text.time.period.publication'] = 'past']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-past" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-past],'theme')"/>
+                        <xsl:variable name="current-labels-past" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-past],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-past[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-past[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-past,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-past,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -13085,14 +13135,14 @@
                         var trace3 = {
                         x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
                         <xsl:variable name="idnos-recent" select="$corpus[.//term[@type='text.time.period.publication'] = 'recent past']//idno[@type='cligs']"/>
-                        <xsl:variable name="thematic-labels-recent" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-recent],'theme')"/>
+                        <xsl:variable name="current-labels-recent" select="cligs:get-multiple-labels($corpus-works[idno=$idnos-recent],'current')"/>
                         y: [<xsl:for-each select="$labels">
                             <xsl:choose>
                                 <xsl:when test=". = 'other'">
-                                    <xsl:value-of select="count($thematic-labels-recent[not(.=$labels)])"/>
+                                    <xsl:value-of select="count($current-labels-recent[not(.=$labels)])"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:value-of select="count(index-of($thematic-labels-recent,.))"/>
+                                    <xsl:value-of select="count(index-of($current-labels-recent,.))"/>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:if test="position() != last()">,</xsl:if>
@@ -13112,30 +13162,30 @@
                             <xsl:variable name="num-contemp">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-contemp[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-contemp[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-contemp,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-contemp,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
                             <xsl:variable name="num-past">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-past[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-past[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-past,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-past,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
                             <xsl:variable name="num-recent">
                                 <xsl:choose>
                                     <xsl:when test=". = 'other'">
-                                        <xsl:value-of select="count($thematic-labels-recent[not(.=$labels)])"/>
+                                        <xsl:value-of select="count($current-labels-recent[not(.=$labels)])"/>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <xsl:value-of select="count(index-of($thematic-labels-recent,.))"/>
+                                        <xsl:value-of select="count(index-of($current-labels-recent,.))"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:variable>
@@ -13195,7 +13245,7 @@
                         <xsl:for-each select="$labels">
                             var trace<xsl:value-of select="position()"/> = {
                             <!-- get the works with this primary subgenre -->
-                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'theme',$labels,.)"/>
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-subgenre($corpus-works,'current',$labels,.)"/>
                             y: [<xsl:value-of select="string-join($corpus[.//idno[@type='cligs']=$works-subgenre/idno[@type='cligs']]//measure[@unit='words'],',')"/>],
                             type: 'box',
                             name: "<xsl:value-of select="."/>"
@@ -13211,7 +13261,7 @@
                         yaxis: {title: "number of tokens"},
                         xaxis: {title: "works by subgenre", automargin: true},
                         showlegend: false,
-                        colorway: ["rgb(31, 119, 180)","rgb(214, 39, 40)","rgb(140, 86, 75)","rgb(255, 127, 14)","rgb(44, 160, 44)","rgb(148, 103, 189)"]
+                        colorway: ["rgb(214, 39, 40)","rgb(31, 119, 180)","rgb(44, 160, 44)","rgb(148, 103, 189)","rgb(227, 119, 194)"],
                         };
                         
                         Plotly.newPlot('myDiv', data, layout);
@@ -13320,7 +13370,7 @@
     </xsl:template>
     
     <xsl:template name="plot-novelas-by-country">
-        <!-- creates three donut charts comparing the distribution of works carry the label "novela" by country,
+        <!-- creates three donut charts comparing the distribution of works carrying the label "novela" by country,
         comparing the bibliography and the corpus -->
         
         <xsl:variable name="labels" select="('novela','other','none')"/>
@@ -13550,7 +13600,7 @@
         in Bib-ACMé -->
         <xsl:variable name="labels" select="('novela','other','none')"/>
         
-        <xsl:result-document href="{concat($output-dir,'subgenres-novelas-by-decade-bib.html')}" method="html" encoding="UTF-8">
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-by-decade-bib.html')}" method="html" encoding="UTF-8">
             <html>
                 <head>
                     <!-- Plotly.js -->
@@ -13892,7 +13942,7 @@
                         grid: {rows: 1, columns: 2},
                         font: {size: 12},
                         legend: {font: {size: 14}},
-                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(227, 119, 194)"],
+                        colorway: ["rgb(31, 119, 180)","rgb(148, 103, 189)","rgb(227, 119, 194)"],
                         annotations: [
                         {
                         font: {
@@ -14227,6 +14277,19 @@
         </xsl:result-document>
     </xsl:template>
     
+    <xsl:template name="list-novelas-recent-other">
+        <!-- list the CLiGS identifiers of the novels that have a setting set in the recent past and that 
+        do not carry the label "novela", but some other representational mode label -->
+        <xsl:variable name="idnos-recent-past" select="$corpus[.//term[@type='text.time.period.publication']/normalize-space(.)='recent past']//idno[@type='cligs']"/>
+        <xsl:for-each select="$corpus-works[idno=$idnos-recent-past]">
+            <xsl:if test="term[starts-with(@type,'subgenre.summary.mode.representation')][normalize-space(.)!='novela'][not(./preceding-sibling::term[starts-with(@type,'subgenre.summary.mode.representation')]/normalize-space(.)='novela')][not(./following-sibling::term[starts-with(@type,'subgenre.summary.mode.representation.explicit')]/normalize-space(.)='novela')]">
+                <xsl:value-of select="idno"/><xsl:text>,</xsl:text>
+            </xsl:if>
+        </xsl:for-each>
+        
+        <!--<xsl:value-of select="cligs:get-primary-labels($corpus-works[idno=$idnos-recent-past],'mode.representation')"/>-->
+    </xsl:template>
+    
     <xsl:template name="plot-novelas-length">
         <!-- creates a series of box plots showing work lengths in tokens by subgenres related to the mode of representation -->
         
@@ -14271,6 +14334,3157 @@
         </xsl:result-document>
     </xsl:template>
     
+    <xsl:template name="plot-novelas-originales">
+        <!-- creates two donut charts comparing the proportions of works in Bib-ACMé and Conha19
+        carrying the label "novela original" -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:variable name="labels-bib" select="cligs:get-primary-labels($bibacme-works,'identity')"/>
+        <xsl:variable name="labels-corp" select="cligs:get-primary-labels($corpus-works,'identity')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 800px; height: 400px;"></div>
+                    <script>
+                        var labels = ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"]
+                        var values_bib = [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>]
+                        var values_corp = [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>]
+                        var data = [{
+                        values: values_bib,
+                        labels: labels,
+                        type: "pie",
+                        direction: "clockwise",
+                        name: "Bib-ACMé",
+                        domain: {row: 0, column: 0},
+                        hole: 0.5
+                        },{
+                        values: values_corp,
+                        labels: labels,
+                        type: "pie",
+                        direction: "clockwise",
+                        name: "Conha19",
+                        domain: {row: 0, column: 1},
+                        hole: 0.5
+                        }];
+                        
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        legend: {font: {size: 16}},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Bib-ACMé',
+                        x: 0.16,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Conha19',
+                        x: 0.84,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas">
+        <!-- creates two donut charts comparing the proportions of works in Bib-ACMé and Conha19
+        carrying labels related to the American context -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:variable name="labels-bib" select="cligs:get-primary-labels($bibacme-works,'identity','novela americana')"/>
+        <xsl:variable name="labels-corp" select="cligs:get-primary-labels($corpus-works,'identity','novela americana')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 800px; height: 400px;"></div>
+                    <script>
+                        var labels = ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"]
+                        var values_bib = [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>]
+                        var values_corp = [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>]
+                        var data = [{
+                        values: values_bib,
+                        labels: labels,
+                        type: "pie",
+                        direction: "clockwise",
+                        name: "Bib-ACMé",
+                        domain: {row: 0, column: 0},
+                        hole: 0.5
+                        },{
+                        values: values_corp,
+                        labels: labels,
+                        type: "pie",
+                        direction: "clockwise",
+                        name: "Conha19",
+                        domain: {row: 0, column: 1},
+                        hole: 0.5
+                        }];
+                        
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        legend: {font: {size: 16}},
+                        colorway: ["rgb(227, 119, 194)","rgb(31, 119, 180)","rgb(148, 103, 189)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Bib-ACMé',
+                        x: 0.16,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Conha19',
+                        x: 0.84,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales">
+        <!-- creates two donut charts comparing the proportions of works in Bib-ACMé and Conha19
+        carrying labels carrying national identity labels -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:variable name="labels-bib" select="cligs:get-primary-labels($bibacme-works,'identity','novela nacional')"/>
+        <xsl:variable name="labels-corp" select="cligs:get-primary-labels($corpus-works,'identity','novela nacional')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 800px; height: 400px;"></div>
+                    <script>
+                        var labels = ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"]
+                        var values_bib = [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>]
+                        var values_corp = [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>]
+                        var data = [{
+                        values: values_bib,
+                        labels: labels,
+                        type: "pie",
+                        direction: "clockwise",
+                        name: "Bib-ACMé",
+                        domain: {row: 0, column: 0},
+                        hole: 0.5
+                        },{
+                        values: values_corp,
+                        labels: labels,
+                        type: "pie",
+                        direction: "clockwise",
+                        name: "Conha19",
+                        domain: {row: 0, column: 1},
+                        hole: 0.5
+                        }];
+                        
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        legend: {font: {size: 16}},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(44, 160, 44)","rgb(214, 39, 40)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Bib-ACMé',
+                        x: 0.16,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Conha19',
+                        x: 0.84,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-by-country">
+        <!-- creates three donut charts comparing the distribution of works that carry the label "novela original" by country,
+        comparing the bibliography and the corpus -->
+        
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-by-country.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 900px; height: 700px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-MX" select="cligs:get-primary-labels($bibacme-works[country='México'],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-MX[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-MX[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-MX,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Mexico (Bib)",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-AR" select="cligs:get-primary-labels($bibacme-works[country='Argentina'],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-AR[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-AR[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-AR,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Argentina (Bib)",
+                        domain: {row: 0, column: 1}
+                        };
+                        var trace3 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-CU" select="cligs:get-primary-labels($bibacme-works[country='Cuba'],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-CU[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-CU[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-CU,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Cuba (Bib)",
+                        domain: {row: 0, column: 2}
+                        };
+                        var trace4 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-MX" select="cligs:get-primary-labels($corpus-works[country='México'],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-MX[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-MX[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-MX,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Mexico (Corp)",
+                        domain: {row: 1, column: 0}
+                        };
+                        var trace5 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-AR" select="cligs:get-primary-labels($corpus-works[country='Argentina'],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-AR[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-AR[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-AR,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Argentina (Corp)",
+                        domain: {row: 1, column: 1}
+                        };
+                        var trace6 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-CU" select="cligs:get-primary-labels($corpus-works[country='Cuba'],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-CU[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-CU[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-CU,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Cuba (Corp)",
+                        domain: {row: 1, column: 2}
+                        };
+                        var data = [trace1, trace2, trace3, trace4, trace5, trace6];
+                        var layout = {
+                        grid: {rows: 2, columns: 3},
+                        font: {size: 12},
+                        legend: {font: {size: 14}, orientation: "h"},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Mexico (Bib)',
+                        x: 0.1,
+                        y: 0.78
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Argentina (Bib)',
+                        x: 0.5,
+                        y: 0.78
+                        },
+                        ,
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Cuba (Bib)',
+                        x: 0.89,
+                        y: 0.78
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Mexico (Corp)',
+                        x: 0.09,
+                        y: 0.22
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Argentina (Corp)',
+                        x: 0.5,
+                        y: 0.22
+                        },
+                        ,
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Cuba (Corp)',
+                        x: 0.9,
+                        y: 0.22
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-by-country">
+        <!-- creates three donut charts comparing the distribution of "novelas americanas" by country,
+        comparing the bibliography and the corpus -->
+        
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-by-country.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 900px; height: 700px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-MX" select="cligs:get-primary-labels($bibacme-works[country='México'],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-MX[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-MX[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-MX,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Mexico (Bib)",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-AR" select="cligs:get-primary-labels($bibacme-works[country='Argentina'],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-AR[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-AR[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-AR,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Argentina (Bib)",
+                        domain: {row: 0, column: 1}
+                        };
+                        var trace3 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-CU" select="cligs:get-primary-labels($bibacme-works[country='Cuba'],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-CU[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-CU[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-CU,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Cuba (Bib)",
+                        domain: {row: 0, column: 2}
+                        };
+                        var trace4 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-MX" select="cligs:get-primary-labels($corpus-works[country='México'],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-MX[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-MX[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-MX,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Mexico (Corp)",
+                        domain: {row: 1, column: 0}
+                        };
+                        var trace5 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-AR" select="cligs:get-primary-labels($corpus-works[country='Argentina'],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-AR[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-AR[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-AR,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Argentina (Corp)",
+                        domain: {row: 1, column: 1}
+                        };
+                        var trace6 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-CU" select="cligs:get-primary-labels($corpus-works[country='Cuba'],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-CU[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-CU[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-CU,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Cuba (Corp)",
+                        domain: {row: 1, column: 2}
+                        };
+                        var data = [trace1, trace2, trace3, trace4, trace5, trace6];
+                        var layout = {
+                        grid: {rows: 2, columns: 3},
+                        font: {size: 12},
+                        legend: {font: {size: 14}, orientation: "h"},
+                        colorway: ["rgb(227, 119, 194)","rgb(31, 119, 180)","rgb(148, 103, 189)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Mexico (Bib)',
+                        x: 0.1,
+                        y: 0.78
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Argentina (Bib)',
+                        x: 0.5,
+                        y: 0.78
+                        },
+                        ,
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Cuba (Bib)',
+                        x: 0.89,
+                        y: 0.78
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Mexico (Corp)',
+                        x: 0.09,
+                        y: 0.22
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Argentina (Corp)',
+                        x: 0.5,
+                        y: 0.22
+                        },
+                        ,
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Cuba (Corp)',
+                        x: 0.9,
+                        y: 0.22
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-by-country">
+        <!-- creates three donut charts comparing the distribution of works that carry the label "novela original" by country,
+        comparing the bibliography and the corpus -->
+        
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-by-country.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 900px; height: 700px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-MX" select="cligs:get-primary-labels($bibacme-works[country='México'],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-MX[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-MX[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-MX,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Mexico (Bib)",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-AR" select="cligs:get-primary-labels($bibacme-works[country='Argentina'],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-AR[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-AR[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-AR,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Argentina (Bib)",
+                        domain: {row: 0, column: 1}
+                        };
+                        var trace3 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-bib-CU" select="cligs:get-primary-labels($bibacme-works[country='Cuba'],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-bib-CU[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-bib-CU[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-bib-CU,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Cuba (Bib)",
+                        domain: {row: 0, column: 2}
+                        };
+                        var trace4 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-MX" select="cligs:get-primary-labels($corpus-works[country='México'],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-MX[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-MX[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-MX,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Mexico (Corp)",
+                        domain: {row: 1, column: 0}
+                        };
+                        var trace5 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-AR" select="cligs:get-primary-labels($corpus-works[country='Argentina'],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-AR[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-AR[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-AR,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Argentina (Corp)",
+                        domain: {row: 1, column: 1}
+                        };
+                        var trace6 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="labels-corp-CU" select="cligs:get-primary-labels($corpus-works[country='Cuba'],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-corp-CU[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:when test=". = 'none'">
+                                    <xsl:value-of select="count($labels-corp-CU[.='none'])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-corp-CU,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Cuba (Corp)",
+                        domain: {row: 1, column: 2}
+                        };
+                        var data = [trace1, trace2, trace3, trace4, trace5, trace6];
+                        var layout = {
+                        grid: {rows: 2, columns: 3},
+                        font: {size: 12},
+                        legend: {font: {size: 14}, orientation: "h"},
+                        colorway: ["rgb(227, 119, 194)","rgb(44, 160, 44)","rgb(148, 103, 189)","rgb(31, 119, 180)","rgb(214, 39, 40)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Mexico (Bib)',
+                        x: 0.1,
+                        y: 0.78
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Argentina (Bib)',
+                        x: 0.5,
+                        y: 0.78
+                        },
+                        ,
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Cuba (Bib)',
+                        x: 0.89,
+                        y: 0.78
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Mexico (Corp)',
+                        x: 0.09,
+                        y: 0.22
+                        },
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Argentina (Corp)',
+                        x: 0.5,
+                        y: 0.22
+                        },
+                        ,
+                        {
+                        font: {
+                        size: 12
+                        },
+                        showarrow: false,
+                        text: 'Cuba (Corp)',
+                        x: 0.9,
+                        y: 0.22
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-by-decade-bib">
+        <!-- creates a stacked bar chart showing the works carrying the label "novela original" by decade,
+        in Bib-ACMé -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-by-decade-bib.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            type: "bar",
+                            name: "<xsl:value-of select="."/>",
+                            x: [<xsl:value-of select="string-join($decades,',')"/>],
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            y: [<xsl:value-of select="cligs:get-num-decades($decades, $work-publication-years)"/>]
+                            };
+                        </xsl:for-each>
+                        
+                        var data = [<xsl:for-each select="$labels">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="position()"/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        barmode: "stack",
+                        xaxis: {tickmode: "linear", dtick: 10, title: "decades", tickfont: {size: 16}},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 14}},
+                        font: {size: 16},
+                        colorway: ["rgb(31, 119, 180)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-by-decade-corp">
+        <!-- creates a stacked bar chart showing the works carrying the label "novela original" by decade,
+        in Conha19 -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-by-decade-corp.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            type: "bar",
+                            name: "<xsl:value-of select="."/>",
+                            x: [<xsl:value-of select="string-join($decades,',')"/>],
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            y: [<xsl:value-of select="cligs:get-num-decades($decades, $work-publication-years)"/>]
+                            };
+                        </xsl:for-each>
+                        
+                        var data = [<xsl:for-each select="$labels">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="position()"/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        barmode: "stack",
+                        xaxis: {tickmode: "linear", dtick: 10, title: "decades", tickfont: {size: 16}},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 14}},
+                        font: {size: 16},
+                        colorway: ["rgb(31, 119, 180)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-1880-bib">
+        <!-- creates a grouped bar chart showing the works carrying the label "novela original" before and in/after 1880,
+        in Bib-ACMé -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-1880-bib.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 600px;"></div>
+                    <script>
+                        var trace1 = {
+                        type: "bar",
+                        name: "before 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var trace2 = {
+                        type: "bar",
+                        name: "in or after 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        barmode: "group",
+                        xaxis: {tickmode: "linear", dtick: 1, title: "subgenres", tickfont: {size: 16}, automargin: true},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 16}},
+                        font: {size: 16},
+                        <xsl:variable name="all-work-publication-years" select="cligs:get-first-edition-years($bibacme-works)"/>
+                        <!-- get the number of all works published before 1880 -->
+                        <xsl:variable name="num-all-works-before-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'before')"/>
+                        <!-- get the number of all works published after 1880 -->
+                        <xsl:variable name="num-all-works-after-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'after')"/>
+                        annotations: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:variable name="num-works-before-1880" select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:variable name="num-works-after-1880" select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-before-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-before-1880 div ($num-all-works-before-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "right",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            },
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-after-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-after-1880 div ($num-all-works-after-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "left",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            }
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>
+                        ]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-1880-corp">
+        <!-- creates a grouped bar chart showing the works carrying the label "novela original" before and in/after 1880,
+        in Conha19 -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-1880-corp.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 600px;"></div>
+                    <script>
+                        var trace1 = {
+                        type: "bar",
+                        name: "before 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var trace2 = {
+                        type: "bar",
+                        name: "in or after 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        barmode: "group",
+                        xaxis: {tickmode: "linear", dtick: 1, title: "subgenres", tickfont: {size: 16}, automargin: true},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 16}},
+                        font: {size: 16},
+                        <xsl:variable name="all-work-publication-years" select="cligs:get-first-edition-years($corpus-works)"/>
+                        <!-- get the number of all works published before 1880 -->
+                        <xsl:variable name="num-all-works-before-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'before')"/>
+                        <!-- get the number of all works published after 1880 -->
+                        <xsl:variable name="num-all-works-after-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'after')"/>
+                        annotations: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:variable name="num-works-before-1880" select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:variable name="num-works-after-1880" select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-before-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-before-1880 div ($num-all-works-before-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "right",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            },
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-after-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-after-1880 div ($num-all-works-after-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "left",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            }
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>
+                        ]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-by-decade-bib">
+        <!-- creates a stacked bar chart showing "novelas americanas" by decade,
+        in Bib-ACMé -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-by-decade-bib.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            type: "bar",
+                            name: "<xsl:value-of select="."/>",
+                            x: [<xsl:value-of select="string-join($decades,',')"/>],
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity','novela americana',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            y: [<xsl:value-of select="cligs:get-num-decades($decades, $work-publication-years)"/>]
+                            };
+                        </xsl:for-each>
+                        
+                        var data = [<xsl:for-each select="$labels">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="position()"/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        barmode: "stack",
+                        xaxis: {tickmode: "linear", dtick: 10, title: "decades", tickfont: {size: 16}},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 14}},
+                        font: {size: 16},
+                        colorway: ["rgb(31, 119, 180)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-by-decade-corp">
+        <!-- creates a stacked bar chart showing the "novelas americanas" by decade,
+        in Conha19 -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-by-decade-corp.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            type: "bar",
+                            name: "<xsl:value-of select="."/>",
+                            x: [<xsl:value-of select="string-join($decades,',')"/>],
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela americana',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            y: [<xsl:value-of select="cligs:get-num-decades($decades, $work-publication-years)"/>]
+                            };
+                        </xsl:for-each>
+                        
+                        var data = [<xsl:for-each select="$labels">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="position()"/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        barmode: "stack",
+                        xaxis: {tickmode: "linear", dtick: 10, title: "decades", tickfont: {size: 16}},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 14}},
+                        font: {size: 16},
+                        colorway: ["rgb(31, 119, 180)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-1880-bib">
+        <!-- creates a grouped bar chart showing the "novelas americanas" before and in/after 1880,
+        in Bib-ACMé -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-1880-bib.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 600px;"></div>
+                    <script>
+                        var trace1 = {
+                        type: "bar",
+                        name: "before 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity','novela americana',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var trace2 = {
+                        type: "bar",
+                        name: "in or after 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity','novela americana',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        barmode: "group",
+                        xaxis: {tickmode: "linear", dtick: 1, title: "subgenres", tickfont: {size: 16}, automargin: true},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 16}},
+                        font: {size: 16},
+                        <xsl:variable name="all-work-publication-years" select="cligs:get-first-edition-years($bibacme-works)"/>
+                        <!-- get the number of all works published before 1880 -->
+                        <xsl:variable name="num-all-works-before-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'before')"/>
+                        <!-- get the number of all works published after 1880 -->
+                        <xsl:variable name="num-all-works-after-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'after')"/>
+                        annotations: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity','novela americana',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:variable name="num-works-before-1880" select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:variable name="num-works-after-1880" select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-before-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-before-1880 div ($num-all-works-before-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "right",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            },
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-after-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-after-1880 div ($num-all-works-after-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "left",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            }
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>
+                        ]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-1880-corp">
+        <!-- creates a grouped bar chart showing the "novelas americanas" before and in/after 1880,
+        in Conha19 -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-1880-corp.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 600px;"></div>
+                    <script>
+                        var trace1 = {
+                        type: "bar",
+                        name: "before 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela americana',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var trace2 = {
+                        type: "bar",
+                        name: "in or after 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela americana',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        barmode: "group",
+                        xaxis: {tickmode: "linear", dtick: 1, title: "subgenres", tickfont: {size: 16}, automargin: true},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 16}},
+                        font: {size: 16},
+                        <xsl:variable name="all-work-publication-years" select="cligs:get-first-edition-years($corpus-works)"/>
+                        <!-- get the number of all works published before 1880 -->
+                        <xsl:variable name="num-all-works-before-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'before')"/>
+                        <!-- get the number of all works published after 1880 -->
+                        <xsl:variable name="num-all-works-after-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'after')"/>
+                        annotations: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela americana',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:variable name="num-works-before-1880" select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:variable name="num-works-after-1880" select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-before-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-before-1880 div ($num-all-works-before-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "right",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            },
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-after-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-after-1880 div ($num-all-works-after-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "left",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            }
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>
+                        ]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-by-decade-bib">
+        <!-- creates a stacked bar chart showing "novelas nacionales" by decade,
+        in Bib-ACMé -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-by-decade-bib.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            type: "bar",
+                            name: "<xsl:value-of select="."/>",
+                            x: [<xsl:value-of select="string-join($decades,',')"/>],
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity','novela nacional',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            y: [<xsl:value-of select="cligs:get-num-decades($decades, $work-publication-years)"/>]
+                            };
+                        </xsl:for-each>
+                        
+                        var data = [<xsl:for-each select="$labels">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="position()"/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        barmode: "stack",
+                        xaxis: {tickmode: "linear", dtick: 10, title: "decades", tickfont: {size: 16}},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 14}},
+                        font: {size: 16},
+                        colorway: ["rgb(44, 160, 44)","rgb(31, 119, 180)","rgb(214, 39, 40)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-by-decade-corp">
+        <!-- creates a stacked bar chart showing the "novelas nacionales" by decade,
+        in Conha19 -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-by-decade-corp.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            type: "bar",
+                            name: "<xsl:value-of select="."/>",
+                            x: [<xsl:value-of select="string-join($decades,',')"/>],
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela nacional',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            y: [<xsl:value-of select="cligs:get-num-decades($decades, $work-publication-years)"/>]
+                            };
+                        </xsl:for-each>
+                        
+                        var data = [<xsl:for-each select="$labels">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="position()"/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        barmode: "stack",
+                        xaxis: {tickmode: "linear", dtick: 10, title: "decades", tickfont: {size: 16}},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 14}},
+                        font: {size: 16},
+                        colorway: ["rgb(44, 160, 44)","rgb(31, 119, 180)","rgb(214, 39, 40)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-1880-bib">
+        <!-- creates a grouped bar chart showing the "novelas nacionales" before and in/after 1880,
+        in Bib-ACMé -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-1880-bib.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 600px;"></div>
+                    <script>
+                        var trace1 = {
+                        type: "bar",
+                        name: "before 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity','novela nacional',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var trace2 = {
+                        type: "bar",
+                        name: "in or after 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity','novela nacional',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        barmode: "group",
+                        xaxis: {tickmode: "linear", dtick: 1, title: "subgenres", tickfont: {size: 16}, automargin: true},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 16}},
+                        font: {size: 16},
+                        <xsl:variable name="all-work-publication-years" select="cligs:get-first-edition-years($bibacme-works)"/>
+                        <!-- get the number of all works published before 1880 -->
+                        <xsl:variable name="num-all-works-before-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'before')"/>
+                        <!-- get the number of all works published after 1880 -->
+                        <xsl:variable name="num-all-works-after-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'after')"/>
+                        annotations: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($bibacme-works,'identity','novela nacional',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:variable name="num-works-before-1880" select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:variable name="num-works-after-1880" select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-before-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-before-1880 div ($num-all-works-before-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "right",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            },
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-after-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-after-1880 div ($num-all-works-after-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "left",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            }
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>
+                        ]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-1880-corp">
+        <!-- creates a grouped bar chart showing the "novelas nacionales" before and in/after 1880,
+        in Conha19 -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-1880-corp.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 600px;"></div>
+                    <script>
+                        var trace1 = {
+                        type: "bar",
+                        name: "before 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela nacional',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var trace2 = {
+                        type: "bar",
+                        name: "in or after 1880",
+                        x: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        y: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela nacional',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:value-of select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            <xsl:if test="position()!=last()">,</xsl:if>
+                        </xsl:for-each>]
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        barmode: "group",
+                        xaxis: {tickmode: "linear", dtick: 1, title: "subgenres", tickfont: {size: 16}, automargin: true},
+                        yaxis: {title: "number of works"},
+                        legend: {font: {size: 16}},
+                        font: {size: 16},
+                        <xsl:variable name="all-work-publication-years" select="cligs:get-first-edition-years($corpus-works)"/>
+                        <!-- get the number of all works published before 1880 -->
+                        <xsl:variable name="num-all-works-before-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'before')"/>
+                        <!-- get the number of all works published after 1880 -->
+                        <xsl:variable name="num-all-works-after-1880" select="cligs:get-num-years(1880, $all-work-publication-years, 'after')"/>
+                        annotations: [<xsl:for-each select="$labels">
+                            <!-- get the works with a certain subgenre  -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela nacional',$labels,.)"/>
+                            <!-- get the years of the first editions of these works -->
+                            <xsl:variable name="work-publication-years" select="cligs:get-first-edition-years($works-subgenre)"/>
+                            <!-- of these, get the number of works published before 1880 -->
+                            <xsl:variable name="num-works-before-1880" select="cligs:get-num-years(1880, $work-publication-years, 'before')"/>
+                            <!-- of these, get the number of works published after 1880 -->
+                            <xsl:variable name="num-works-after-1880" select="cligs:get-num-years(1880, $work-publication-years, 'after')"/>
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-before-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-before-1880 div ($num-all-works-before-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "right",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            },
+                            {
+                            x: <xsl:value-of select="position() - 1"/>,
+                            y: <xsl:value-of select="$num-works-after-1880"/>,
+                            text: "<xsl:value-of select="round($num-works-after-1880 div ($num-all-works-after-1880 div 100))"/>%",
+                            showarrow: false,
+                            xanchor: "left",
+                            yanchor: "bottom",
+                            font: {size: 14}
+                            }
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>
+                        ]
+                        };
+                        Plotly.newPlot("myDiv", data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-prestige">
+        <!-- creates two donut charts comparing the proportions of works carrying the label "novela original" in 
+        high and low prestige novels -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-by-prestige.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 650px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-high-prestige" select="$corpus[.//term[@type='text.prestige'] = 'high']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-high" select="cligs:get-primary-labels($corpus-works[idno=$idnos-high-prestige],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-high[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-high,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "high prestige",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-low-prestige" select="$corpus[.//term[@type='text.prestige'] = 'low']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-low" select="cligs:get-primary-labels($corpus-works[idno=$idnos-low-prestige],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-low[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-low,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "low prestige",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'high',
+                        x: 0.18,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'low',
+                        x: 0.81,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-prestige">
+        <!-- creates two donut charts comparing the proportions of works carrying the label "novela americana" in 
+        high and low prestige novels -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-by-prestige.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-high-prestige" select="$corpus[.//term[@type='text.prestige'] = 'high']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-high" select="cligs:get-primary-labels($corpus-works[idno=$idnos-high-prestige],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-high[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-high,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "high prestige",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-low-prestige" select="$corpus[.//term[@type='text.prestige'] = 'low']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-low" select="cligs:get-primary-labels($corpus-works[idno=$idnos-low-prestige],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-low[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-low,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "low prestige",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(31, 119, 180)","rgb(148, 103, 189)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'high',
+                        x: 0.19,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'low',
+                        x: 0.8,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-prestige">
+        <!-- creates two donut charts comparing the proportions of works carrying the label "novela nacional" in 
+        high and low prestige novels -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-by-prestige.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-high-prestige" select="$corpus[.//term[@type='text.prestige'] = 'high']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-high" select="cligs:get-primary-labels($corpus-works[idno=$idnos-high-prestige],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-high[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-high,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "high prestige",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-low-prestige" select="$corpus[.//term[@type='text.prestige'] = 'low']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-low" select="cligs:get-primary-labels($corpus-works[idno=$idnos-low-prestige],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-low[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-low,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "low prestige",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(44, 160, 44)","rgb(148, 103, 189)","rgb(214, 39, 40)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'high',
+                        x: 0.19,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'low',
+                        x: 0.8,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-narrative-perspective">
+        <!-- creates two donut charts comparing the proportions of works with the label "novela original" in 
+        third and first person novels -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-by-narrative-perspective.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-third-person" select="$corpus[.//term[@type='text.narration.narrator.person'] = 'third person']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-third" select="cligs:get-primary-labels($corpus-works[idno=$idnos-third-person],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-third[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-third,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "third person",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-first-person" select="$corpus[.//term[@type='text.narration.narrator.person'] = 'first person']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-first" select="cligs:get-primary-labels($corpus-works[idno=$idnos-first-person],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-first[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-first,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "first person",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'third',
+                        x: 0.18,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'first',
+                        x: 0.81,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-narrative-perspective">
+        <!-- creates two donut charts comparing the proportions of works with the label "novela americana" in 
+        third and first person novels -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-by-narrative-perspective.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-third-person" select="$corpus[.//term[@type='text.narration.narrator.person'] = 'third person']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-third" select="cligs:get-primary-labels($corpus-works[idno=$idnos-third-person],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-third[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-third,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "third person",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-first-person" select="$corpus[.//term[@type='text.narration.narrator.person'] = 'first person']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-first" select="cligs:get-primary-labels($corpus-works[idno=$idnos-first-person],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-first[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-first,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "first person",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(31, 119, 180)","rgb(148, 103, 189)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'third',
+                        x: 0.18,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'first',
+                        x: 0.81,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-narrative-perspective">
+        <!-- creates two donut charts comparing the proportions of works with the label "novela nacional" in 
+        third and first person novels -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-by-narrative-perspective.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-third-person" select="$corpus[.//term[@type='text.narration.narrator.person'] = 'third person']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-third" select="cligs:get-primary-labels($corpus-works[idno=$idnos-third-person],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-third[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-third,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "third person",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-first-person" select="$corpus[.//term[@type='text.narration.narrator.person'] = 'first person']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-first" select="cligs:get-primary-labels($corpus-works[idno=$idnos-first-person],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-first[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-first,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "first person",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(44, 160, 44)","rgb(214, 39, 40)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'third',
+                        x: 0.18,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'first',
+                        x: 0.81,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-setting-continent">
+        <!-- creates two donut charts comparing the proportions works with the label "novela original" in 
+        novels with an American vs. European setting -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-by-setting-continent.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-America" select="$corpus[.//term[@type='text.setting.continent'] = 'America']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-America" select="cligs:get-primary-labels($corpus-works[idno=$idnos-America],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-America[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-America,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "America",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-Europe" select="$corpus[.//term[@type='text.setting.continent'] = 'Europe']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-Europe" select="cligs:get-primary-labels($corpus-works[idno=$idnos-Europe],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-Europe[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-Europe,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Europe",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'America',
+                        x: 0.15,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Europe',
+                        x: 0.84,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-setting-continent">
+        <!-- creates two donut charts comparing the proportions works with the label "novela americana" in 
+        novels with an American vs. European setting -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-by-setting-continent.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-America" select="$corpus[.//term[@type='text.setting.continent'] = 'America']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-America" select="cligs:get-primary-labels($corpus-works[idno=$idnos-America],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-America[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-America,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "America",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-Europe" select="$corpus[.//term[@type='text.setting.continent'] = 'Europe']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-Europe" select="cligs:get-primary-labels($corpus-works[idno=$idnos-Europe],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-Europe[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-Europe,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Europe",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(31, 119, 180)","rgb(148, 103, 189)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'America',
+                        x: 0.15,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Europe',
+                        x: 0.84,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-setting-continent">
+        <!-- creates two donut charts comparing the proportions works with the label "novela nacional" in 
+        novels with an American vs. European setting -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-by-setting-continent.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-America" select="$corpus[.//term[@type='text.setting.continent'] = 'America']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-America" select="cligs:get-primary-labels($corpus-works[idno=$idnos-America],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-America[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-America,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "America",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-Europe" select="$corpus[.//term[@type='text.setting.continent'] = 'Europe']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-Europe" select="cligs:get-primary-labels($corpus-works[idno=$idnos-Europe],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-Europe[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-Europe,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "Europe",
+                        domain: {row: 0, column: 1}
+                        };
+                        
+                        var data = [trace1, trace2];
+                        var layout = {
+                        grid: {rows: 1, columns: 2},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(44, 160, 44)","rgb(148, 103, 189)","rgb(214, 39, 40)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'America',
+                        x: 0.15,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'Europe',
+                        x: 0.84,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-setting-time-period">
+        <!-- creates three donut charts comparing the proportions of the label "novela original" in 
+        novels with a contemporary setting and a setting in the recent past or past -->
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-by-setting-time-period.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-contemp" select="$corpus[.//term[@type='text.time.period.publication'] = 'contemporary']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-contemp" select="cligs:get-primary-labels($corpus-works[idno=$idnos-contemp],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-contemp[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-contemp,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "contemporary",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-past" select="$corpus[.//term[@type='text.time.period.publication'] = 'past']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-past" select="cligs:get-primary-labels($corpus-works[idno=$idnos-past],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-past[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-past,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "past",
+                        domain: {row: 0, column: 1}
+                        };
+                        var trace3 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-recent" select="$corpus[.//term[@type='text.time.period.publication'] = 'recent past']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-recent" select="cligs:get-primary-labels($corpus-works[idno=$idnos-recent],'identity')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-recent[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-recent,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "recent past",
+                        domain: {row: 0, column: 2}
+                        };
+                        
+                        var data = [trace1, trace2, trace3];
+                        var layout = {
+                        grid: {rows: 1, columns: 3},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'contemp.',
+                        x: 0.1,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'past',
+                        x: 0.5,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'recent',
+                        x: 0.88,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-setting-time-period">
+        <!-- creates three donut charts comparing the proportions of the label "novela americana" in 
+        novels with a contemporary setting and a setting in the recent past or past -->
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-by-setting-time-period.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-contemp" select="$corpus[.//term[@type='text.time.period.publication'] = 'contemporary']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-contemp" select="cligs:get-primary-labels($corpus-works[idno=$idnos-contemp],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-contemp[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-contemp,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "contemporary",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-past" select="$corpus[.//term[@type='text.time.period.publication'] = 'past']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-past" select="cligs:get-primary-labels($corpus-works[idno=$idnos-past],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-past[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-past,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "past",
+                        domain: {row: 0, column: 1}
+                        };
+                        var trace3 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-recent" select="$corpus[.//term[@type='text.time.period.publication'] = 'recent past']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-recent" select="cligs:get-primary-labels($corpus-works[idno=$idnos-recent],'identity','novela americana')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-recent[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-recent,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "recent past",
+                        domain: {row: 0, column: 2}
+                        };
+                        
+                        var data = [trace1, trace2, trace3];
+                        var layout = {
+                        grid: {rows: 1, columns: 3},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(31, 119, 180)","rgb(148, 103, 189)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'contemp.',
+                        x: 0.1,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'past',
+                        x: 0.5,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'recent',
+                        x: 0.88,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-setting-time-period">
+        <!-- creates three donut charts comparing the proportions of the label "novela nacional" in 
+        novels with a contemporary setting and a setting in the recent past or past -->
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-by-setting-time-period.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 1000px; height: 400px;"></div>
+                    <script>
+                        var trace1 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-contemp" select="$corpus[.//term[@type='text.time.period.publication'] = 'contemporary']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-contemp" select="cligs:get-primary-labels($corpus-works[idno=$idnos-contemp],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-contemp[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-contemp,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "contemporary",
+                        domain: {row: 0, column: 0}
+                        };
+                        var trace2 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-past" select="$corpus[.//term[@type='text.time.period.publication'] = 'past']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-past" select="cligs:get-primary-labels($corpus-works[idno=$idnos-past],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-past[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-past,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "past",
+                        domain: {row: 0, column: 1}
+                        };
+                        var trace3 = {
+                        labels: ["<xsl:value-of select="string-join($labels,'&quot;,&quot;')"/>"],
+                        <xsl:variable name="idnos-recent" select="$corpus[.//term[@type='text.time.period.publication'] = 'recent past']//idno[@type='cligs']"/>
+                        <xsl:variable name="labels-recent" select="cligs:get-primary-labels($corpus-works[idno=$idnos-recent],'identity','novela nacional')"/>
+                        values: [<xsl:for-each select="$labels">
+                            <xsl:choose>
+                                <xsl:when test=". = 'other'">
+                                    <xsl:value-of select="count($labels-recent[not(.=$labels)])"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="count(index-of($labels-recent,.))"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>],
+                        type: "pie",
+                        hole: 0.5,
+                        direction: "clockwise",
+                        name: "recent past",
+                        domain: {row: 0, column: 2}
+                        };
+                        
+                        var data = [trace1, trace2, trace3];
+                        var layout = {
+                        grid: {rows: 1, columns: 3},
+                        font: {size: 12},
+                        legend: {font: {size: 14}},
+                        colorway: ["rgb(227, 119, 194)","rgb(148, 103, 189)","rgb(44, 160, 44)","rgb(214, 39, 40)","rgb(31, 119, 180)"],
+                        annotations: [
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'contemp.',
+                        x: 0.1,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'past',
+                        x: 0.5,
+                        y: 0.5
+                        },
+                        {
+                        font: {
+                        size: 16
+                        },
+                        showarrow: false,
+                        text: 'recent',
+                        x: 0.88,
+                        y: 0.5
+                        }
+                        ]
+                        };
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-originales-length">
+        <!-- creates a series of box plots showing work lengths in tokens by works carrying the label "novela original" -->
+        
+        <xsl:variable name="labels" select="('novela original','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-original-length.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 600px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            <!-- get the works with this subgenre -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity',$labels,.)"/>
+                            y: [<xsl:value-of select="string-join($corpus[.//idno[@type='cligs']=$works-subgenre/idno[@type='cligs']]//measure[@unit='words'],',')"/>],
+                            type: 'box',
+                            name: "<xsl:value-of select="."/>"
+                            };
+                        </xsl:for-each>
+                        
+                        
+                        var data = [<xsl:for-each select="1 to count($labels)">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="."/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        yaxis: {title: "number of tokens"},
+                        xaxis: {title: "works by subgenre", automargin: true},
+                        showlegend: false,
+                        colorway: ["rgb(31, 119, 180)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        };
+                        
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-americanas-length">
+        <!-- creates a series of box plots showing work lengths in tokens by works carrying the label "novela americana" -->
+        
+        <xsl:variable name="labels" select="('novela americana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-americana-length.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 600px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            <!-- get the works with this subgenre -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela americana',$labels,.)"/>
+                            y: [<xsl:value-of select="string-join($corpus[.//idno[@type='cligs']=$works-subgenre/idno[@type='cligs']]//measure[@unit='words'],',')"/>],
+                            type: 'box',
+                            name: "<xsl:value-of select="."/>"
+                            };
+                        </xsl:for-each>
+                        
+                        
+                        var data = [<xsl:for-each select="1 to count($labels)">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="."/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        yaxis: {title: "number of tokens"},
+                        xaxis: {title: "works by subgenre", automargin: true},
+                        showlegend: false,
+                        colorway: ["rgb(31, 119, 180)","rgb(148, 103, 189)","rgb(227, 119, 194)"]
+                        };
+                        
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    <xsl:template name="plot-novelas-nacionales-length">
+        <!-- creates a series of box plots showing work lengths in tokens by works carrying the label "novela nacional" -->
+        
+        <xsl:variable name="labels" select="('novela mexicana','novela argentina','novela cubana','other','none')"/>
+        
+        <xsl:result-document href="{concat($output-dir,'subgenres-novela-nacional-length.html')}" method="html" encoding="UTF-8">
+            <html>
+                <head>
+                    <!-- Plotly.js -->
+                    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+                </head>
+                <body>
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                    <div id="myDiv" style="width: 600px; height: 600px;"></div>
+                    <script>
+                        <xsl:for-each select="$labels">
+                            var trace<xsl:value-of select="position()"/> = {
+                            <!-- get the works with this subgenre -->
+                            <xsl:variable name="works-subgenre" select="cligs:get-works-primary-subgenre($corpus-works,'identity','novela nacional',$labels,.)"/>
+                            y: [<xsl:value-of select="string-join($corpus[.//idno[@type='cligs']=$works-subgenre/idno[@type='cligs']]//measure[@unit='words'],',')"/>],
+                            type: 'box',
+                            name: "<xsl:value-of select="."/>"
+                            };
+                        </xsl:for-each>
+                        
+                        
+                        var data = [<xsl:for-each select="1 to count($labels)">
+                            <xsl:text>trace</xsl:text><xsl:value-of select="."/>
+                            <xsl:if test="position() != last()">,</xsl:if>
+                        </xsl:for-each>];
+                        var layout = {
+                        yaxis: {title: "number of tokens"},
+                        xaxis: {title: "works by subgenre", automargin: true},
+                        showlegend: false,
+                        colorway: ["rgb(44, 160, 44)","rgb(31, 119, 180)","rgb(214, 39, 40)","rgb(148, 103, 189)","rgb(227, 119, 194)"],
+                        };
+                        
+                        Plotly.newPlot('myDiv', data, layout);
+                    </script>
+                </body>
+            </html>
+        </xsl:result-document>
+    </xsl:template>
+    
+    
     
     <!-- ########### HELPER TEMPLATES ########### -->
     
@@ -14298,6 +17512,16 @@
     
     <!-- ########### FUNCTIONS ############ -->
     
+    <xsl:function name="cligs:count-labels" as="xs:integer+">
+        <!-- of a set of subgenre labels: return counts for each label in a collection of labels
+        (how often does each label occur in the collection?) -->
+        <xsl:param name="label-collection"/><!-- the collection of labels to be counted -->
+        <xsl:param name="label-set"/><!-- the kinds of labels to count -->
+        <xsl:for-each select="$label-set">
+            <xsl:value-of select="count(index-of($label-collection,.))"/>
+        </xsl:for-each>
+    </xsl:function>
+    
     <xsl:function name="cligs:get-primary-labels">
         <!-- for a set of works: get just the primary labels of a certain type of subgenre label -->
         <xsl:param name="works"/>
@@ -14318,6 +17542,129 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="$labels[1]/normalize-space(.)"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:when test="$label-type='identity'">
+                            <xsl:choose>
+                                <xsl:when test="$labels[normalize-space(.)='novela original']">
+                                    <xsl:text>novela original</xsl:text>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="$labels[1]/normalize-space(.)"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$labels[@cligs:importance='2']/normalize-space(.)"/>        
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+                <xsl:when test="$num-labels=0">
+                    <xsl:text>none</xsl:text>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:for-each>
+    </xsl:function>
+    
+    <xsl:function name="cligs:get-primary-labels">
+        <!-- for a set of works: get just the primary labels of a certain type of subgenre label,
+        3-param-version with subtype -->
+        <xsl:param name="works"/>
+        <xsl:param name="label-type"/><!-- e.g. "theme" -->
+        <xsl:param name="label-subtype"/><!-- which label(s) to consider primary 
+            in case of various labels of the same type, 
+        e.g. "novela original", "novela americana" or "novela nacional" for identity -->
+        <xsl:variable name="novelas-americanas" select="('novela americana','novela mexicana','novela cubana','novela argentina','novela criolla','novela bonaerense','novela porteña','novela habanera','novela yucateca','novela suriana','novela tapatía','novela india','novela mixteca','novela de Tabasco','novela azteca','novela camagüeyana','novela kantabro-americana', 'novela franco-argentina')"/>
+        <xsl:variable name="novelas-mexicanas" select="('novela mexicana','novela yucateca','novela suriana','novela tapatía','novela mixteca','novela de Tabasco','novela azteca')"/>
+        <xsl:variable name="novelas-argentinas" select="('novela argentina','novela bonaerense','novela porteña','novela franco-argentina')"/>
+        <xsl:variable name="novelas-cubanas" select="('novela cubana','novela habanera','novela camagüeyana')"/>
+        <xsl:for-each select="$works">
+            <xsl:variable name="labels" select=".//term[starts-with(@type,concat('subgenre.summary.',$label-type))]"/>
+            <xsl:variable name="num-labels" select="count($labels)"/>
+            <xsl:choose>
+                <xsl:when test="$num-labels=1">
+                    <xsl:choose>
+                        <xsl:when test="$label-subtype='novela americana'">
+                            <xsl:choose>
+                                <xsl:when test="$labels[normalize-space(.)=$novelas-americanas]">
+                                    <xsl:text>novela americana</xsl:text>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="normalize-space($labels)"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:when test="$label-subtype='novela nacional'">
+                            <xsl:choose>
+                                <xsl:when test="$labels[normalize-space(.)=$novelas-mexicanas]">
+                                    <xsl:text>novela mexicana</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="$labels[normalize-space(.)=$novelas-argentinas]">
+                                    <xsl:text>novela argentina</xsl:text>
+                                </xsl:when>
+                                <xsl:when test="$labels[normalize-space(.)=$novelas-cubanas]">
+                                    <xsl:text>novela cubana</xsl:text>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="normalize-space($labels)"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="normalize-space($labels)"/>        
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+                <xsl:when test="$num-labels>1">
+                    <xsl:choose>
+                        <xsl:when test="$label-type='mode.representation'">
+                            <xsl:choose>
+                                <xsl:when test="$labels[normalize-space(.)='novela']">
+                                    <xsl:text>novela</xsl:text>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="$labels[1]/normalize-space(.)"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                        <xsl:when test="$label-type='identity'">
+                            <xsl:choose>
+                                <xsl:when test="$label-subtype='novela americana'">
+                                    <xsl:choose>
+                                        <xsl:when test="$labels[normalize-space(.)=$novelas-americanas]">
+                                            <xsl:text>novela americana</xsl:text>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$labels[1]/normalize-space(.)"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                                <xsl:when test="$label-subtype='novela nacional'">
+                                    <xsl:choose>
+                                        <xsl:when test="$labels[normalize-space(.)=$novelas-mexicanas]">
+                                            <xsl:text>novela mexicana</xsl:text>
+                                        </xsl:when>
+                                        <xsl:when test="$labels[normalize-space(.)=$novelas-argentinas]">
+                                            <xsl:text>novela argentina</xsl:text>
+                                        </xsl:when>
+                                        <xsl:when test="$labels[normalize-space(.)=$novelas-cubanas]">
+                                            <xsl:text>novela cubana</xsl:text>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$labels[1]/normalize-space(.)"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:choose>
+                                        <xsl:when test="$labels[normalize-space(.)=$label-subtype]">
+                                            <xsl:value-of select="$label-subtype[1]"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$labels[1]/normalize-space(.)"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:when>
@@ -14942,6 +18289,148 @@
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <xsl:text>other</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+                            <xsl:when test="$label-type='identity'">
+                                <xsl:choose>
+                                    <xsl:when test="$labels[normalize-space(.)='novela original']">
+                                        <xsl:text>novela original</xsl:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>other</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:choose>
+                                    <xsl:when test="$labels[@cligs:importance='2']/normalize-space(.)=$label-set">
+                                        <xsl:value-of select="$labels[@cligs:importance='2']/normalize-space(.)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>other</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+                    <xsl:when test="$num-labels=0">
+                        <xsl:text>none</xsl:text>
+                    </xsl:when>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:if test="$primary-label = $label">
+                <xsl:copy-of select="."/>
+            </xsl:if>
+        </xsl:for-each>
+    </xsl:function>
+    
+    <xsl:function name="cligs:get-works-primary-subgenre">
+        <!-- return a set of works which has a certain primary subgenre, 5-param-version with label subtype -->
+        <xsl:param name="works"/><!-- a set of work entries -->
+        <xsl:param name="label-type"/><!-- type of subgenre label, e.g. "theme" -->
+        <xsl:param name="label-subtype"/><!-- subtype of subgenre label, e.g. "novela americana" -->
+        <xsl:param name="label-set"/><!-- the set of labels to look for, e.g. "novela histórica", "novela sentimental", "other" -->
+        <xsl:param name="label"/><!-- the subgenre, e.g. "novela histórica", "other", "none" -->
+        <xsl:variable name="novelas-americanas" select="('novela americana','novela mexicana','novela cubana','novela argentina','novela criolla','novela bonaerense','novela porteña','novela habanera','novela yucateca','novela suriana','novela tapatía','novela india','novela mixteca','novela de Tabasco','novela azteca','novela camagüeyana','novela kantabro-americana', 'novela franco-argentina')"/>
+        <xsl:variable name="novelas-mexicanas" select="('novela mexicana','novela yucateca','novela suriana','novela tapatía','novela mixteca','novela de Tabasco','novela azteca')"/>
+        <xsl:variable name="novelas-argentinas" select="('novela argentina','novela bonaerense','novela porteña','novela franco-argentina')"/>
+        <xsl:variable name="novelas-cubanas" select="('novela cubana','novela habanera','novela camagüeyana')"/>
+        
+        <xsl:for-each select="$works">
+            <xsl:variable name="labels" select=".//term[starts-with(@type,concat('subgenre.summary.',$label-type))]"/>
+            <xsl:variable name="num-labels" select="count($labels)"/>
+            <xsl:variable name="primary-label">
+                <xsl:choose>
+                    <xsl:when test="$num-labels=1">
+                        <xsl:choose>
+                            <xsl:when test="$label-subtype='novela americana'">
+                                <xsl:choose>
+                                    <xsl:when test="$labels[normalize-space(.)=$novelas-americanas]">
+                                        <xsl:text>novela americana</xsl:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>other</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+                            <xsl:when test="$label-subtype='novela nacional'">
+                                <xsl:choose>
+                                    <xsl:when test="$labels[normalize-space(.)=$novelas-mexicanas]">
+                                        <xsl:text>novela mexicana</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="$labels[normalize-space(.)=$novelas-argentinas]">
+                                        <xsl:text>novela argentina</xsl:text>
+                                    </xsl:when>
+                                    <xsl:when test="$labels[normalize-space(.)=$novelas-cubanas]">
+                                        <xsl:text>novela cubana</xsl:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>other</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:choose>
+                                    <xsl:when test="normalize-space($labels)=$label-set">
+                                        <xsl:value-of select="normalize-space($labels)"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>other</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>        
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:when>
+                    <xsl:when test="$num-labels>1">
+                        <xsl:choose>
+                            <xsl:when test="$label-type='mode.representation'">
+                                <xsl:choose>
+                                    <xsl:when test="$labels[normalize-space(.)='novela']">
+                                        <xsl:text>novela</xsl:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text>other</xsl:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+                            <xsl:when test="$label-type='identity'">
+                                <xsl:choose>
+                                    <xsl:when test="$label-subtype='novela americana'">
+                                        <xsl:choose>
+                                            <xsl:when test="$labels[normalize-space(.)=$novelas-americanas]">
+                                                <xsl:text>novela americana</xsl:text>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:text>other</xsl:text>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:when>
+                                    <xsl:when test="$label-subtype='novela nacional'">
+                                        <xsl:choose>
+                                            <xsl:when test="$labels[normalize-space(.)=$novelas-mexicanas]">
+                                                <xsl:text>novela mexicana</xsl:text>
+                                            </xsl:when>
+                                            <xsl:when test="$labels[normalize-space(.)=$novelas-argentinas]">
+                                                <xsl:text>novela argentina</xsl:text>
+                                            </xsl:when>
+                                            <xsl:when test="$labels[normalize-space(.)=$novelas-cubanas]">
+                                                <xsl:text>novela cubana</xsl:text>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:text>other</xsl:text>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:choose>
+                                            <xsl:when test="$labels[normalize-space(.)=$label-subtype]">
+                                                <xsl:value-of select="$label-subtype[1]"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xsl:text>other</xsl:text>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:when>
