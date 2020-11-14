@@ -14,6 +14,7 @@ import glob
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+from tmw import prepare
 
 
 def clean_stoplist(wdir, stopwords):
@@ -37,4 +38,21 @@ def clean_stoplist(wdir, stopwords):
 	print("done")
 	
 	
+	
+	
 clean_stoplist("/home/ulrike/Git/data-nh/analysis/features/stopwords/topics_stopwords.txt")
+
+wdir="/home/ulrike/Git/"
+
+### Segmenter
+### Split entire texts into smaller segments.
+inpath = join(wdir, "conha19/txt_annotated_nouns/", "*.txt")
+outfolder = join(wdir, "data-nh/analysis/features/topics/", "1_segments", "")
+target = 1000
+sizetolerancefactor = 1 # 1 = exact target; >1 = with some tolerance (1.1 = +/- 10%).
+preserveparagraphs = False # True|False
+prepare.segmenter(inpath, outfolder, target, sizetolerancefactor, preserveparagraphs)
+
+
+
+
