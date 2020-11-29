@@ -20,7 +20,7 @@
     <xsl:output method="text" encoding="UTF-8"/>
     
     <xsl:template match="/">
-        <xsl:text>"idno","author-short","title-short","year","country","narrative-perspective","subgenre-theme","subgenre-current","tokens"</xsl:text><xsl:text>
+        <xsl:text>"idno","author-short","title-short","year","country","narrative-perspective","subgenre-theme","subgenre-current","subgenre-novela","tokens"</xsl:text><xsl:text>
 </xsl:text>
         <xsl:for-each select="collection($corpus-dir)//TEI">
             <xsl:sort select=".//idno[@type='cligs']"/>
@@ -47,6 +47,14 @@
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:text>unknown,</xsl:text>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test=".//term[@type='text.genre.subgenre.summary.mode.representation.explicit'][.='novela']">
+                    <xsl:text>novela,</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:text>none,</xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
             <xsl:value-of select=".//measure[@unit='words']"/>

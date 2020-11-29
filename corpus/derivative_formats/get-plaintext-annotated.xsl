@@ -12,7 +12,7 @@
     based on the version annotated with FreeLing.
         
     How to call the script (to process the whole corpus):
-    java -jar /home/ulrike/Programme/saxon/saxon9he.jar -s:/home/ulrike/Git/conha19/annotated/ -o:/home/ulrike/Git/conha19/txt_annotated/ -xsl:/home/ulrike/Git/scripts-nh/corpus/derivative_formats/get-plaintext-annotated.xsl
+    java -jar /home/ulrike/Programme/saxon/saxon9he.jar -s:/home/ulrike/Git/conha19/annotated_corr/ -o:/home/ulrike/Git/conha19/txt_annotated/ -xsl:/home/ulrike/Git/scripts-nh/corpus/derivative_formats/get-plaintext-annotated.xsl
    
     -->
     

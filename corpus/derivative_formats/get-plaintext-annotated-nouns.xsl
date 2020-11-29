@@ -35,15 +35,9 @@
     </xsl:template>
     
     
-    <!-- ### REPLACE ### -->
-    
-    <!-- replace proper nouns -->
-    <xsl:template match="w[@pos='noun'][@type='proper']" priority="1">
-        <xsl:text>ENTITY</xsl:text><xsl:text> </xsl:text>
-    </xsl:template>
-        
-        
     <!-- ### IGNORE ### -->
+    <!-- ignore proper nouns -->
+    <xsl:template match="w[@pos='noun'][@type='proper']" priority="1"/>
     
     <!-- ignore the TEI header, front, back parts, and words that are not nouns -->
     <xsl:template match="teiHeader | front | back | w[@pos!='noun']"/>

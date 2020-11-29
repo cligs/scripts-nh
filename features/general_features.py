@@ -32,30 +32,28 @@ def create_ngram_feature_set(wdir, ngram, ngram_types, mfw, outfile):
 	mfw (int): the number of most frequent items to use
 	outfile (str): relative path to the output file for the resulting feature set
 	"""
-
+	print("creating feature set for " + str(ngram_types) + " and " + str(mfw) + " MFW...")
+	
 	# get ngram data
 	features = pd.DataFrame()
 	
 	for idx, val in enumerate(ngram_types):
-		nfr = pd.read_csv(join(wdir, "data-nh/analysis/features/mfw/vocab_" + str(ngram) + "_chars_" + val + ".csv"))
+		nfr = pd.read_csv(join(wdir, "data-nh/analysis/features/mfw/bow_all_" + str(ngram) + "gram_chars_" + val + ".csv"), index_col=0)
 		if idx == 0:
-			features.append(ngt_fr)
+			features = features.append(nfr)
 		else:
-			features.join(ngt_fr)
+			features = features.join(nfr)
 			
-	print(features.head())
 	
 	# get the mfw
 	# sum the counts for each feature
 	sums = features.sum().sort_values(ascending=False)
+	
 	# get requested token range
 	mfw_vocab = list(sums[:mfw].index)
 	
-	print(mfw_vocab)
 	# select mfw from data
-	features = features.loc[:,[mfw_vocab]]
-	
-	print(features.head())
+	features = features.loc[:,mfw_vocab]
 	
 	# store feature set
 	features.to_csv(join(wdir, outfile))
@@ -84,13 +82,15 @@ def count_vocab(wdir, inpath, stopwords, vocab, outfile):
 	vocab = pd.read_csv(join(wdir, vocab), header=None)
 	vocab = vocab.iloc[:,0].tolist()
 	
-	if not isfile(join(wdir, outfile)):
-		# create data frame for results
-		# get idnos
-		idnos = [f[-10:-4] for f in glob.glob(join(wdir, inpath, "*.txt"))]
-		idnos = sorted(idnos)
-		bow = pd.DataFrame(index=idnos,columns=vocab)
-		bow.to_csv(join(wdir, outfile))
+
+	
+	# create data frame for results
+	# get idnos
+	idnos = [f[-10:-4] for f in glob.glob(join(wdir, inpath, "*.txt"))]
+	idnos = sorted(idnos)
+	bow = pd.DataFrame(index=idnos,columns=vocab)
+	bow.to_csv(join(wdir, outfile))
+	
 	
 	
 	# read the documents
@@ -121,7 +121,8 @@ def count_vocab(wdir, inpath, stopwords, vocab, outfile):
 				bow.loc[idno,w] = num_w
 	
 		# store bow file
-		bow.to_csv(join(wdir, outfile))
+		bow.to_csv(join(wdir, outfile),columns=vocab)
+		
 	
 	print("done")
 
@@ -163,7 +164,7 @@ def create_vocabulary(wdir, inpath, stopwords, outfile):
 					all_words.append(w)
 			
 	all_words = pd.DataFrame(all_words).sort_values(by=0)
-	all_words.to_csv(join(wdir, outfile), header=None, index=False)
+	all_words.to_csv(join(wdir, outfile), header=False, index=False)
 	
 	print("done")
 
@@ -288,33 +289,50 @@ def create_ngram_vocab(wdir, ngram, ngram_type, outfile, **kwargs):
 	
 	# save resulting ngram vocabulary
 	all_ngrams = pd.DataFrame(all_ngrams).sort_values(by=0)
-	all_ngrams.to_csv(join(wdir, outfile), header=None, index=False)
+	all_ngrams.to_csv(join(wdir, outfile), header=False, index=False)
 	
 	print("done")
 	
 	
 
-def prepare_fulltexts(wdir, inpath, outpath):
+def prepare_fulltexts(wdir, inpath, outpath, **kwargs):
 	"""
 	prepare the annotated full texts for the generation of character n-grams:
 	- remove whitespace before , . ! ? : ; » ”
 	- remove whitespace after ¿ ¡ « “
 	- replace _ with whitespace
 	
-	Arguments:
+	Arguments, positional:
 	wdir (str): path to the working directory
 	inpath (str): relative path to the input directory
 	outpath (str): relative path to the output directory
+	
+	Argument, keyword:
+	stopwords_file (str): relative path to a file with a list of stopwords to remove from the full texts before processing them further
 	"""
 	print("cleaning annotated full text files...")
 	
+	stopwords_file = kwargs.get("stopwords_file", None)
+	stopwords = None
+	if stopwords_file is not None:
+		stopwords = pd.read_csv(join(wdir, stopwords_file), header=None)
+		stopwords = stopwords.iloc[:,0].tolist()
+	
+	# remove spaces between words and punctuation marks
 	for filepath in glob.glob(join(wdir, inpath, "*.txt")):
 		filename = filepath[-10:]
+		print("doing " + filename + "...")
 		with open(filepath, "r", encoding="UTF-8") as infile:
 			text = infile.read()
 			text = re.sub(r"\s+([,\.!?:;»”])", r"\1", text)
 			text = re.sub(r"([¿¡«“])\s+", r"\1", text)
 			text = re.sub(r"_", r" ", text)
+			# convert to lower case
+			text = text.lower()
+			# remove stop words if requested
+			if stopwords is not None:
+				for st in stopwords:
+					text = re.sub(r"\b" + st + r"\b", " ", text)
 			with open(join(wdir, outpath, filename), "w", encoding="UTF-8") as outfile:
 				outfile.write(text)
 	
@@ -540,18 +558,18 @@ def create_bow_model(wdir, corpusdir, outfile, **kwargs):
 	ngram_unit (str): unit of ngrams, "w" (words) or "c" (characters)
 	"""
 	
-	print("creating bow model...")
-	
 	mfw = kwargs.get("mfw", None)
 	stopword_file = kwargs.get("stopword_file")
 	ngram = kwargs.get("ngram")
 	ngram_unit = kwargs.get("ngram_unit")
 	
+	print("creating bow model for MFW" + str(mfw) + "...")
+	
 	# default parameter values (that can be overwritten):
 	stopwords = None
 	analyzer = "word"
 	ngramrange = (1,1)
-	tokenpattern = "(?u)\b\w+\b"
+	tokenpattern = r"(?u)\b\w+\b" # default for the CountVectorizer: (?u)\b\w\w+\b
 	
 	if stopword_file:
 		stopwords = pd.read_csv(join(wdir, stopword_file), header=None)
@@ -607,24 +625,31 @@ stopwords: reuse exception lists of named entities from orthography check
 mfws = [100,200,300,400,500,1000,2000,3000,4000,5000]
 ngram_words = [2,3,4]
 ngram_chars = [3,4,5]
-ngram_chars_type = ["word", "affix-punct", "all"]
-ngram_chars_subtype = ["multi-word", "prefix", "end-punct"] #"mid-word"
+ngram_chars_type = ["word", "affix-punct"]
+ngram_chars_subtype = ["mid-word", "multi-word", "prefix", "end-punct"]
 norm_mode = ["tf","tfidf","zscore"]
 
 
 
-'''
-# prepare full texts for character n-grams
-prepare_fulltexts("/home/ulrike/Git/", "conha19/txt_annotated/", "conha19/txt_annotated_corr/")
-'''
+
+# prepare full texts for general character n-grams (remove stopwords manually)
+#prepare_fulltexts("/home/ulrike/Git/", "conha19/txt_annotated/", "conha19/txt_annotated_stop/", stopwords_file="data-nh/analysis/features/stopwords/mfw_stopwords.txt")
+
+# prepare full texts for character n-gram subtypes
+#prepare_fulltexts("/home/ulrike/Git/", "conha19/txt_annotated/", "conha19/txt_annotated_corr/")
+
 
 '''
 # create stopword list for the word analyzer
 create_stopword_list("/home/ulrike/Git/", "data-nh/corpus/text-treatment/exception-words/", ["exceptions-proper-names_ext.txt", "exceptions-surnames_ext.txt", "exceptions-countries_ext.txt", "exceptions-capitals.txt", "exceptions-places.txt"], "data-nh/analysis/features/stopwords/mfw_stopwords.txt")
 '''
 
-''' TO DO: create again with new token_pattern
+######## MFW and classic NGRAM ########
+
+
+
 # create bow models with absolute counts:
+'''
 for m in mfws:
 	
 	# tokens
@@ -632,12 +657,13 @@ for m in mfws:
 	# word ngrams
 	for ngw in ngram_words:
 		create_bow_model("/home/ulrike/Git/", "conha19/txt_annotated", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngw) + "gram_words.csv", mfw=m, ngram=ngw, ngram_unit="w", stopword_file="data-nh/analysis/features/stopwords/mfw_stopwords.txt")
-	# character ngrams ("all" = classical approach TO DO: hier auch vorher stop words aus den Textdateien rauswerfen?)
+	
+	# character ngrams ("all" = classical approach)
 	for ngc in ngram_chars:
-		create_bow_model("/home/ulrike/Git/", "conha19/txt_annotated", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars.csv", mfw=m, ngram=ngc, ngram_unit="c")
+		create_bow_model("/home/ulrike/Git/", "conha19/txt_annotated_stop", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars.csv", mfw=m, ngram=ngc, ngram_unit="c")
 '''
 
-
+######## NGRAM SUBTYPES ########
 # create special character n-gram feature sets
 # do this for: 3,4,5; mid-word, multi-word, prefix, end-punct, and for the different mfw
 # combine mid-word and multi-word to a "word" set and prefix and end-punct to an "affix-punct" set
@@ -655,27 +681,48 @@ for ngc in ngram_chars:
 
 
 # count ngram vocabularies:
+
+'''
 for ngc in ngram_chars:
 	for ngs in ngram_chars_subtype:
 		count_vocab("/home/ulrike/Git", "conha19/txt_annotated_corr", "data-nh/analysis/features/stopwords/mfw_stopwords.txt", "data-nh/analysis/features/mfw/vocab_" + str(ngc) + "gram_chars_" + ngs + ".csv", "data-nh/analysis/features/mfw/bow_all_" + str(ngc) + "gram_chars_" + ngs + ".csv")
-	
+'''
+
+'''
+# CHECK: are there Unnamed columns?
+feature_set = "4gram_chars_mid-word"
+df = pd.read_csv("/home/ulrike/Git/data-nh/analysis/features/mfw/bow_all_" + feature_set + ".csv", index_col=0)
+vocab = pd.read_csv("/home/ulrike/Git/data-nh/analysis/features/mfw/vocab_" + feature_set + ".csv", header=None)
+num_unnamed = df.columns.str.match('Unnamed').tolist().count(True)
+print("length of the vocabulary: " + str(len(vocab)))
+print("columns of the data frame: " + str(len(df.columns)))
+print("number of Unnamed columns: " + str(num_unnamed))
+'''
+
+# remove Unnamed columns
+#df = df.loc[:, ~df.columns.str.match('Unnamed')]
+# save new frame
+#df.to_csv("/home/ulrike/Git/data-nh/analysis/features/mfw/bow_all_" + feature_set + ".csv")
 
 
-#create_ngram_feature_set("/home/ulrike/Git", 3, ["mid-word","multi-word"], 100, "data-nh/analysis/features/mfw/bow_mfw100_3gram_chars_word.csv")
+'''
+# create grouped n-gram feature sets:
+for mfw in mfws:
+	for ngc in ngram_chars:
+		create_ngram_feature_set("/home/ulrike/Git", ngc, ["mid-word","multi-word"], mfw, "data-nh/analysis/features/mfw/bow_mfw" + str(mfw) + "_" + str(ngc) + "gram_chars_word.csv")
+		create_ngram_feature_set("/home/ulrike/Git", ngc, ["prefix","end-punct"], mfw, "data-nh/analysis/features/mfw/bow_mfw" + str(mfw) + "_" + str(ngc) + "gram_chars_affix-punct.csv")
+'''
 
-
-
-
-
+######## CHECKS, NORMALIZATION, VISUALIZATION ########
 '''
 # check vocabulary of mfw for additional stop words	
 store_vocabulary("/home/ulrike/Git/", "data-nh/analysis/features/mfw/bow_mfw5000.csv", "data-nh/analysis/features/mfw/vocab_bow_mfw5000.csv")
 '''
 
 
-'''
-# normalize bow models:
 
+# normalize bow models:
+'''
 for m in mfws:
 	for n in norm_mode:
 	
@@ -689,6 +736,17 @@ for m in mfws:
 		for ngc in ngram_chars:
 			normalize_bow_model("/home/ulrike/Git/", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars.csv", n)
 '''
+
+'''
+# normalize ngram subtype models:
+for m in mfws:
+	for n in norm_mode:
+		for ngc in ngram_chars:
+			for ngt in ngram_chars_type:
+				normalize_bow_model("/home/ulrike/Git/", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars_" + ngt + ".csv", n)
+'''	
+
+
 
 '''
 #  visualize characteristics of feature sets

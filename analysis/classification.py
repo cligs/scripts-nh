@@ -5,7 +5,7 @@
 """
 @author: Ulrike Henny-Krahmer
 
-Classify the novels using different feature sets and types of subgenre labels.
+Classify the novels using different feature sets, types of subgenre labels, and classifiers.
 """
 
 import pandas as pd
@@ -13,8 +13,12 @@ import numpy as np
 from os.path import join
 import plotly.graph_objects as go
 from sklearn import svm
+from sklearn import neighbors
+from sklearn import ensemble
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_validate
 from sklearn.model_selection import GridSearchCV
 
 
@@ -106,55 +110,358 @@ def select_data(wdir, mdfile, subgenre_type, subgenre1, subgenre2, features):
 		X = np.concatenate((X, data.loc[sub2.index].to_numpy()))
 		
 	return X,y
+	
+	
+def get_feature_paths(wdir):
+	"""
+	collect the filepaths to all the different feature sets, relative to the working directory
+	
+	Argument:
+	wdir (str): path to the working directory
+	"""
+	mfw = "data-nh/analysis/features/mfw/"
+	topics = "data-nh/analysis/features/topics/"
+	
+	# different feature constellations that were produced:
+	mfws = [100,200,300,400,500,1000,2000,3000,4000,5000]
+	ngram_words = [2,3,4]
+	ngram_chars = [3,4,5]
+	ngram_chars_type = ["word", "affix-punct"]
+	norm_mode = ["tf","tfidf","zscore"]
+	
+	num_topics = [50,60,70,80,90,100]
+	optimize_intervals = [50,100,250,500,1000,2500,5000,None]
+	num_repetitions = 5
+	
+	for mfw in mfws:
+		for nm in norm_mode:
+			# word features
+			file_name = "bow_mfw" + str(mfw) + "_" + nm + ".csv"
+			file_path = join(mfw, file_name)
+			return file_path
+			# word n-grams
+			for ngw in ngram_words:
+				file_name = "bow_mfw" + str(mfw) + "_" + str(ngw) + "gram_words_" + nm + ".csv"
+				file_path = join(mfw, file_name)
+				return file_path
+			# general character n-grams
+			for ngc in ngram_chars:
+				file_name = "bow_mfw" + str(mfw) + "_" + str(ngc) + "gram_chars_" + nm + ".csv"
+				file_path = join(mfw, file_name)
+				return file_path
+				# character n-gram subtypes
+				for ngt in ngram_chars_type:
+					file_name = "bow_mfw" + str(mfw) + "_" + str(ngc) + "gram_chars_" + ngt + "_" + nm + ".csv"
+					file_path = join(mfw, file_name)
+					return file_path
+	
+	'''
+	WARTEN, bis die Topic-Daten fertig sind, um die genauen Pfade der aggregierten Daten zu haben.
+	for t in num_topics:
+		for oi in optimize_intervals:
+			file_name = ""
+			file_path = join(topics, file_name)
+			return file_path
+	'''
+	
+def scale_feature_sets(wdir, feature_set_paths):
+	"""
+	For use with SVM: scale the feature sets to [0,1]
+	
+	Arguments:
+	wdir (str): path to the working directory
+	feature_set_paths (list): list of relative paths to the different feature sets
+	"""
+	print("scaling feature sets...")
+	
+	
+	for fs in feature_set_paths:
+		df = pd.read_csv(join(wdir, fs), index_col=0)
+		
+		# scale the features
+		scaler = MinMaxScaler()
+		new_data = scaler.fit_transform(df.to_numpy())
+		new_df = pd.DataFrame(index=df.index, columns=df.columns, data=new_data)
+		
+		# store the scaled feature set in a new file
+		new_path = fs[:-4] + "_MinMax.csv"
+		new_df.to_csv(join(wdir, new_path))
+	
+	print("done")
 
 
 
-# FUNCTION CALLS
+select_metadata(wdir, md_file, subgenre_sets, outpath):
+	"""
+	select metadata for specific subgenre constellations to analyze
+	save the metadata subsets
+	
+	Arguments:
+	wdir (str): path to the working directory
+	md_file (str): relative path to the metadata file
+	subgenre_sets (list): list of dicts describing which subgenre constellations to choose, e.g. [{"level": "subgenre-current", "class 1": "novela romántica", "class 2": "other"}]
+	outpath (str): relative path to the output directory for the metadata selection files
+	"""
+	print("select metadata...")
+	
+	md = pd.read_csv(join(wdir, md_file), index_col=0)
+	
+	for sb_set in subgenre_sets:
+		level = sb_set["level"]
+		class1 = sb_set["class 1"]
+		class2 = sb_set["class 2"]
+		
+		print("selecting metadata for " + level + ", " + class1 + " vs. " + class2, "...")
+		
+		
+		# get the instances of the first subgenre
+		sub1 = md.loc[md[level] == class1]
+		
+		# get the instances of the second subgenre
+		if class2 == "other":
+			md.loc[np.logical_not(md[level].isin([class1, "unknown"])),level]  = "other"
+			
+		sub2 = md.loc[md[level] == class2]
+			
+		
+		# is one class bigger than the other? if yes, undersample (select random samples from the bigger class)
+		num_sub1 = len(sub1)
+		num_sub2 = len(sub2)
+		
+		print("Number of samples per class: " + str(len(sub1)))
+		
+		# repeat the sampling process 10 times
+		for i in range(10):
+			if num_sub1 > num_sub2:
+				sub1 = sub1.sample(n=num_sub2)
+			elif num_sub2 > num_sub1:
+				sub2 = sub2.sample(n=num_sub1)
+				
+			# create new metadata frame with selected entries
+			new_md = sub1.append(sub2)
+			# store new metadata selection
+			outfile = "metadata_" + level + "_" + re.sub(r"\s", r"_", class1) + "_" + re.sub(r"\s", r"_", class2) + "_" + str(i) + ".csv"
+			new_md.to_csv(join(wdir, outpath, outfile))
 
-# primary literary currents
+	
+	print("done")
+	
+
+def select_data_mfw(wdir, md_inpath, feature_inpath, sb_set, mfw, unit, no, rep):
+	"""
+	prepare data for classifier as X (np data array), y (labels)
+	for mfw
+	returns X, y
+	
+	Arguments:
+	wdir (str): path to the working directory
+	md_inpath (str): relative path to the directory containing selected metadata for subgenre constellations
+	feature_inpath (str): relative path to the directory containing the feature sets
+	sb_set (dict): dictionary describing the subgenre constellation to analyze, e.g. {"level": "subgenre-current", "class 1": "novela romántica", "class 2": "other"}
+	mfw (int): number of mfw
+	unit (str): token unit ("word", "word 3gram", "char 3gram", etc.)
+	no (str): normalization mode ("tf", "tfidf", "zscore")
+	rep (int): number of the data selection repetition to use
+	"""	
+	# which type of subgenre is analyzed?
+	level = sb_set["level"]
+	
+	# load the metadata file corresponding to the selected subgenre constellation and feature set
+	md_path = join(wdir, md_inpath) # to do: ergänzen
+	md = pd.read_csv(md_path, index_col=0)
+	
+	# prepare the data to return
+	# labels
+	y = md[level]
+		
+	# values
+	feature_path = join(wdir, feature_inpath) # to do: ergänzen
+	data = pd.read_csv(join(wdir, features), index_col=0)
+	X = data.loc[md.index].to_numpy()
+		
+	return X,y
+	
+
+def parameter_study(wdir):
+	"""
+	test different subgenre constellations and selected feature sets
+	do grid searches for the three types of classifiers (SVM, KNN, RF) to see which parameters work best
+	
+	Argument:
+	wdir (str): path to the working directory
+	"""
+	
+	# chosen subgenre constellations
+	subgenre_sets = [{"level": "subgenre-current", "class 1": "novela romántica", "class 2": "other"},
+	{"level": "subgenre-current", "class 1": "novela realista", "class 2": "novela naturalista"},
+	{"level": "subgenre-theme", "class 1": "novela histórica", "class 2": "other"},
+	{"level": "subgenre-theme", "class 1": "novela sentimental", "class 2": "novela de costumbres"}]
+
+	# how often should the data selection (with undersampling) be repeated?
+	repetitions = 10
+
+	# chosen feature parameters
+	mfws = [100, 1000, 5000]
+	token_units = ["word", "word 3gram", "char 3gram"]
+	norms = ["tfidf", "zscore"]
+
+	num_topics = [50, 100]
+	optimize_intervals = [100, 1000]
+
+	# select metadata for subgenre constellations
+	select_metadata(wdir, "conha19/metadata.csv", subgenre_sets, "data-nh/analysis/classification/data_selection/preliminary/")
+
+	# classifiers
+	classifiers = ["SVM", "KNN", "RF"]
+	# data frames for results
+	fr_svm = pd.DataFrame()
+	fr_knn = pd.DataFrame()
+	fr_rf = pd.DataFrame()
+
+	for sb_set in subgenre_sets:
+		# mfw
+		for mfw in mfws:
+			for unit in token_units:
+				for no in norms:
+					for rep in repetitions:
+						X, y = select_data_mfw(wdir, "data-nh/analysis/classification/data_selection/preliminary/", "data-nh/analysis/features/mfw/", sb_set, mfw, unit, no, rep)
+						
+						# do grid searches for the different classifiers
+						## choose classifier
+						for cl in classifiers:
+							if cl == "SVM":
+								clf = svm.SVC(kernel="linear")
+								param_grid = [{"C": [1,10,100,1000]}]
+							elif cl == "KNN":
+								clf = neighbors.KNeighborsClassifier()
+								param_grid = [{"n_neighbors": [3,5,7], "weights": ["uniform", "distance"], "metric": ["euclidean", "manhattan"]}]
+							elif cl == "RF":
+								clf = ensemble.RandomForestClassifier(random_state=0)
+								param_grid = [{"max_features": ["sqrt", "log2"]}]
+							
+							grid_search = GridSearchCV(clf, param_grid=param_grid, cv=10)
+							grid_search.fit(X,y)
+							results = grid_search.cv_results_
+							results = pd.DataFrame.from_dict(results)
+							
+							results["subgenre_level"] = sb_set["level"]
+							results["class1"] = sb_set["class1"]
+							results["class2"] = sb_set["class2"]
+							results["mfw"] = mfw
+							results["token_unit"] = unit
+							results["normalization"] = no
+							results["repetition"] = rep
+							
+							if cl == "SVM":
+								fr_svm.append(results)
+							elif cl == "KNN":
+								fr_knn.append(results)
+							elif cl == "RF":
+								fr_fr.append(results)
+		# topics
+		# to do...
+
+	# store results
+	outpath = "data-nh/analysis/classification/parameter_study"
+		
+	fr_svm.to_csv(join(wdir, outpath, "grid-searches-SVM.csv"))
+	fr_knn.to_csv(join(wdir, outpath, "grid-searches-KNN.csv"))
+	fr_rf.to_csv(join(wdir, outpath, "grid-searches-RF.csv"))
+
+	print("done")
+
+
+def evaluate_parameter_study(wdir, clf, param):
+	"""
+	count how often each parameter value is on rank 1 for the test score
+	
+	Arguments:
+	wdir (str): path to the working directory
+	clf (str): type of classifier ("SVM", "KNN" or "RF")
+	param (str): which parameter to evaluate (e.g. "C")
+	"""
+	print("evaluating parameter study for " + clf + "...")
+	
+	# load results
+	df = pd.read_csv(join(wdir, "data-nh/analysis/classification/parameter_study/grid-searches-" + clf + ".csv"))
+	# keep only rows with rank_test_score = 1
+	df = df.loc[df["rank_test_score"] == 1]
+	df = df.groupby(by=param).size().reset_index(name="counts").sort_values(by="counts", ascending=False)
+	
+	print(df)
+	
+
+
+#################### FUNCTION CALLS ####################
+
+wdir = "/home/ulrike/Git"
+
+# get relative paths to feature sets
+feature_set_paths = get_feature_paths(wdir)
+# write to a csv file for later use
+df = pd.DataFrame(data=feature_set_paths)
+df.to_csv(join(wdir, "data-nh/analysis/features/feature_sets.csv"), index=False, header=False)
+
+# prepare the feature sets for use with SVM: scale to [0,1]
+scale_feature_sets(wdir, feature_set_paths)
+
+
+# preliminary parameter study
+
+parameter_study(wdir)
+
+evaluate_parameter_study(wdir, "SVM", "param_C")				
+	
+
+
+
+##################### main classification tasks #####################
+#### primary literary currents ####
 
 #plot_overview_literary_currents_primary("/home/ulrike/Git/", "conha19/metadata.csv", "data-nh/analysis/classification/literary-currents/", "overview-primary-currents-corp")
 
-# prepare the data: "novela romántica" vs. "other", mfw100_tfidf
-X, y = select_data("/home/ulrike/Git/", "conha19/metadata.csv", "subgenre-current", "novela romántica", "other", "data-nh/analysis/features/mfw/bow_mfw100_tfidf.csv")
+# chosen subgenre constellations
+subgenre_sets = [{"level": "subgenre-current", "class 1": "novela romántica", "class 2": "other"},
+{"level": "subgenre-current", "class 1": "novela realista", "class 2": "other"},
+{"level": "subgenre-current", "class 1": "novela naturalista", "class 2": "other"},
+{"level": "subgenre-current", "class 1": "novela romántica", "class 2": "novela realista"},
+{"level": "subgenre-current", "class 1": "novela romántica", "class 2": "novela naturalista"},
+{"level": "subgenre-current", "class 1": "novela realista", "class 2": "novela naturalista"}]
 
-
-## choose classifier
-clf = svm.SVC(kernel="linear", C=100)
-
-'''
-## standard
-# split randomly into training and test set
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
-# train the model
-clf.fit(X_train, y_train)
-# evaluate, default: accuracy
-train_score = clf.score(X_train, y_train)
-test_score = clf.score(X_test, y_test)
-print(train_score)
-print(test_score)
-print(clf.predict(X_test))
-'''
-
-'''
-## cross validation
-scores = cross_val_score(clf, X, y, cv=10, scoring="f1_macro") # default: accuracy
-print(scores)
-print(scores.mean())
-'''
-
-## grid search
-param_grid = [{'C': [0.1, 1, 10, 100, 1000]}]
-grid_search = GridSearchCV(clf, param_grid=param_grid, cv=10)
-grid_search.fit(X, y)  
-results = grid_search.cv_results_
-results = pd.DataFrame.from_dict(results)
-results.to_csv("/home/ulrike/Git/data-nh/analysis/classification/literary-currents/grid-search.csv")
-
-print("done")
+# make a test with one constellation and feature type:
+# https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.cross_validate.html#sklearn.model_selection.cross_validate
+sb_set = subgenre_sets[0]
+mfw = 100
+unit = "word"
+no = "tfidf"
+rep = 0
+X, y = select_data_mfw(wdir, "data-nh/analysis/classification/data_selection/preliminary/", "data-nh/analysis/features/mfw/", sb_set, mfw, unit, no, rep)
+clf = svm.SVC(kernel="linear", C=1000)
+scores = cross_validate(clf, X, y, cv=10, scoring=["accuracy", "precision", "recall", "f1"], return_train_score=True, return_estimator=True)
+						
+# erstmal angucken, was da zurückkommt...
 
 #print(clf.classes_)
 #print(clf.coef_)
+
+
+#### primary thematic labels ####
+subgenre_sets = [{"level": "subgenre-theme", "class 1": "novela histórica", "class 2": "other"},
+{"level": "subgenre-theme", "class 1": "novela sentimental", "class 2": "other"},
+{"level": "subgenre-theme", "class 1": "novela de costumbres", "class 2": "other"},
+{"level": "subgenre-theme", "class 1": "novela histórica", "class 2": "novela sentimental"},
+{"level": "subgenre-theme", "class 1": "novela histórica", "class 2": "novela de costumbres"},
+{"level": "subgenre-theme", "class 1": "novela sentimental", "class 2": "novela de costumbres"}]
+
+
+
+#### novelas ####
+subgenre_sets = [{"level": "subgenre-novela", "class 1": "novela", "class 2": "none"}]
+
+
+##################### analysis and visualization of results #####################
+
+
 
 
 
