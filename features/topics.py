@@ -16,6 +16,8 @@ import numpy as np
 import plotly.graph_objects as go
 from tmw import prepare
 from tmw import model
+from tmw import postprocess
+from tmw import visualize
 
 
 def clean_stoplist(wdir, stopwordsfile):
@@ -77,22 +79,23 @@ StoplistProject = join(wdir, "data-nh/analysis/features/stopwords/", "topics_sto
 NumTopics = [50,60,70,80,90,100]
 NumIterations = [5000]
 OptimizeIntervals = [50,100,250,500,1000,2500,5000,None]
-NumRepetitions = 5 # how many models with the same settings to build
+NumRepetitions = 5 # how many models with the same settings to build # 5
 NumTopWords = 50
 NumThreads = 4
 ModelFolder = join(wdir, "data-nh/analysis/features/topics/", "3_models")
 
-model.call_mallet_modeling(MalletPath, CorpusFile, ModelFolder, NumTopics, NumIterations, OptimizeIntervals, NumRepetitions, NumTopWords, NumThreads)
+#model.call_mallet_modeling(MalletPath, CorpusFile, ModelFolder, NumTopics, NumIterations, OptimizeIntervals, NumRepetitions, NumTopWords, NumThreads)
 
 
 
-'''
+
 ########## POSTPROCESSING ##########
 
 
 ### Set parameters as used in the topic model
 NumIterations = 5000
 
+'''
 # call postprocessing functions for all types of parameter combinations
 for RP in range(NumRepetitions):
 	for NT in NumTopics:
@@ -105,7 +108,7 @@ for RP in range(NumRepetitions):
 			outfolder = join(wdir, "data-nh/analysis/features/topics/", "4_aggregates", param_settings)
 			mastermatrixfile = "mastermatrix.csv"
 			metadatafile = join(wdir, "conha19/", "metadata.csv")
-			topics_in_texts = join(wdir, "data-nh/analysis/features/topics/", "2_mallet", "topics-in-texts_" + param_settings + ".csv")
+			topics_in_texts = join(wdir, "data-nh/analysis/features/topics/", "3_models", "topics-in-texts_" + param_settings + ".csv")
 			number_of_topics = NT
 			useBins = False
 			binDataFile = ""
@@ -122,19 +125,42 @@ for RP in range(NumRepetitions):
 
 			### save_firstWords
 			### Saves the first words of each topic to a separate file.
-			topicWordFile = join(wdir, "data-nh/analysis/features/topics/", "2_mallet", "topics-with-words_" + param_settings + ".csv")
+			topicWordFile = join(wdir, "data-nh/analysis/features/topics/", "3_models", "topics-with-words_" + param_settings + ".csv")
 			outfolder = join(wdir, "data-nh/analysis/features/topics/", "4_aggregates", param_settings)
 			filename = "firstWords.csv"
 			postprocess.save_firstWords(topicWordFile, outfolder, filename)
 
 			### Save topic ranks
-			topicWordFile = join(wdir, "data-nh/analysis/features/topics/", "2_mallet", "topics-with-words_" + param_settings + ".csv")
+			topicWordFile = join(wdir, "data-nh/analysis/features/topics/", "3_models", "topics-with-words_" + param_settings + ".csv")
 			outfolder = join(wdir, "data-nh/analysis/features/topics/", "4_aggregates", param_settings)
 			filename = "topicRanks.csv"
 			postprocess.save_topicRanks(topicWordFile, outfolder, filename)
-
+'''
 
 ########## VISUALIZATION ##########
 
 # create word clouds for the topics of selected models
-'''
+
+
+### Set parameters as used in the topic model
+NumTopics = [50,100]
+NumIterations = 5000
+OptimizeIntervals = [50,1000,None]
+NumRepetitions = 1
+
+for RP in range(NumRepetitions):
+	for NT in NumTopics:
+		for OI in OptimizeIntervals:
+			param_settings = str(NT) + "tp-" + str(NumIterations) + "it-" + str(OI) + "in-" + str(RP)
+
+			### make_wordle_from_mallet
+			### Creates a wordle for each topic.
+			word_weights_file = join(wdir, "data-nh/analysis/features/topics/", "3_models", "word-weights_" + param_settings + ".csv")
+			words = 40
+			outfolder = join(wdir, "data-nh/analysis/features/topics/", "5_visuals", param_settings, "wordles")
+			font_path = join(wdir, "data-nh/analysis/features/topics/extras", "AlegreyaSans-Regular.otf")
+			dpi = 300
+			TopicRanksFile = join(wdir, "data-nh/analysis/features/topics/", "4_aggregates", param_settings, "topicRanks.csv")
+			visualize.make_wordle_from_mallet(word_weights_file, NT, words, TopicRanksFile, outfolder, dpi) # ggf. font_path
+
+

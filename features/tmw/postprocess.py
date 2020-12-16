@@ -24,7 +24,7 @@ import re
 def get_metadata(metadatafile):
     print("- getting metadata...")
     """Read metadata file and create DataFrame."""
-    metadata = pd.DataFrame.from_csv(metadatafile, header=0, sep=",")
+    metadata = pd.read_csv(metadatafile, header=0, sep=",")
     #print("metadata\n", metadata)
     return metadata
 

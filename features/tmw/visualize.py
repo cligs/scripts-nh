@@ -31,7 +31,7 @@ import pygal
 
 def read_mallet_output(word_weights_file):
     """Reads Mallet output (topics with words and word weights) into dataframe.""" 
-    word_scores = pd.read_table(word_weights_file, header=None, sep="\t")
+    word_scores = pd.read_csv(word_weights_file, header=None, sep="\t")
     word_scores = word_scores.sort_values(by=[0,2], axis=0, ascending=[True, False])
     word_scores_grouped = word_scores.groupby(0)
     #print(word_scores.head())
@@ -46,7 +46,6 @@ def get_wordlewords(words, word_weights_file, topic):
     wordlewords = ""
     j = 0
     for word in topic_words:
-        word = word
         score = word_scores[j]
         j += 1
         wordlewords = wordlewords + ((word + " ") * int(score))
@@ -79,7 +78,7 @@ def make_wordle_from_mallet(word_weights_file,
     for topic in range(0,num_topics):
         ## Gets the text for one topic.
         text = get_wordlewords(words, word_weights_file, topic)
-        wordcloud = WordCloud(width=1600, height=1200, background_color="white", margin=4).generate(text) #font_path=font_path, 
+        wordcloud = WordCloud(width=1600, height=1200, background_color="white", margin=4, collocations=False).generate(text) #font_path=font_path, 
         default_colors = wordcloud.to_array()
         rank = get_topicRank(topic, TopicRanksFile)
         figure_title = "topic "+ str(topic) + " ("+str(rank)+"/"+str(num_topics)+")"       

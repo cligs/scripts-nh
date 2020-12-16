@@ -9,7 +9,7 @@
     @author: Ulrike Henny-Krahmer
     
     This script produces a plain text version of a single TEI corpus file, 
-    based on the version annotated with FreeLing. Only nouns are kept and named entities are replaced.
+    based on the version annotated with FreeLing. Only noun lemmas are kept and named entities are replaced.
         
     How to call the script (to process the whole corpus):
     java -jar /home/ulrike/Programme/saxon/saxon9he.jar -s:/home/ulrike/Git/conha19/annotated/ -o:/home/ulrike/Git/conha19/txt_annotated_nouns/ -xsl:/home/ulrike/Git/scripts-nh/corpus/derivative_formats/get-plaintext-annotated-nouns.xsl
@@ -31,7 +31,7 @@
     
     <!-- copy word text of nouns -->
     <xsl:template match="w[@pos='noun']">
-        <xsl:value-of select="."/><xsl:text> </xsl:text>
+        <xsl:value-of select="@lemma"/><xsl:text> </xsl:text>
     </xsl:template>
     
     

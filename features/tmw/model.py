@@ -66,6 +66,7 @@ def call_mallet_modeling(MalletPath,
 
 	### Constructing Mallet command from parameters.
 	for Repetition in range(NumRepetitions):
+		#Repetition = 4
 		print("modeling repetition number " + str(Repetition) + "...")
 		for Topics in NumTopics: 
 			for Iterations in NumIterations: 
