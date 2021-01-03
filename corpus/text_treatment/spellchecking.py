@@ -148,7 +148,7 @@ def correct_words(errFolder, corrFolder, substFile):
 ##########################################################################
 	
 
-def plot_error_distribution(wdir, spellcheck_file, **kwargs):
+def plot_error_distribution(wdir, spellcheck_file, outfile, **kwargs):
 	"""
 	Visualizes the distribution of errors (how many errors occur how frequently?)
 
@@ -158,8 +158,10 @@ def plot_error_distribution(wdir, spellcheck_file, **kwargs):
 	
 	wdir (str): path to the working directory, e.g. "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
 	spellcheck_file (str): name of the csv file containing the spellcheck results, e.g. "spellcheck.csv"
+	outfile (str): relative path to the output file, without file name extension
 	log (str): optional argument; should the x-axis be logarithmic? "yes" or "no"; defaults to "no"
 	"""
+	print("plot error distribution...")
 	
 	log = kwargs.get("log", "no")
 
@@ -171,14 +173,22 @@ def plot_error_distribution(wdir, spellcheck_file, **kwargs):
 	fig = go.Figure(data=go.Scatter(x=x, y=y, mode="markers"))
 	if log == "yes":
 		xaxis_type="log"
+		xaxis_title="number of errors (log)"
 	else:
 		xaxis_type="linear"
+		xaxis_title="number of errors"
 		
-	fig.update_layout(autosize=False,width=900,height=500,xaxis_type=xaxis_type)
-	fig.show()
+	fig.update_layout(autosize=False,width=800,height=500,xaxis_type=xaxis_type,xaxis_title=xaxis_title,yaxis_title="error frequency")
+	
+	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 
 
-def plot_top_errors(wdir, spellcheck_file, num_errors):
+def plot_top_errors(wdir, spellcheck_file, outfile, num_errors):
 	"""
 	Visualizes the top errors as a bar chart (which top error words occur how frequently?)
 	
@@ -187,8 +197,10 @@ def plot_top_errors(wdir, spellcheck_file, num_errors):
 	Arguments:
 	wdir (str): path to the working directory, e.g. "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
 	spellcheck_file (str): name of the csv file containing the spellcheck results, e.g. "spellcheck.csv"
+	outfile (str): relative path to the output file
 	num_errors (int): number of top errors to plot
 	"""
+	print("plot top errors...")
 	
 	data = pd.read_csv(join(wdir, spellcheck_file), index_col=0, header=0)
 	data = data.head(num_errors)
@@ -197,12 +209,19 @@ def plot_top_errors(wdir, spellcheck_file, num_errors):
 	y = list(data["sum"])
 
 	fig = go.Figure([go.Bar(x=x, y=y)])
-	fig.update_layout(autosize=False,width=1000,height=600)
-	fig.update_xaxes(tickangle=270)
-	fig.show()
+	fig.update_layout(autosize=False,width=800,height=500)
+	fig.update_xaxes(tickangle=270,tickfont=dict(size=14),title="error word")
+	fig.update_yaxes(title="error frequency")
+	
+	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 	
 	
-def plot_errors_per_file(wdir, spellcheck_file, mode, norm):
+def plot_errors_per_file(wdir, spellcheck_file, outfile, mode, norm):
 	"""
 	Visualizes how many errors there are per text file in the corpus (as a violin plot)
 	
@@ -211,9 +230,11 @@ def plot_errors_per_file(wdir, spellcheck_file, mode, norm):
 	Arguments:
 	wdir (str): path to the working directory, e.g. "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
 	spellcheck_file (str): name of the csv file containing the spellcheck results, e.g. "spellcheck.csv"
+	outfile (str): relative path to the output file (without filename extension)
 	mode (str): "types" or "tokens" or "both"
 	norm (str): "absolute" error numbers or "relative" to text length
 	"""
+	print("plot errors per file...")
 	
 	data = pd.read_csv(join(wdir, spellcheck_file), index_col=0, header=0)
 	data = data.drop("sum", axis=1).T.sort_index()
@@ -225,7 +246,7 @@ def plot_errors_per_file(wdir, spellcheck_file, mode, norm):
 	
 	# for relative numbers divide the error values by the number of tokens / types in the text
 	if norm == "relative":
-		wdir_corpus = "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/"
+		wdir_corpus = "/home/ulrike/Git/conha19/"
 		text_lengths = get_text_lengths(wdir_corpus, "txt/*.txt")
 		text_vocabs = get_text_vocabulary_sizes(wdir_corpus, "txt/*.txt")
 		data_tokens = data_tokens.divide(text_lengths)
@@ -246,11 +267,21 @@ def plot_errors_per_file(wdir, spellcheck_file, mode, norm):
 		fig.add_trace(go.Violin(x=x_tokens, y=data_tokens, name="tokens", box_visible=True, meanline_visible=True))
 		fig.add_trace(go.Violin(x=x_types, y=data_types, name="types", box_visible=True, meanline_visible=True))
 	
-	fig.update_layout(autosize=False,width=900,height=600)
-	fig.show()
+	if norm == "relative":
+		yaxis_title="number of tokens/types (relative)"
+	else:
+		yaxis_title="number of tokens/types"
+	
+	fig.update_layout(autosize=False,width=800,height=500,yaxis_title=yaxis_title,xaxis_tickfont=dict(size=14),legend_font=dict(size=14))
+	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 	
 	
-def plot_errors_per_file_grouped(wdir, spellcheck_file, md_file, md_category, norm):
+def plot_errors_per_file_grouped(wdir, spellcheck_file, outfile, md_file, md_category, norm):
 	"""
 	Visualizes how many errors there are per text file in the corpus (as a violin plot),
 	for a certain metadata type, e.g. kind of edition, grouped by tokens and types
@@ -260,10 +291,12 @@ def plot_errors_per_file_grouped(wdir, spellcheck_file, md_file, md_category, no
 	Arguments:
 	wdir (str): path to the working directory, e.g. "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
 	spellcheck_file (str): name of the csv file containing the spellcheck results, e.g. "spellcheck.csv"
+	outfile (str): relative path to the output file (without filename extension)
 	md_file (str): path to the metadata table containing information about the kind of source edition of each file
 	md_category (str): metadata category for the plot, e.g. "sources_edition" or "sources_filetype"
 	norm (str): "absolute" error numbers or "relative" to text length 
 	"""
+	print("plot errors per file grouped...")
 	
 	data = pd.read_csv(join(wdir, spellcheck_file), index_col=0, header=0)
 	metadata = pd.read_csv(join(wdir, md_file), index_col=0, header=0)
@@ -279,14 +312,14 @@ def plot_errors_per_file_grouped(wdir, spellcheck_file, md_file, md_category, no
 	
 	# for relative numbers divide the error values by the number of tokens in the text
 	if norm == "relative":
-		wdir_corpus = "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/"
+		wdir_corpus = "/home/ulrike/Git/conha19/"
 		text_lengths = get_text_lengths(wdir_corpus, "txt/*.txt")
 		text_vocabs = get_text_vocabulary_sizes(wdir_corpus, "txt/*.txt")
 		data["tokens_sum"] = data["tokens_sum"].divide(text_lengths)
 		data["types_sum"] = data["types_sum"].divide(text_vocabs)
 		
-		print(data["types_sum"].idxmax())
-		exit()
+		#print(data["types_sum"].idxmax())
+		#exit()
 	
 	
 	data = data.sort_values(by=md_category)
@@ -298,14 +331,23 @@ def plot_errors_per_file_grouped(wdir, spellcheck_file, md_file, md_category, no
 	fig.add_trace(go.Violin(x=data[md_category], y=data['types_sum'], legendgroup='types', scalegroup='types', name='types', line_color='orange', box_line_color="red"))
 
 	fig.update_traces(box_visible=True, meanline_visible=True)
-	fig.update_layout(violinmode='group')
-	fig.update_layout(autosize=False,width=1100,height=1000) # if many x values: height 1000, otherwise 800
+	fig.update_layout(violinmode='group',yaxis_title="number of tokens/types (relative)")
+	fig.update_layout(autosize=False,width=900,height=1000,legend_font=dict(size=14)) 
+	# source edition type: 900/700, file type: 700/600, institution: 900/900
+	fig.update_layout(margin=dict(b=300))
 	
-	fig.update_xaxes(tickangle=270) # if there are many values on the x axis
-	fig.show()
+	fig.update_xaxes(tickfont=dict(size=13),title="source institution")
+	fig.update_xaxes(tickangle=270) # if there are many values on the x axis: tickangle=270
+	# titles: source edition type, source file type
+	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 	
 	
-def plot_errors_covered_exceptions(wdir, spellcheck_file, exc_lists, exc_labels):
+def plot_errors_covered_exceptions(wdir, spellcheck_file, outfile, exc_lists, exc_labels):
 	"""
 	Creates a grouped bar chart showing how many error tokens and types were covered by the
 	various exception lists.
@@ -315,6 +357,7 @@ def plot_errors_covered_exceptions(wdir, spellcheck_file, exc_lists, exc_labels)
 	Arguments:
 	wdir (str): path to the working directory, e.g. "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
 	spellcheck_file (str): name of the csv file containing the spellcheck results, e.g. "spellcheck.csv"
+	outfile (str): relative path to the output file (without filename extension)
 	exc_lists (list): list of strings; relative paths (from the wdir) to the exception word lists
 	exc_labels (list): list of strings; labels/exception list names to show in the plot
 	"""
@@ -356,8 +399,14 @@ def plot_errors_covered_exceptions(wdir, spellcheck_file, exc_lists, exc_labels)
 		go.Bar(name='types', x=exc_labels, y=y_types)
 	])
 	# Change the bar mode
-	fig.update_layout(barmode='group',autosize=False,width=900,height=600)
-	fig.show()
+	fig.update_layout(barmode='group',autosize=False,width=800,height=500,yaxis_title="number of tokens/types",xaxis_tickfont=dict(size=14),legend_font=dict(size=14))
+	
+	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 	
 	
 ##########################################################################

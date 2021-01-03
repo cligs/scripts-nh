@@ -211,5 +211,5 @@ def get_mfw_ranks(wdir, feat_matrix, corpus_path, outfile):
 
 #corpus_to_lower("/home/ulrike/Git/papers/family_resemblance_dsrom19/", "texts/txt_full/", "texts/txt_full_lower")
 
-get_mfw_ranks("/home/ulrike/Git/papers/family_resemblance_dsrom19/", "features/mfw_1000_tfidf_full.csv", "texts/txt_full_lower/", "features/mfw_ranks.csv")
+#get_mfw_ranks("/home/ulrike/Git/papers/family_resemblance_dsrom19/", "features/mfw_1000_tfidf_full.csv", "texts/txt_full_lower/", "features/mfw_ranks.csv")
 

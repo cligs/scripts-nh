@@ -13,10 +13,10 @@
         vs. all the other novels in the corpus.
         
         How to call the script:
-        java -jar saxon9he.jar /home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/nh0001.xml /home/ulrike/Git/scripts-nh/corpus/direct-speech-travelogues.xsl > /home/ulrike/Git/data-nh/corpus/direct-speech-travelogues.html
+        java -jar /home/ulrike/Programme/saxon/saxon9he.jar /home/ulrike/Git/conha19/tei/nh0001.xml /home/ulrike/Git/scripts-nh/corpus/direct-speech-travelogues.xsl > /home/ulrike/Git/data-nh/corpus/direct-speech-travelogues.html
     -->
     
-    <xsl:variable name="wdir">/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/</xsl:variable>
+    <xsl:variable name="wdir">/home/ulrike/Git/conha19/</xsl:variable>
     
     <xsl:template match="/">
         <html>
@@ -26,11 +26,16 @@
             </head>
             <body>
                 <!-- Plotly chart will be drawn inside this DIV -->
-                <div id="myDiv" style="width: 800px"></div>
+                <div id="myDiv" style="width: 700px; height: 500px;"></div>
+                <!-- Plotly chart will be exported to this tag -->
+                <img id="png-export"/>
                 <script>
+                    var d3 = Plotly.d3;
+                    var img_png= d3.select('#png-export');
+                    
                     var data = [
                     {
-                    y: [<xsl:for-each select="collection(concat($wdir, 'master'))//TEI">
+                    y: [<xsl:for-each select="collection(concat($wdir, 'tei'))//TEI[.//body//p[said]]">
                         <xsl:variable name="num_p" select="count(.//body//p)"/>
                         <!-- paragraphs containing direct speech -->
                         <xsl:variable name="num_p_speech" select="count(.//body//p[said])"/>
@@ -64,12 +69,25 @@
                     ];
                     
                     var layout = {
+                    legend: {font: {size: 14}},
                     yaxis: {
-                    range: [0,1]
-                    }
+                        range: [0,1],
+                        title: "paragraphs with direct speech (relative)"
+                    },
+                    xaxis: {tickfont: {size: 14}}
                     };
                     
-                    Plotly.newPlot('myDiv', data, layout);
+                    Plotly.newPlot('myDiv', data, layout)<!--.then(
+                        function(gd)
+                        {
+                        Plotly.toImage(gd,{width:1654,height:1034}) 
+                        .then(
+                        function(url)
+                        {
+                        img_png.attr("src", url);
+                        }
+                        )
+                        });-->
                 </script>
             </body>
         </html>

@@ -9,12 +9,12 @@
     <!-- With this script, the gaps contained in the TEI files of the corpus are analyzed. -->
     
     <!-- How to call the script: 
-    java -jar saxon9he.jar "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/nh0001.xml"  "/home/ulrike/Git/scripts-nh/corpus/text_treatment/gaps.xsl" > "/home/ulrike/Git/data-nh/corpus/text-treatment/gaps.txt"-->
+    java -jar /home/ulrike/Programme/saxon/saxon9he.jar "/home/ulrike/Git/conha19/tei/nh0001.xml"  "/home/ulrike/Git/scripts-nh/corpus/text_treatment/check-gaps.xsl" > "/home/ulrike/Git/data-nh/corpus/text-treatment/gaps.txt"-->
     
     <xsl:output method="text" encoding="UTF-8"/>
     
     <xsl:variable name="data-dir">/home/ulrike/Git/data-nh/corpus/text-treatment/</xsl:variable>
-    <xsl:variable name="collection" select="collection('/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master')//TEI"/>
+    <xsl:variable name="collection" select="collection('/home/ulrike/Git/conha19/tei')//TEI"/>
     
     <xsl:template match="/">
         <!-- count the number of gaps -->
@@ -44,8 +44,15 @@
                         type: 'bar'
                         }
                         ];
+                        var layout = {
+                        xaxis: {
+                        tickfont: {size: 14},
+                        title: "type of gap"
+                        },
+                        yaxis: {title: "number"}
+                        }
                         
-                        Plotly.newPlot('myDiv', data);
+                        Plotly.newPlot('myDiv', data, layout);
                     </script>
                 </body>
             </html>

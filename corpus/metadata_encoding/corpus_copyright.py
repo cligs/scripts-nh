@@ -95,7 +95,7 @@ def plot_edition_years(wdir, md_file, outfile, edition_type):
 	tick_texts = [str(i) for i in tick_texts]
 
 	fig = go.Figure([go.Bar(x=years_list, y=y)])
-	fig.update_layout(autosize=False,width=900,height=600,xaxis_type="category")
+	fig.update_layout(autosize=False,width=800,height=500,xaxis_type="category",xaxis_title="years",yaxis_title="number of novels")
 	fig.update_xaxes(tickangle=270,tickmode="array",tickvals=tick_values,ticktext=tick_texts) # tickfont=dict(size=10)
 	fig.write_html(join(wdir, outfile))
 	
@@ -145,8 +145,8 @@ def plot_author_death_years(wdir, md_file, outfile):
 	tick_texts = [str(i) for i in tick_texts]
 
 	fig = go.Figure([go.Bar(x=years_list, y=y)])
-	fig.update_layout(autosize=False,width=900,height=600,xaxis_type="category")
-	fig.update_xaxes(tickangle=270,tickmode="array",tickvals=tick_values,ticktext=tick_texts) # tickfont=dict(size=10)
+	fig.update_layout(autosize=False,width=800,height=600,xaxis_type="category",xaxis_title="years",yaxis_title="number of authors")
+	fig.update_xaxes(tickangle=270,tickmode="array",tickvals=tick_values,ticktext=tick_texts,tickfont=dict(size=12))
 	fig.write_html(join(wdir, outfile))
 	
 	print("done: saved figure")

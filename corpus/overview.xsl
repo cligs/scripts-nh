@@ -285,10 +285,10 @@
         <!--<xsl:call-template name="plot-novelas-nacionales-narrative-perspective"/>-->
         <!--<xsl:call-template name="plot-novelas-originales-setting-continent"/>-->
         <!--<xsl:call-template name="plot-novelas-americanas-setting-continent"/>-->
-        <xsl:call-template name="plot-novelas-nacionales-setting-continent"/>
+        <!--<xsl:call-template name="plot-novelas-nacionales-setting-continent"/>-->
         <!--<xsl:call-template name="plot-novelas-originales-setting-time-period"/>-->
         <!--<xsl:call-template name="plot-novelas-americanas-setting-time-period"/>-->
-        <xsl:call-template name="plot-novelas-nacionales-setting-time-period"/>
+        <!--<xsl:call-template name="plot-novelas-nacionales-setting-time-period"/>-->
         <!--<xsl:call-template name="plot-novelas-originales-length"/>-->
         <!--<xsl:call-template name="plot-novelas-americanas-length"/>-->
         <!--<xsl:call-template name="plot-novelas-nacionales-length"/>-->

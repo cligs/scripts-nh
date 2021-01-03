@@ -119,7 +119,8 @@ def get_words_per_page(wdir, infile):
 				yaxis: {
 				dtick: 50,
 				title: 'number of words'
-				}
+				},
+				xaxis: {tickfont: {size: 14}}
 				};
 				
 				

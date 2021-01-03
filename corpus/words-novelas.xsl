@@ -21,7 +21,7 @@
     As a second step, the same is done for works carrying the label "novela corta".
     
     How to call the script:
-        java -jar saxon9he.jar /home/ulrike/Git/bibacme/app/data/editions.xml /home/ulrike/Git/scripts-nh/corpus/words-novelas.xsl
+        java -jar /home/ulrike/Programme/saxon/saxon9he.jar /home/ulrike/Git/bibacme/app/data/editions.xml /home/ulrike/Git/scripts-nh/corpus/words-novelas.xsl
     -->
     
     <xsl:variable name="input-editions" select="doc('/home/ulrike/Git/bibacme/app/data/editions.xml')"/>
@@ -66,11 +66,11 @@
         
         <!-- create a box plot combining the number of words of "novelas cortas" for full texts and bibliographic entries;
         Output files: fulltexts-bibls-short-word-count.csv -->
-        <!--<xsl:call-template name="plot-fulltexts-bibls-short-words"/>-->
+        <xsl:call-template name="plot-fulltexts-bibls-short-words"/>
         
         <!-- for the purpose of documentation: generate a table containing an overview of the 
         novels used in this analysis -->
-        <xsl:call-template name="generate-table"/>
+        <!--<xsl:call-template name="generate-table"/>-->
     </xsl:template>
     
     <xsl:template name="collect-idnos">
@@ -103,7 +103,7 @@
         <!-- extract the word count value from the full texts (in TEI) -->
         <xsl:result-document href="{concat($data-dir, 'fulltexts-word-count.csv')}" method="text" encoding="UTF-8">
             <xsl:for-each select="doc(concat($data-dir, 'cligs-idnos.xml'))//idno">
-                <xsl:value-of select="doc(concat('/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/',.,'.xml'))//measure[@unit='words']"/>
+                <xsl:value-of select="doc(concat('/home/ulrike/Git/conha19/tei/',.,'.xml'))//measure[@unit='words']"/>
                 <xsl:if test="position() != last()"><xsl:text>
 </xsl:text></xsl:if>
             </xsl:for-each>
@@ -122,7 +122,7 @@
                         {
                         y: [
                         <xsl:for-each select="doc(concat($data-dir, 'cligs-idnos.xml'))//idno">
-                            <xsl:value-of select="doc(concat('/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/',.,'.xml'))//measure[@unit='words']"/>
+                            <xsl:value-of select="doc(concat('/home/ulrike/Git/conha19/tei/',.,'.xml'))//measure[@unit='words']"/>
                             <xsl:if test="position() != last()">,</xsl:if>
                         </xsl:for-each>
                         ],
@@ -137,8 +137,10 @@
                         layout = {
                         yaxis: {
                         dtick: 50000,
-                        title: 'number of words'
-                        }
+                        title: 'number of words',
+                        font: {size: 14}
+                        },
+                        xaxis: {tickfont: {size: 14}}
                         };
                         
                         
@@ -323,6 +325,9 @@
                         side: 'right',
                         overlaying: 'y',
                         range: [0,340000]
+                        },
+                        xaxis: {
+                        tickfont: {size: 14}
                         }
                         };
                         
@@ -359,7 +364,7 @@
 </xsl:text>
             </xsl:for-each-group>
             <xsl:for-each select="doc(concat($data-dir, 'cligs-idnos.xml'))//idno">
-                <xsl:value-of select="doc(concat('/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/',.,'.xml'))//measure[@unit='words']"/>
+                <xsl:value-of select="doc(concat('/home/ulrike/Git/conha19/tei/',.,'.xml'))//measure[@unit='words']"/>
                 <xsl:if test="position() != last()"><xsl:text>
 </xsl:text></xsl:if>
             </xsl:for-each>
@@ -398,7 +403,7 @@
                             <xsl:value-of select="$word-num"/><xsl:text>,</xsl:text>
                         </xsl:for-each-group>
                         <xsl:for-each select="doc(concat($data-dir, 'cligs-idnos.xml'))//idno">
-                            <xsl:value-of select="doc(concat('/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/',.,'.xml'))//measure[@unit='words']"/>
+                            <xsl:value-of select="doc(concat('/home/ulrike/Git/conha19/tei/',.,'.xml'))//measure[@unit='words']"/>
                             <xsl:if test="position() != last()">,</xsl:if>
                         </xsl:for-each>
                         ],
@@ -415,7 +420,8 @@
                         dtick: 10000,
                         title: 'number of words',
                         range: [0,350000]
-                        }
+                        },
+                        xaxis: {tickfont: {size: 14}}
                         };
                         
                         
@@ -479,7 +485,7 @@
     <xsl:template name="plot-fulltexts-bibls-short-words">
         <!-- create a box plot combining the number of words of "novelas cortas" for full texts and bibliographic entries -->
         <xsl:result-document href="{concat($data-dir, 'fulltexts-bibls-short-word-count.csv')}" method="text" encoding="UTF-8">
-            <xsl:for-each-group select="doc('bibls-short.xml')//biblStruct" group-by="@corresp">
+            <xsl:for-each-group select="doc(concat($data-dir,'bibls-short.xml'))//biblStruct" group-by="@corresp">
                 <xsl:variable name="num-bibls" select="count(current-group())"/>
                 <xsl:variable name="page-nums">
                     <pagenums xmlns="http://www.tei-c.org/ns/1.0">
@@ -501,7 +507,7 @@
 </xsl:text>
             </xsl:for-each-group>
             <xsl:for-each select="doc(concat($data-dir, 'cligs-idnos-short.xml'))//idno">
-                <xsl:value-of select="doc(concat('/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/',.,'.xml'))//measure[@unit='words']"/>
+                <xsl:value-of select="doc(concat('/home/ulrike/Git/conha19/tei/',.,'.xml'))//measure[@unit='words']"/>
                 <xsl:if test="position() != last()"><xsl:text>
 </xsl:text></xsl:if>
             </xsl:for-each>
@@ -514,7 +520,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 600px; height: 600px;"></div>
+                    <div id="myDiv" style="width: 600px; height: 700px;"></div>
                     <script>
                         var data = [
                         {
@@ -540,7 +546,7 @@
                             <xsl:value-of select="$word-num"/><xsl:text>,</xsl:text>
                         </xsl:for-each-group>
                         <xsl:for-each select="doc(concat($data-dir, 'cligs-idnos-short.xml'))//idno">
-                            <xsl:value-of select="doc(concat('/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus/master/',.,'.xml'))//measure[@unit='words']"/>
+                            <xsl:value-of select="doc(concat('/home/ulrike/Git/conha19/tei/',.,'.xml'))//measure[@unit='words']"/>
                             <xsl:if test="position() != last()">,</xsl:if>
                         </xsl:for-each>
                         ],
@@ -556,7 +562,8 @@
                         yaxis: {
                         dtick: 10000,
                         title: 'number of words'
-                        }
+                        },
+                        xaxis: {tickfont: {size: 14}}
                         };
                         
                         

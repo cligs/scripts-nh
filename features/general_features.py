@@ -114,7 +114,8 @@ def count_vocab(wdir, inpath, stopwords, vocab, outfile):
 			# count: how often does each item from the vocabulary occur in the text?
 			print(len(vocab))
 			for w in vocab:
-				results = re.findall(str(w), text)
+				w_esc = re.escape(str(w))
+				results = re.findall(w_esc, text)
 				num_w = len(results)
 				
 				# store result in frame
@@ -228,26 +229,29 @@ def create_ngram_vocab(wdir, ngram, ngram_type, outfile, **kwargs):
 		# create ngrams
 		for w in vocab:
 			
-			# how many ngrams can be extracted from this word? (depending on word length)
-			if ngram_type == "mid-word":
-				w_range = len(w) - 2
-			elif ngram_type == "prefix":
-				w_range = len(w) - 1
-				
-			ngram_range = w_range - ngram + 1
-			
-			for i in range(ngram_range):
-				if ngram_type == "mid-word":
-					start_pos = i + 1
-				elif ngram_type == "prefix":
-					start_pos = i
-				end_pos = start_pos + ngram
-				ngram_token = w[start_pos:end_pos]
+			# prefix: just on ngram per word
+			if ngram_type == "prefix":
+				ngram_token = w[:ngram]
 				
 				if ngram_token not in all_ngrams:
 					all_ngrams.append(ngram_token)
-	
-	
+				
+			elif ngram_type == "mid-word":
+				# part of the word that can be used:
+				w_range = w[1:-1]
+				
+				# how many different ngrams can be extracted from this?
+				ngram_range = len(w_range) - ngram + 1
+				
+				for i in range(ngram_range):
+					start_pos = i + 1
+					end_pos = start_pos + ngram
+					ngram_token = w[start_pos:end_pos]
+					
+					if ngram_token not in all_ngrams:
+						all_ngrams.append(ngram_token)
+
+		
 	# create multi-word and end-punct ngrams
 	
 	if ngram_type == "multi-word" or ngram_type == "end-punct":
@@ -395,6 +399,90 @@ def plot_variances(wdir, features, outfile):
 
 
 
+def plot_zero_values_bar(wdir, feature_dir, mfws, token_unit, outfile):
+	"""
+	Create a bar chart for zero value analysis of all MFW ranges
+	
+	Arguments:
+	wdir (str): path to the working directory
+	feature_dir (str): relative path to the directory containing the feature sets
+	mfws (list): list with the different mfw numbers
+	token_unit (str): e.g. "word" for whole words, "3gram_words", etc.
+	outfile (str): relative path to the output file for the chart (without file ending)
+	"""
+	print("plot zero values bar...")
+	
+	labels = [str(mfw) for mfw in mfws]
+	
+	zero_counts = []
+	non_zero_counts = []
+	zero_counts_rel = []
+	non_zero_counts_rel = []
+	
+	if token_unit == "word":
+		token_unit = ""
+	else:
+		token_unit = "_" + token_unit
+			
+	
+	# collect zero and non-zero values for all mfws
+	for mfw in mfws:
+		features = pd.read_csv(join(wdir, feature_dir, "bow_mfw" + str(mfw) + token_unit + ".csv"), index_col=0)
+	
+		# get number of zero values for each column
+		x = []
+		for col in features:
+			col_counts = features[col].value_counts()
+			if 0 in col_counts.index:
+				x.append(col_counts[0])
+			else:
+				x.append(0)
+		
+		# overall number of zero values
+		zero_count = sum(x)
+		# overall number of values
+		value_count = features.shape[0] * features.shape[1]
+		non_zero_count = value_count - zero_count
+		
+		zero_counts.append(zero_count)
+		zero_counts_rel.append(zero_count / value_count)
+		non_zero_counts.append(non_zero_count)
+		non_zero_counts_rel.append(non_zero_count / value_count)
+		
+	#zero_counts_rel = [i/j for i,j in zip(zero_counts, mfws)]
+	#non_zero_counts_rel = [i/j for i,j in zip(non_zero_counts, mfws)]
+	
+	print("plot with absolute values...")
+	# absolute
+	fig = go.Figure(data=[
+		go.Bar(name="non-zero", x=labels, y=non_zero_counts),
+		go.Bar(name="zero", x=labels, y=zero_counts)
+		])
+	fig.update_layout(autosize=False, width=800, height=500, title="Zero values in feature sets", barmode="stack")
+	fig.update_xaxes(type='category', title="mfw")
+	fig.update_yaxes(title="value counts (relative)")
+	
+	fig.write_image(join(wdir, outfile + "_abs_bar.png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outfile + "_abs_bar.html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	print("plot with relative values...")
+	# relative to value counts
+	fig2 = go.Figure(data=[
+		go.Bar(name="non-zero", x=labels, y=non_zero_counts_rel),
+		go.Bar(name="zero", x=labels, y=zero_counts_rel)
+		])
+	fig2.update_layout(autosize=False, width=800, height=500, title="Zero values in feature sets", barmode="stack")
+	fig2.update_xaxes(type='category', title="mfw")
+	fig2.update_yaxes(title="value counts (relative)")
+	
+	fig2.write_image(join(wdir, outfile + "_rel_bar.png")) # scale=2 (increase physical resolution)
+	fig2.write_html(join(wdir, outfile + "_rel_bar.html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig2.show()
+
+	print("done: plot zero values")
+	
+
 def plot_zero_values(wdir, features, outfile):
 	"""
 	Create a histogram showing how many features have zero values how often, 
@@ -527,8 +615,8 @@ def normalize_bow_model(wdir, bow_file, mode):
 		# divide the counts of each document by its maximum count
 		rel_counts = bow.div(max_counts,axis=0)
 		
-		means = bow.mean(axis=0)
-		stds = bow.std(axis=0)
+		means = rel_counts.mean(axis=0)
+		stds = rel_counts.std(axis=0)
 		new_counts = (rel_counts - means) / stds
 		
 	# save new frame
@@ -626,7 +714,7 @@ mfws = [100,200,300,400,500,1000,2000,3000,4000,5000]
 ngram_words = [2,3,4]
 ngram_chars = [3,4,5]
 ngram_chars_type = ["word", "affix-punct"]
-ngram_chars_subtype = ["mid-word", "multi-word", "prefix", "end-punct"]
+ngram_chars_subtype = ["mid-word", "multi-word", "prefix", "end-punct"] 
 norm_mode = ["tf","tfidf","zscore"]
 
 
@@ -689,20 +777,29 @@ for ngc in ngram_chars:
 '''
 
 '''
-# CHECK: are there Unnamed columns?
-feature_set = "4gram_chars_mid-word"
+# CHECK: are there Unnamed columns or NaNs?
+feature_set = "4gram_chars_prefix"
 df = pd.read_csv("/home/ulrike/Git/data-nh/analysis/features/mfw/bow_all_" + feature_set + ".csv", index_col=0)
 vocab = pd.read_csv("/home/ulrike/Git/data-nh/analysis/features/mfw/vocab_" + feature_set + ".csv", header=None)
 num_unnamed = df.columns.str.match('Unnamed').tolist().count(True)
 print("length of the vocabulary: " + str(len(vocab)))
 print("columns of the data frame: " + str(len(df.columns)))
 print("number of Unnamed columns: " + str(num_unnamed))
-'''
+#print(df.loc[:,df.columns.str.match('Unnamed')])
 
 # remove Unnamed columns
 #df = df.loc[:, ~df.columns.str.match('Unnamed')]
 # save new frame
 #df.to_csv("/home/ulrike/Git/data-nh/analysis/features/mfw/bow_all_" + feature_set + ".csv")
+
+vocab_list = vocab.iloc[:,0].tolist()
+for v in vocab_list:
+	if v not in df.columns.tolist():
+		print("in vocab but not in df:" + str(v))
+# remove NaN rows
+#vocab = vocab.dropna()
+#vocab.to_csv("/home/ulrike/Git/data-nh/analysis/features/mfw/vocab_" + feature_set + ".csv", header=False, index=False)
+'''
 
 
 '''
@@ -720,9 +817,9 @@ store_vocabulary("/home/ulrike/Git/", "data-nh/analysis/features/mfw/bow_mfw5000
 '''
 
 
-
-# normalize bow models:
 '''
+# normalize bow models:
+
 for m in mfws:
 	for n in norm_mode:
 	
@@ -744,37 +841,67 @@ for m in mfws:
 		for ngc in ngram_chars:
 			for ngt in ngram_chars_type:
 				normalize_bow_model("/home/ulrike/Git/", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars_" + ngt + ".csv", n)
-'''	
+'''
 
 
 
 '''
 #  visualize characteristics of feature sets
 
+# observe: number of zero values does not change for absolute, tf or tf-idf values
+# and for z-scores zero values are very rare
+# therefore, the zero value charts are only created for the absolute values here
 for m in mfws:
 	
+	# tokens:
 	plot_zero_values("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + ".csv", "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw" + str(m))
 	plot_variances("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + ".csv", "data-nh/analysis/features/mfw/overviews/variances_bow_mfw" + str(m))
 	
+	# word ngrams:
+	for ngw in ngram_words:
+		plot_zero_values("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngw) + "gram_words.csv", "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw" + str(m) + "_" + str(ngw) + "gram_words")
+		plot_variances("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngw) + "gram_words.csv", "data-nh/analysis/features/mfw/overviews/variances_bow_mfw" + str(m) + "_" + str(ngw) + "gram_words")
+	
+	# character ngrams:
+	for ngc in ngram_chars:
+		plot_zero_values("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars.csv", "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars")
+		plot_variances("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars.csv", "data-nh/analysis/features/mfw/overviews/variances_bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars")
+
+
 	for n in norm_mode:
 		
 		# tokens:
-		plot_zero_values("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + n + ".csv", "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw" + str(m) + "_" + n)
 		plot_variances("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + n + ".csv", "data-nh/analysis/features/mfw/overviews/variances_bow_mfw" + str(m) + "_" + n)
+		
 		# word ngrams:
 		for ngw in ngram_words:
-			plot_zero_values("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngw) + "gram_words_" + n + ".csv", "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw" + str(m) + "_" + str(ngw) + "gram_words_" + n)
 			plot_variances("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngw) + "gram_words_" + n + ".csv", "data-nh/analysis/features/mfw/overviews/variances_bow_mfw" + str(m) + "_" + str(ngw) + "gram_words_" + n)
 		
 		# character ngrams:
 		for ngc in ngram_chars:
-			plot_zero_values("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars_" + n + ".csv", "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars_" + n)
 			plot_variances("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars_" + n + ".csv", "data-nh/analysis/features/mfw/overviews/variances_bow_mfw" + str(m) + "_" + str(ngc) + "gram_chars_" + n)
 '''
 
+
+# create a bar chart for zero value analysis of all MFW ranges
+#plot_zero_values_bar("/home/ulrike/Git", "data-nh/analysis/features/mfw", mfws, "word", "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw_all")
+
 '''
-# get most frequent tokens of a certain type and range
-get_mfw("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw5000_5gram_chars.csv", 101, 200) #_2gram_words, _5gram_chars
+for ngw in ngram_words:
+	token_unit = str(ngw) + "gram_words"
+	plot_zero_values_bar("/home/ulrike/Git", "data-nh/analysis/features/mfw", mfws, token_unit, "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw_all_" + token_unit)
+
+for ngc in ngram_chars:
+	token_unit = str(ngc) + "gram_chars"
+	plot_zero_values_bar("/home/ulrike/Git", "data-nh/analysis/features/mfw", mfws, token_unit, "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw_all_" + token_unit)
+	
+	for ngt in ngram_chars_type:
+		token_unit_type = token_unit + "_" + ngt
+		plot_zero_values_bar("/home/ulrike/Git", "data-nh/analysis/features/mfw", mfws, token_unit_type, "data-nh/analysis/features/mfw/overviews/zeros_bow_mfw_all_" + token_unit_type)
 '''
+
+# get most frequent tokens of a certain type and range for inspection
+#get_mfw("/home/ulrike/Git", "data-nh/analysis/features/mfw/bow_mfw5000_4gram_chars_word.csv", 101, 10) #_2gram_words, _4gram_chars
+
 
 

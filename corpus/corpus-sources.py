@@ -108,27 +108,35 @@ def get_data_to_plot(data, source_info, **kwargs):
 	return [labels, values]
 	
 
-def plot_sources(source_info):
+def plot_sources(source_info, width, height):
 	"""
 	Donut charts showing how many texts were included from which type of source.
 	
 	Arguments:
 	source_info (str): which kind of source information to plot. Possible values: "sources_medium", "sources_filetype", "sources_institution", "sources_edition", "institution_type"
+	width (int): width of the chart (pixel)
+	height (int): height of the chart (pixel)
 	"""
 
-	corpus_dir = "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
-	data = pd.read_csv(join(corpus_dir, "metadata_sources.csv"), index_col=0)
+	data_dir = "/home/ulrike/Git/data-nh/corpus/corpus-sources/"
+	data = pd.read_csv(join(data_dir, "../metadata_sources.csv"), index_col=0)
 	
 	colors = ["rgb(31, 119, 180)", "rgb(255, 127, 14)", "rgb(44, 160, 44)", "rgb(214, 39, 40)"]
 	
 	labels, values = get_data_to_plot(data, source_info)
 
 	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise", hole=.4)])
-	fig.update_layout(autosize=False,width=600,height=500,legend=dict(font=dict(size=16))) # 600, 500, 16 | 1000, 1000, 14 for sources_institution
-	fig.show()
+	fig.update_layout(autosize=False,width=width,height=height,legend=dict(font=dict(size=14)))
+	
+	fig.write_image(join(data_dir, source_info + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(data_dir, source_info + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 	
 	
-def plot_sources_scalegroup(source_info, drop_source_info, drop_group_1, drop_group_2):
+def plot_sources_scalegroup(source_info, drop_source_info, drop_group_1, drop_group_2, outfile):
 	"""
 	Creates two donut charts showing how many texts were included from which type of source. For each of the charts, another subgroup is dropped,
 	e.g. for the sources by institution, one chart is created for full text sources and the other for image sources. The size of the donut charts
@@ -139,9 +147,10 @@ def plot_sources_scalegroup(source_info, drop_source_info, drop_group_1, drop_gr
 	drop_source_info (str): from which kind of source info should values be dropped? e.g. "sources_filetype"
 	drop_group_1 (str): rows with which value to drop for the first group, e.g. "text" if the subplot is for "image" 
 	drop_group_2 (str): rows with which value to drop for the second group, e.g. "image" if the subplot is for "text"
+	outfile (str): name of the output file (without extension)
 	"""
-	corpus_dir = "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
-	data = pd.read_csv(join(corpus_dir, "metadata_sources.csv"), index_col=0)
+	data_dir = "/home/ulrike/Git/data-nh/corpus/corpus-sources/"
+	data = pd.read_csv(join(data_dir, "../metadata_sources.csv"), index_col=0)
 	
 	colors = ["rgb(31, 119, 180)", "rgb(255, 127, 14)", "rgb(44, 160, 44)", "rgb(214, 39, 40)"]
 	
@@ -153,7 +162,13 @@ def plot_sources_scalegroup(source_info, drop_source_info, drop_group_1, drop_gr
 	fig.add_trace(go.Pie(labels=labels_2, values=values_2, scalegroup='one', name=drop_group_1, direction="clockwise", hole=.4), 2, 1)
 	fig.update_layout(autosize=False,width=1000,height=900,legend=dict(font=dict(size=14)))
 	fig.update_traces(textposition="inside")
-	fig.show()
+	
+	fig.write_image(join(data_dir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(data_dir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 	
 
 def plot_sources_hierarchical(source_info_1, source_info_2):
@@ -168,8 +183,8 @@ def plot_sources_hierarchical(source_info_1, source_info_2):
 	source_info_2 (str): which kind of source information to plot as the outer circle / parents. Possible values are the same as for source_info_1.
 	"""
 	
-	corpus_dir = "/home/ulrike/Git/hennyu/novelashispanoamericanas/corpus"
-	data = pd.read_csv(join(corpus_dir, "metadata_sources.csv"), index_col=0)
+	data_dir = "/home/ulrike/Git/data-nh/corpus/corpus-sources/"
+	data = pd.read_csv(join(data_dir, "../metadata_sources.csv"), index_col=0)
 	
 	data_grouped_level_1 = data.groupby([source_info_1, source_info_2]).size()
 	data_grouped_level_0 = data_grouped_level_1.sum(level=0)
@@ -195,14 +210,25 @@ def plot_sources_hierarchical(source_info_1, source_info_2):
 	textfont=dict(size = 16)
 	))
 	
-	fig.update_layout(autosize=False,width=900,height=900) # 700, 700
-	fig.show()
+	fig.update_layout(autosize=False,width=800,height=800)
+	
+	outfile = source_info_1 + "_" + source_info_2
+	fig.write_image(join(data_dir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(data_dir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 	
 
 #get_sources_metadata()
 
-#plot_sources("sources_edition")
+#plot_sources("sources_medium", 450, 350)
+#plot_sources("sources_filetype", 450, 350)
+#plot_sources("sources_institution", 1000, 1000)
+#plot_sources("institution_type", 450, 350)
+#plot_sources("sources_edition", 450, 350)
 
 plot_sources_hierarchical("sources_edition", "institution_type")
 
-#plot_sources_scalegroup("sources_institution", "sources_filetype", "text", "image")
+#plot_sources_scalegroup("sources_institution", "sources_filetype", "text", "image", "sources_institution_filetype")

@@ -11,7 +11,8 @@ from os.path import join
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-
+wdir = "/home/ulrike/Git/"
+outdir = join(wdir, "data-nh/corpus/bibliography-sources/")
 
 def sources_shares():
 	"""
@@ -70,11 +71,18 @@ def sources_shares():
 		row=2, col=2
 	)
 
-	fig.update_layout(autosize=False,width=800,height=800,legend=dict(font=dict(size=16)))
+	fig.update_layout(autosize=False,width=700,height=700,legend=dict(font=dict(size=14)))
 	fig.update_yaxes(range=[0,600])
+	fig.update_xaxes(tickfont=dict(size=14))
 
-	#fig.write_image("bibacme-sources-shares.svg")
-	fig.show()
+	outfile = "sources-shares"
+	fig.write_image(join(wdir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
+	
 
 
 def sources_inclusion():
@@ -95,10 +103,17 @@ def sources_inclusion():
 	labels = ['included','missing information','too short','excluded for other reason']
 	values = [len(included), len(excluded_missing_info), len(excluded_short), len(excluded_other)]
 	
-	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise")])
-	fig.update_layout(autosize=False,width=700,height=500,legend=dict(font=dict(size=16)))
-	fig.show()
+	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise", hole=.4)])
+	fig.update_layout(autosize=False,width=600,height=400,legend=dict(font=dict(size=14)))
+	
+	outfile = "sources-inclusion"
+	fig.write_image(join(wdir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	#fig.show()
+	
+	print("done")
 
 
-# sources_shares()
-sources_inclusion()
+#sources_shares()
+#sources_inclusion()

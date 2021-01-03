@@ -29,27 +29,35 @@ join(exdir, "../exceptions-foreign.txt"), join(exdir, "../exceptions-oral.txt"),
 join(exdir, "../exceptions-archaic.txt"), join(exdir, "../exceptions-other.txt")]
 
 #spellchecking.check_collection(wdir, "txt/*.txt", "spellcheck.csv", "es", ex_lists)
-
+'''
 for filename in os.listdir(join(wdir,"txt")):
 	idno = filename[:-4]
 	spellchecking.check_collection(wdir, join("txt", idno + ".txt"), "spellcheck_" + idno + ".csv", "es", ex_lists)
+'''
 
-#spellchecking.plot_error_distribution(wdir_2, "spellcheck_exc.csv") # log="yes"
-#spellchecking.plot_top_errors(wdir_2, "spellcheck_exc.csv", 30)
-#spellchecking.plot_errors_per_file(wdir_2, "spellcheck_exc.csv", "both", "relative")
-#spellchecking.plot_errors_per_file_grouped(wdir_2, "spellcheck_exc.csv", "/home/ulrike/Git/data-nh/corpus/metadata_sources.csv", "sources_edition", "relative")
+#spellchecking.plot_error_distribution(wdir_2, "spellcheck.csv", "distribution-spelling-errors")
+#spellchecking.plot_error_distribution(wdir_2, "spellcheck.csv", "distribution-spelling-errors-logarithmic", log="yes")
+#spellchecking.plot_top_errors(wdir_2, "spellcheck.csv", "top-30-errors", 30)
 
-
-
-"""
-spellchecking.plot_errors_covered_exceptions(wdir_2, "spellcheck.csv", ["exception-words/exceptions-places.txt", "exception-words/exceptions-countries_ext.txt", 
+'''
+spellchecking.plot_errors_covered_exceptions(wdir_2, "spellcheck.csv", "coverage-exception-lists", ["exception-words/exceptions-places.txt", "exception-words/exceptions-countries_ext.txt", 
 "exception-words/exceptions-foreign.txt", "exception-words/exceptions-oral.txt", "exception-words/exceptions-archaic.txt", "exception-words/exceptions-other.txt",
 "exception-words/exceptions-proper-names_ext.txt", "exception-words/exceptions-special.txt", "exception-words/exceptions-surnames.txt",
 "exception-words/exceptions-diminutives.txt", "exception-words/exceptions-verb-forms.txt", "exception-words/exceptions-adverbs.txt",
 "exception-words/exceptions-superlatives.txt", "exception-words/exceptions-capitals.txt"], 
 ["places", "countries", "foreign words", "oral speech", "archaic vocabulary", "other", "proper names", "specialized vocabulary", "surnames", "diminutives", 
 "verb forms with pronoun suffixes", "adverbs", "superlatives", "capitals"])
-"""
+'''
+
+#spellchecking.plot_error_distribution(wdir_2, "spellcheck_exc.csv", "distribution-spelling-errors-exc") # log="yes"
+#spellchecking.plot_errors_per_file(wdir_2, "spellcheck_exc.csv", "distribution-spelling-errors-files", "both", "absolute")
+#spellchecking.plot_errors_per_file(wdir_2, "spellcheck_exc.csv", "distribution-spelling-errors-files-relative", "both", "relative")
+#spellchecking.plot_errors_per_file_grouped(wdir_2, "spellcheck_exc.csv", "distribution-spelling-errors-files-editiontype", "/home/ulrike/Git/data-nh/corpus/metadata_sources.csv", "sources_edition", "relative")
+#spellchecking.plot_errors_per_file_grouped(wdir_2, "spellcheck_exc.csv", "distribution-spelling-errors-files-filetype", "/home/ulrike/Git/data-nh/corpus/metadata_sources.csv", "sources_filetype", "relative")
+#spellchecking.plot_errors_per_file_grouped(wdir_2, "spellcheck_exc.csv", "distribution-spelling-errors-files-institution", "/home/ulrike/Git/data-nh/corpus/metadata_sources.csv", "sources_institution", "relative")
+
+
+#spellchecking.plot_top_errors(wdir_2, "spellcheck_exc.csv", 30)
 
 #spellchecking.count_errors(wdir_2, "spellcheck_exc.csv")
 #spellchecking.generate_exception_list(wdir, join(exdir, "diminutive-patterns-es.txt"), join(wdir, "spellcheck.csv"), "exceptions-diminutives.txt", "ending")
@@ -59,7 +67,8 @@ spellchecking.plot_errors_covered_exceptions(wdir_2, "spellcheck.csv", ["excepti
 ### copyright ###
 
 wdir = "/home/ulrike/Git/data-nh/corpus/metadata-encoding/"
-#corpus_copyright.plot_author_death_years(wdir, "../metadata_copyright.csv", "authors-death-years.html")
+corpus_copyright.plot_author_death_years(wdir, "../metadata_copyright.csv", "authors-death-years.html")
+corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "first-publication-years.html", "first")
 #corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "base-publication-years.html", "base")
 #corpus_copyright.plot_copyright_status(wdir, "../metadata_copyright.csv", "copyright-status.html")
 
