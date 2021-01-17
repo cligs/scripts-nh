@@ -200,7 +200,9 @@ def visualize_enclitics_freeling(wdir, md, infile, outfile):
 		jitter=0.3, # add some jitter for a better separation between points
 		pointpos=-1.8)) # relative position of points wrt box
 	
-	fig.update_layout(autosize=False, width=1200, height=600, title="FreeLing POS of verb forms with enclitic pronouns", yaxis_title="number of POS assignments (relative)")
+	fig.update_layout(autosize=False, width=1000, height=600, title="FreeLing POS of verb forms with enclitic pronouns", yaxis_title="number of POS assignments (relative)", legend_font=dict(size=16))
+	fig.update_xaxes(tickfont=dict(size=16))
+	fig.update_yaxes(tickfont=dict(size=16))
 	
 	fig.write_image(join(wdir, outfile + "_box.png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + "_box.html")) # include_plotlyjs="cdn" (don't include whole plotly library)
@@ -407,7 +409,7 @@ def correct_enclitics_freeling(wdir, inpath, patterns, exceptions, accents, outp
 
 #analyze_enclitics_freeling("/home/ulrike/Git", "conha19/metadata.csv", "data-nh/corpus/derivative-formats/verbs-enclitics-freeling-matches.xml", "data-nh/corpus/derivative-formats/verbs-enclitics-freeling.csv")
 
-#visualize_enclitics_freeling("/home/ulrike/Git", "conha19/metadata.csv", "data-nh/corpus/derivative-formats/verbs-enclitics-freeling.csv", "data-nh/corpus/derivative-formats/plot-verbs-enclitics-freeling")
+visualize_enclitics_freeling("/home/ulrike/Git", "conha19/metadata.csv", "data-nh/corpus/derivative-formats/verbs-enclitics-freeling.csv", "data-nh/corpus/derivative-formats/plot-verbs-enclitics-freeling")
 
 #correct_enclitics_freeling("/home/ulrike/Git", "conha19/annotated/", "data-nh/corpus/derivative-formats/verb-form-patterns-es-detail.txt", "data-nh/corpus/derivative-formats/verbs-enclitics-exceptions.txt", "data-nh/corpus/derivative-formats/verb-form-endings-accents.txt", "conha19/annotated_corr")
 

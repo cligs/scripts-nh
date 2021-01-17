@@ -16,7 +16,6 @@ sys.path.append(os.path.abspath("/home/ulrike/Git/scripts-nh/corpus"))
 from corpus.text_treatment import spellchecking
 from corpus.metadata_encoding import corpus_copyright
 from corpus.metadata_encoding import validate_tei
-from features import bow
 
 ### spell checking ###
 wdir="/home/ulrike/Git/conha19/"
@@ -67,8 +66,8 @@ spellchecking.plot_errors_covered_exceptions(wdir_2, "spellcheck.csv", "coverage
 ### copyright ###
 
 wdir = "/home/ulrike/Git/data-nh/corpus/metadata-encoding/"
-corpus_copyright.plot_author_death_years(wdir, "../metadata_copyright.csv", "authors-death-years.html")
-corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "first-publication-years.html", "first")
+#corpus_copyright.plot_author_death_years(wdir, "../metadata_copyright.csv", "authors-death-years.html")
+#corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "first-publication-years.html", "first")
 #corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "base-publication-years.html", "base")
 #corpus_copyright.plot_copyright_status(wdir, "../metadata_copyright.csv", "copyright-status.html")
 
@@ -77,9 +76,7 @@ corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "first-pu
 #validate_tei.validate_RNG("/home/ulrike/Git/conha19/tei/*.xml", "/home/ulrike/Git/reference/tei/cligs.rng", "/home/ulrike/Git/conha19/schema/log-rng.txt")
 
 
-### other ###
 
-#bow.create_bow_model(wdir, "txt", "bow.csv")
 
 
 

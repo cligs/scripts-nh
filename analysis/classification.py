@@ -10,8 +10,10 @@ Classify the novels using different feature sets, types of subgenre labels, and 
 
 import pandas as pd
 import numpy as np
+import glob
 import re
 from os.path import join
+from os import rename
 import plotly.graph_objects as go
 from sklearn import svm
 from sklearn import neighbors
@@ -26,6 +28,8 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import make_scorer
+
+
 
 ############### FUNCTIONS ##################
 
@@ -283,19 +287,22 @@ def select_metadata(wdir, md_file, subgenre_sets, outpath):
 		# repeat the sampling process 10 times
 		for i in range(10):
 			if num_sub1 > num_sub2:
-				sub1 = sub1.sample(n=num_sub2)
+				sub1_sampled = sub1.sample(n=num_sub2)
 			elif num_sub2 > num_sub1:
-				sub2 = sub2.sample(n=num_sub1)
+				sub2_sampled = sub2.sample(n=num_sub1)
 				
 			# create new metadata frame with selected entries
-			new_md = sub1.append(sub2)
+			if num_sub1 > num_sub2:
+				new_md = sub1_sampled.append(sub2)
+			elif num_sub2 > num_sub1:
+				new_md = sub2_sampled.append(sub1)
 			# sort by idno
 			new_md = new_md.sort_values(by="idno")
 			# store new metadata selection
 			outfile = "metadata_" + level + "_" + re.sub(r"\s", r"_", class1) + "_" + re.sub(r"\s", r"_", class2) + "_" + str(i) + ".csv"
 			new_md.to_csv(join(wdir, outpath, outfile))
-
-	
+			
+		
 	print("done")
 	
 
@@ -334,10 +341,14 @@ def select_data_mfw(wdir, md_inpath, feature_inpath, sb_set, mfw, unit, no, rep,
 		token_unit = ""
 	else:
 		token_unit = unit + "_"
-	if cl == "SVM":
+	
+	if cl == "SVM" and no != "zscore":
 		scale = "_MinMax"
 	else:
 		scale = ""
+	
+	
+	#scale = ""
 	feature_path = join(wdir, feature_inpath, "bow_mfw" + str(mfw) + "_" + token_unit + no + scale + ".csv")
 	data = pd.read_csv(join(wdir, feature_path), index_col=0)
 	X = data.loc[md.index].to_numpy()
@@ -424,7 +435,7 @@ def parameter_study(wdir):
 	topic_repetitions = 5
 
 	# select metadata for subgenre constellations
-	#select_metadata(wdir, "conha19/metadata.csv", subgenre_sets, "data-nh/analysis/classification/data_selection/preliminary/")
+	select_metadata(wdir, "conha19/metadata.csv", subgenre_sets, "data-nh/analysis/classification/data_selection/preliminary/")
 	
 	
 	# classifiers
@@ -568,7 +579,7 @@ def evaluate_parameter_study(wdir, outdir, clf, param):
 	wdir (str): path to the working directory
 	outdir (str): relative path to the output directory
 	clf (str): type of classifier ("SVM", "KNN" or "RF")
-	param (str): which parameter to evaluate (e.g. "C")
+	param (str): which parameter to evaluate (e.g. "param_C")
 	"""
 	print("evaluating parameter study for " + clf + "...")
 	
@@ -611,7 +622,20 @@ def evaluate_parameter_study(wdir, outdir, clf, param):
 		y = [value_all, value_mfw, value_topics]
 		fig.add_trace(go.Bar(name=str(p_val), x=["all", "mfw", "topics"], y=y))
 	
-	fig.update_layout(autosize=False, width=600, height=500, title="Grid search results for " + clf, barmode="group")
+	if param == "param_n_neighbors":
+		xtitle = "feature type / number of neighbors"
+	elif param == "param_weights":
+		xtitle = "feature type / weights"
+	elif param == "param_metric":
+		xtitle = "feature type / metric"
+	elif param == "param_C":
+		xtitle = "feature type / C"
+	elif param == "param_max_features":
+		xtitle = "feature type / max. features"
+		
+	fig.update_layout(autosize=False, width=500, height=500, title="Grid search results for " + clf, barmode="group",legend_font=dict(size=14))
+	fig.update_xaxes(title=xtitle,tickfont=dict(size=14))
+	fig.update_yaxes(title="frequency of rank 1")
 
 	fig.write_image(join(wdir, outdir, "ranks1_" + clf + "_" + param + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outdir, "ranks1_" + clf + "_" + param + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
@@ -628,20 +652,21 @@ def get_estimator(cl, feature_type):
 	feature_type (str): main feature type, mfw or topics
 	"""
 	if feature_type == "mfw":
-		n_neighbors = 3
+		C = 100
 	elif feature_type == "topics":
-		n_neighbors = 5
+		C = 1
 	
 	if cl == "KNN":
-		clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, weights="distance", metric="manhattan")
+		clf = neighbors.KNeighborsClassifier(n_neighbors=7, weights="distance", metric="manhattan")
 		
 	elif cl == "SVM":
-		clf = svm.SVC(kernel="linear", C=1)
+		clf = svm.SVC(kernel="linear", C=C)
 		
 	elif cl == "RF":
 		clf = ensemble.RandomForestClassifier(random_state=0, max_features="sqrt")
 		
 	return clf
+	
 	
 
 def get_scores(estimator, X, y, class1, cv):
@@ -691,7 +716,7 @@ def store_features(cl, scores, cv, feature_names):
 	cv (int): number of cv volds
 	feature_names (list): the names of the features (the topic numbers or the words or ngrams)
 	"""
-	columns = ["cv_call"] + feature_names
+	columns = ["cv_call", "class1_cl", "class2_cl"] + feature_names
 	
 	feature_frame = pd.DataFrame(columns=columns)
 	
@@ -700,7 +725,8 @@ def store_features(cl, scores, cv, feature_names):
 			coef = scores["estimator"][run].coef_.tolist()[0]
 		elif cl == "RF":
 			coef = scores["estimator"][run].feature_importances_.tolist()
-		data = [run] + coef
+		classes = scores["estimator"][run].classes_
+		data = [run, classes[0], classes[1]] + coef
 		coef = pd.Series(index=columns, data=data)
 		
 		feature_frame = feature_frame.append(coef, ignore_index=True)
@@ -805,6 +831,56 @@ def set_frame_metadata_topics(frame, level, class1, class2, num_topics, optimize
 	return frame
 	
 	
+def get_results_subgenres_mfw(wdir, data_dir, cl, mfw, norm, unit, subgenre_1, subgenre_2):
+	"""
+	Get the top and mean results for a certain subgenre constellation (e.g. "novela histórica" vs. "other",
+	given the classifier (e.g. "SVM"), the number of mfw, normalization technique and token unit.
+	Returns the following numbers: top accuracy, mean accuracy, standard deviation accuracy,
+	top F1, mean F1, std.dev. F1
+	
+	Arguments:
+	wdir (str): path to the working directory
+	data_dir (str): relative path to the directory containing the classification results files
+	clf (str): the classifier used, e.g. "SVM"
+	mfw (int): the number of mfw
+	norm (str): type of normalization, "tf", "tfidf", "zscore"
+	subgenre_1 (str): the positive class
+	subgenre_2 (str): the negative class 
+	"""
+	print("get results subgenres mfw...")
+	
+	accuracy_collected = []
+	f1_collected = []
+	
+	# name of results file e.g. results-SVM-mfw100_4gram_chars_word_tf.csv
+	result_file = "results-" + cl + "-mfw" + str(mfw) + "_" + unit + "_" + norm + ".csv"
+	results = pd.read_csv(join(wdir, data_dir, result_file), index_col=0)
+	
+	# select only the results for the subgenre constellation
+	results_sub = results.loc[(results["class1"]==subgenre_1)  & (results["class2"]==subgenre_2)]
+	
+	acc = results_sub["test_accuracy"].tolist()
+	for acc_value in acc:
+		accuracy_collected.append(acc_value)
+		
+	f1 = results_sub["test_f1"].tolist()
+	for f1_value in f1:
+		if f1_value != 0:
+			f1_collected.append(f1_value)
+			
+	top_acc = max(accuracy_collected)
+	mean_acc = np.mean(accuracy_collected)
+	std_acc = np.std(accuracy_collected)
+	
+	top_f1 = max(f1_collected)
+	mean_f1 = np.mean(f1_collected)
+	std_f1 = np.std(f1_collected)
+	
+	return len(accuracy_collected), top_acc, mean_acc, std_acc, top_f1, mean_f1, std_f1
+	
+	print("done")
+	
+	
 def get_results_subgenres_topics(wdir, data_dir, clf, num_topics, oi, subgenre_1, subgenre_2):
 	"""
 	Get the top and mean results for a certain subgenre constellation (e.g. "novela histórica" vs. "other",
@@ -822,30 +898,28 @@ def get_results_subgenres_topics(wdir, data_dir, clf, num_topics, oi, subgenre_1
 	subgenre_2 (str): the negative class 
 	"""
 	print("get results subgenres topics...")
-	print("subgenre 1: " + subgenre_1)
-	print("subgenre 2: " + subgenre_2)
+	#print("subgenre 1: " + subgenre_1)
+	#print("subgenre 2: " + subgenre_2)
 	
 	accuracy_collected = []
 	f1_collected = []
 	
 	result_file = "results-" + clf + "-topics" + str(num_topics) + "_" + str(oi) + "in.csv"
 	results = pd.read_csv(join(wdir, data_dir, result_file), index_col=0)
-	# select only the results for the subgenre constellation
-	print(len(results))
-	results_sub = results.loc[results["class1"]==subgenre_1][results["class2"]==subgenre_2]
-	print(len(results_sub))
 	
-	'''
-	acc = results["test_accuracy"].tolist()
+	# select only the results for the subgenre constellation
+	results_sub = results.loc[results["class1"]==subgenre_1]
+	results_sub = results_sub.loc[results["class2"]==subgenre_2]
+	
+	acc = results_sub["test_accuracy"].tolist()
 	for acc_value in acc:
 		accuracy_collected.append(acc_value)
 		
-	f1 = results["test_f1"].tolist()
+	f1 = results_sub["test_f1"].tolist()
 	for f1_value in f1:
 		if f1_value != 0:
 			f1_collected.append(f1_value)
 			
-				
 	top_acc = max(accuracy_collected)
 	mean_acc = np.mean(accuracy_collected)
 	std_acc = np.std(accuracy_collected)
@@ -853,7 +927,10 @@ def get_results_subgenres_topics(wdir, data_dir, clf, num_topics, oi, subgenre_1
 	top_f1 = max(f1_collected)
 	mean_f1 = np.mean(f1_collected)
 	std_f1 = np.std(f1_collected)
+	
+	return len(accuracy_collected), top_acc, mean_acc, std_acc, top_f1, mean_f1, std_f1
 		
+	'''
 	print("num values: " + str(len(accuracy_collected)))	
 		
 	print("top acc: " + str(top_acc))
@@ -863,8 +940,9 @@ def get_results_subgenres_topics(wdir, data_dir, clf, num_topics, oi, subgenre_1
 	print("top f1: " + str(top_f1))
 	print("mean f1: " + str(mean_f1))
 	print("std f1: " + str(std_f1))
-	'''
+	
 	print("done")
+	'''
 	
 
 def get_results_classifier(wdir, data_dir, classifier, feature_type):
@@ -980,10 +1058,10 @@ def plot_mfw_results(wdir, data_dir, clf):
 	print("plot mfw results...")
 	
 	# output directory for plots (relative to data dir)
-	outdir = "visuals"
+	outdir = "../visuals"
 	
 	mfws = [100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000]
-	norms = ["tfidf", "zscore"] #tf is equal to zscore
+	norms = ["tf", "tfidf", "zscore"] #tf is equal to zscore
 	
 	# example results file name: results-KNN-mfw2000_3gram_chars_tfidf.csv
 	# create scatter plot
@@ -1041,7 +1119,7 @@ def plot_mfw_ngram_results(wdir, data_dir, clf, unit):
 	print("plot mfw ngram results...")
 	
 	# output directory for plots (relative to data dir)
-	outdir = "visuals"
+	outdir = "../visuals"
 	
 	mfws = [100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000]
 	units_word_ngrams = ["2gram_words", "3gram_words", "4gram_words"]
@@ -1148,7 +1226,7 @@ def plot_topic_results(wdir, data_dir, clf):
 	print("plot topic results...")
 	
 	# output directory for plots (relative to data dir)
-	outdir = "visuals"
+	outdir = "../visuals"
 	
 	num_topics = [50, 60, 70, 80, 90, 100]
 	optimize_intervals = [50, 100, 250, 500, 1000, 2500, 5000, None]
@@ -1210,7 +1288,7 @@ def get_result_table_classifier(wdir, data_dir, feature_type):
 	print("get result table classifier for " + feature_type + "...")
 	
 	# relative path to the output directory where the table is stored (relative to data_dir)
-	outdir = "results_summaries"
+	outdir = "../results_summaries"
 	clfs = ["KNN", "SVM", "RF"]
 	feature_sets_mfw = ["MFW", "MFW word n-grams", "MFW character n-grams"]
 	
@@ -1226,12 +1304,12 @@ def get_result_table_classifier(wdir, data_dir, feature_type):
 				# fetch the results
 				res = get_results_classifier(wdir, data_dir, cl, feature_set)
 				
-				data = [cl, feature_set] + res
+				data = [cl, feature_set] + list(res)
 				res_ser = pd.Series(index=columns, data=data)
 				# append to overall summary
-				summary_fr = summary_fr.append(res_ser) # ignore_index = True?
+				summary_fr = summary_fr.append(res_ser, ignore_index = True)
 				# append to avg frame
-				avg_fr = avg_fr.append(res_ser) # ignore_index = True?
+				avg_fr = avg_fr.append(res_ser, ignore_index = True)
 			
 			runs_sum = avg_fr["num_runs"].sum()
 			avg_scores = []
@@ -1244,20 +1322,123 @@ def get_result_table_classifier(wdir, data_dir, feature_type):
 			avg_data = [cl, "all", runs_sum] + avg_scores
 			avg_ser = pd.Series(index=columns, data=avg_data)
 			# append avg to overall summary
-			summary_fr = summary_fr.append(avg_ser)
+			summary_fr = summary_fr.append(avg_ser, ignore_index = True)
 		
 		elif feature_type == "topics":
 			# fetch the results
 			res = get_results_classifier(wdir, data_dir, cl, feature_type)
-			data = [cl, feature_type] + res
+			data = [cl, feature_type] + list(res)
 			res_ser = pd.Series(index=columns, data=data)
 			# append to overall summary
-			summary_fr = summary_fr.append(res_ser) # ignore_index = True?
+			summary_fr = summary_fr.append(res_ser, ignore_index = True)
 	
 	# save result summary
 	summary_fr.to_csv(join(wdir, data_dir, outdir, "results_classifier_" + feature_type + ".csv"))
 	
 	print("done")
+	
+
+def get_result_table_subgenres_mfw(wdir, data_dir, subgenre_level, cl, mfw, norm, unit):
+	"""
+	Create an overview of the classification results for mfw features 
+	for all subgenre constellations on the chosen discursive level (e.g. all thematic subgenres),
+	for a selected classifier and with a fixed parameter constellation.
+	Returns a CSV table containing accuracy and f1 scores for each subgenre constellation.
+	
+	Arguments:
+	wdir (str): Path to the working directory
+	data_dir (str): Relative path to the directory where all the classification results are stored
+	subgenre_level (str): type of subgenres, "themes", "currents", or "novela"
+	cl (str): kind of classifier to use, "KNN", "SVM", or "RF"
+	mfw (int): number of mfw to use
+	norm (int): normalization to use (tf, tfidf, zscore)
+	unit (str): which token unit to use, e.g. "word", "2gram_words", "3gram_chars"
+	"""
+	print("get result table subgenres mfw...")
+	
+	# relative path to the output directory where the table is stored (relative to data_dir)
+	outdir = "../results_summaries"
+	
+	# prepare the data frame, feature_type = unit
+	columns = ["classifier", "feature_type", "mfw", "norm", "subgenre_level", "class_1", "class_2", "num_runs", "top_acc", "mean_acc", "sd_acc", "top_f1", "mean_f1", "sd_f1"]
+	summary_fr = pd.DataFrame(columns=columns)
+	
+	# get results for each subgenre constellation
+	if subgenre_level == "themes":
+		subgenre_sets = subgenre_sets_theme
+	elif subgenre_level == "currents":
+		subgenre_sets = subgenre_sets_currents
+	elif subgenre_level == "novela":
+		subgenre_sets = subgenre_sets_novela
+		
+	for const in subgenre_sets:
+		class1 = const["class 1"]
+		class2 = const["class 2"]
+		print(class1 + " vs. " + class2)
+		
+		res = get_results_subgenres_mfw(wdir, data_dir, cl, mfw, norm, unit, class1, class2)
+		data = [cl, unit, mfw, norm, subgenre_level, class1, class2] + list(res)
+		res_ser = pd.Series(index=columns, data=data)
+		# append to overall summary
+		summary_fr = summary_fr.append(res_ser, ignore_index = True)
+	
+	# save result summary
+	summary_fr.to_csv(join(wdir, data_dir, outdir, "results_subgenres_mfw_" + cl + "_" + str(mfw) + "mfw_" + norm + "_" + unit + ".csv"))
+	
+	
+	print("done")
+
+
+
+def get_result_table_subgenres_topics(wdir, data_dir, subgenre_level, cl, num_topics, oi):
+	"""
+	Create an overview of the classification results for topic features 
+	for all subgenre constellations on the chosen discursive level (e.g. all thematic subgenres),
+	for a selected classifier and with a fixed parameter constellation.
+	Returns a CSV table containing accuracy and f1 scores for each subgenre constellation.
+	
+	Arguments:
+	wdir (str): Path to the working directory
+	data_dir (str): Relative path to the directory where all the classification results are stored
+	subgenre_level (str): type of subgenres, "themes", "currents", or "novela"
+	cl (str): kind of classifier to use, "KNN", "SVM", or "RF"
+	num_topics (int): number of topics to use
+	oi (int): optimization interval to use
+	"""
+	
+	print("get result table subgenres topics for " + subgenre_level + ", with " + cl + ", " + str(num_topics) + " topics, " +  str(oi) + " oi...")
+	
+	# relative path to the output directory where the table is stored (relative to data_dir)
+	outdir = "../results_summaries"
+	
+	# prepare the data frame
+	columns = ["classifier", "feature_type", "num_topics", "oi", "subgenre_level", "class_1", "class_2", "num_runs", "top_acc", "mean_acc", "sd_acc", "top_f1", "mean_f1", "sd_f1"]
+	summary_fr = pd.DataFrame(columns=columns)
+	
+	# get results for each subgenre constellation
+	if subgenre_level == "themes":
+		subgenre_sets = subgenre_sets_theme
+	elif subgenre_level == "currents":
+		subgenre_sets = subgenre_sets_currents
+	elif subgenre_level == "novela":
+		subgenre_sets = subgenre_sets_novela
+		
+	for const in subgenre_sets:
+		class1 = const["class 1"]
+		class2 = const["class 2"]
+		print(class1 + " vs. " + class2)
+	
+		res = get_results_subgenres_topics(wdir, data_dir, cl, num_topics, oi, class1, class2)
+		data = [cl, "topics", num_topics, oi, subgenre_level, class1, class2] + list(res)
+		res_ser = pd.Series(index=columns, data=data)
+		# append to overall summary
+		summary_fr = summary_fr.append(res_ser, ignore_index = True)
+	
+	# save result summary
+	summary_fr.to_csv(join(wdir, data_dir, outdir, "results_subgenres_topics_" + cl + "_" + str(num_topics) + "t_" + str(oi) + "oi.csv"))
+	
+	print("done")
+
 
 	
 def plot_feature_set_results(wdir, data_dir, cl_mfw, cl_topics):
@@ -1272,11 +1453,518 @@ def plot_feature_set_results(wdir, data_dir, cl_mfw, cl_topics):
 	"""
 	print("plot feature set results...")
 	
-	plot_mfw_results(wdir, data_dir, cl_mfw) 
+	plot_mfw_results(wdir, data_dir, cl_mfw)
 	plot_mfw_ngram_results(wdir, data_dir, cl_mfw, "words")
 	plot_mfw_ngram_results(wdir, data_dir, cl_mfw, "chars")
 	plot_topic_results(wdir, data_dir, cl_topics)	
 
+	print("done")
+	
+
+def plot_feature_importances_mfw(wdir, data_dir, subgenre_level, cl, mfw, norm, unit, num_top_feat):
+	"""
+	Plot feature importances for mfw features, for a selected subgenre level.
+	The classifier and feature parameters are chosen beforehand.
+	One plot is created for each subgenre constellation on the level.
+	
+	Arguments:
+	wdir (str): path to the working directory
+	data_dir (str): relative path to the directory containing all the classificaiton results
+	subgenre_level (str): "themes", "currents", or "novelas"
+	cl (str): the chosen classifier, "KNN", "SVM", or "RF"
+	mfw (int): number of mfw
+	norm (str): normalization, "tf", "tfidf", "zscore"
+	unit (str): token unit, e.g. "word", "2gram_words", "3gram_chars"
+	num_top_feat (int): number of top features to include in the plot, e.g. 20
+	"""
+	print("plot feature importances mfw...")
+	
+	# relative path to the output directory where the plots should be stored (relative to data_dir)
+	outdir = "../visuals"
+	
+	# get the relevant features file, e.g. features-SVM-mfw100_5gram_chars_word_zscore.csv
+	feat_filename = "features-" + cl + "-mfw" + str(mfw) + "_" + unit + "_" + norm + ".csv"
+	feat_data = pd.read_csv(join(wdir, data_dir, feat_filename), index_col=0)
+	
+	# get results for each subgenre constellation
+	if subgenre_level == "themes":
+		subgenre_sets = subgenre_sets_theme
+	elif subgenre_level == "currents":
+		subgenre_sets = subgenre_sets_currents
+	elif subgenre_level == "novela":
+		subgenre_sets = subgenre_sets_novela
+		
+	for const in subgenre_sets:
+		class1 = const["class 1"]
+		class2 = const["class 2"]
+		print(class1 + " vs. " + class2)
+		
+		# select the rows that are relevant for this constellation
+		feat_rows = feat_data[(feat_data["class1"] == class1) & (feat_data["class2"] == class2)]
+		
+		# drop metadata columns
+		feat_rows = feat_rows.drop(labels=["subgenre_level", "class1", "class2", "mfw", "token_unit", "normalization", "data_repetition", "cv_call", "class1_cl", "class2_cl"], axis=1)
+		# get column means
+		feat_means = feat_rows.mean(axis=0)
+		# sort by absolute values
+		#feat_means = feat_means.sort_values(key=abs,ascending=False) # pandas update needed before "key" can be used
+		feat_means = feat_means.iloc[(-feat_means.abs()).argsort()]
+		# get top values
+		feat_means = feat_means.iloc[0:num_top_feat]
+		# reorder (for the plot)
+		feat_means = feat_means.iloc[feat_means.abs().argsort()]
+		
+		
+		labels = list(feat_means.index)
+		values = feat_means
+		
+		# create a bar chart
+		if cl == "SVM":
+			xaxis_title = "feature weights"
+		elif cl == "RF":
+			xaxis_title = "feature importances"
+		chart_title = "Feat. imp. ("+ cl + ", " + str(mfw) + "mfw, " + norm + ", " + unit + ", " + class1 + " vs. " + class2 + ")"
+		
+		fig = go.Figure(go.Bar(
+		x=values,
+		y=labels,
+		orientation='h'))
+		fig.update_layout(autosize=False, width=600, height=700, title=chart_title)
+		fig.update_yaxes(type="category",title=unit,tickfont=dict(size=14),automargin=True)
+		fig.update_xaxes(title=xaxis_title)
+		
+		outfile = "feat_imp_" + cl + "_" + str(mfw) + "mfw_" + norm + "_" + unit + "_" + re.sub(r"\s",r"_",class1) + "_" + re.sub(r"\s",r"_",class2)
+
+		fig.write_image(join(wdir, data_dir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
+		fig.write_html(join(wdir, data_dir, outdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+
+	print("done")
+
+
+def plot_feature_importances_topics(wdir, data_dir, subgenre_level, cl, num_topics, oi, topic_rep, num_top_feat):
+	"""
+	Plot feature importances for topic features, for a selected subgenre level.
+	The classifier and feature parameters are chosen beforehand.
+	One plot is created for each subgenre constellation on the level.
+	
+	Arguments:
+	wdir (str): path to the working directory
+	data_dir (str): relative path to the directory containing all the classificaiton results
+	subgenre_level (str): "themes", "currents", or "novelas"
+	cl (str): the chosen classifier, "KNN", "SVM", or "RF"
+	num_topics (int): number of topics
+	oi (int): optimization interval
+	topic_rep (int): number of the topic model repetition to use
+	num_top_feat (int): number of top features to include in the plot, e.g. 20
+	"""
+	
+	print("plot feature importances topics...")
+	
+	# relative path to the output directory where the plots should be stored (relative to data_dir)
+	outdir = "../visuals"
+	
+	# list of topic numbers
+	topic_cols = [str(i) for i in list(range(num_topics))]
+	
+	# get the relevant features file
+	feat_filename = "features-" + cl + "-topics" + str(num_topics) + "_" + str(oi) + "in-topic-rep_" + str(topic_rep) + ".csv"
+	feat_data = pd.read_csv(join(wdir, data_dir, feat_filename), index_col=0)
+	
+	# get first words of the topics (e.g. folder name: 50tp-5000it-50in-2, file name: firstWords.csv, index=topic numbers)
+	fw_folder_name = str(num_topics) + "tp-5000it-" + str(oi) + "in-" + str(topic_rep)
+	first_words_file = pd.read_csv(join(wdir, "data-nh/analysis/features/topics/4_aggregates/", fw_folder_name, "firstWords.csv"), index_col=0, header=None)
+	
+	# get results for each subgenre constellation
+	if subgenre_level == "themes":
+		subgenre_sets = subgenre_sets_theme
+	elif subgenre_level == "currents":
+		subgenre_sets = subgenre_sets_currents
+	elif subgenre_level == "novela":
+		subgenre_sets = subgenre_sets_novela
+		
+	for const in subgenre_sets:
+		
+		class1 = const["class 1"]
+		class2 = const["class 2"]
+		print(class1 + " vs. " + class2)
+		
+		# select the rows that are relevant for this constellation
+		feat_rows = feat_data[(feat_data["class1"] == class1) & (feat_data["class2"] == class2)]
+		
+		# SVM provides positive and negative coefficients. Which class these refer to depends on the class of the first data sample (?) apparently not...
+		# For example: if the first novel of the data selection is the positive class ("novela histórica" in the case of "novela histórica" vs. "other")
+		# then that class gets the positive scores, but if "other" comes first, it gets the positive ones and "novela histórica" the negative ones
+		# It thus depends on each data repetition.
+		# For RF this is not decisive because only positive feature importances are collected.
+		# Here, this will be checked for each data repetition for SVM and if the first sample is the negative class, then the +/- sign of the feature 
+		# importances will be changed.
+		'''
+		if cl == "SVM":
+			# get label file
+			label_filename = "labels-" + cl + "-topics" + str(num_topics) + "_" + str(oi) + "in-topic-rep_" + str(topic_rep) + ".csv"
+			label_file = pd.read_csv(join(wdir, data_dir, label_filename), index_col=0)
+				
+			for data_rep in range(repetitions):
+				print("data rep", data_rep)
+				# check to which class the first sample belongs to
+				# get first first target value (=class label) of the data repetition
+				label_file_first = label_file.loc[(label_file["class1"] == class1) & (label_file["class2"] == class2) & (label_file["data_repetition"] == data_rep)]
+				label_file_first = label_file_first["y_true"].iloc[0]
+				
+				# if the first class is the negative one, change the +/- sign of the feature importances for this data repetition
+				if label_file_first == class2:
+					print("first label is " + label_file_first + ", sign of values is changed...")
+					feat_rows_selected = feat_rows.loc[(feat_rows["class1"] == class1) & (feat_rows["class2"] == class2) & (feat_rows["data_repetition"] == data_rep),topic_cols]
+					feat_rows_changed = -feat_rows_selected
+					feat_rows.loc[(feat_rows["class1"] == class1) & (feat_rows["class2"] == class2) & (feat_rows["data_repetition"] == data_rep),topic_cols] = feat_rows_changed
+		'''			
+		
+		# drop metadata columns
+		if "class1_cl" and "class2_cl" in feat_rows.columns:
+			feat_rows = feat_rows.drop(labels=["class1_cl", "class2_cl"], axis=1)
+			
+		feat_rows = feat_rows.drop(labels=["subgenre_level", "class1", "class2", "num_topics", "optimize_interval", "data_repetition", "topic_repetition", "cv_call"], axis=1)
+		# get column means
+		feat_means = feat_rows.mean(axis=0)
+		# sort by absolute values
+		#feat_means = feat_means.sort_values(key=abs,ascending=False) # pandas update needed before "key" can be used
+		feat_means = feat_means.iloc[(-feat_means.abs()).argsort()]
+		# get top values
+		feat_means = feat_means.iloc[0:num_top_feat]
+		# reorder (for the plot)
+		feat_means = feat_means.iloc[feat_means.abs().argsort()]
+		
+		
+		# collect topic words from firstWords file
+		labels = []
+		for idx in feat_means.index:
+			print("feat means index", idx)
+			topic_words = first_words_file.loc[int(idx)].values[0]
+			labels.append(topic_words)
+		
+		values = feat_means
+		
+		# create a bar chart
+		if cl == "SVM":
+			xaxis_title = "feature weights"
+		elif cl == "RF":
+			xaxis_title = "feature importances"
+		chart_title = "Feat. imp. (topics, " + cl + ", " + str(num_topics) + "t, " + str(oi) + "oi, " + class1 + " vs. " + class2 + ")"
+		
+		fig = go.Figure(go.Bar(
+		x=values,
+		y=labels,
+		orientation='h'))
+		fig.update_layout(autosize=False, width=600, height=700, title=chart_title)
+		fig.update_yaxes(type="category",title="topics",tickfont=dict(size=14),automargin=True)
+		fig.update_xaxes(title=xaxis_title)
+		
+		outfile = "feat_imp_" + cl + "_" + str(num_topics) + "t_" + str(oi) + "oi_topic-rep_" + str(topic_rep) + "_" + re.sub(r"\s",r"_",class1) + "_" + re.sub(r"\s",r"_",class2)
+
+		fig.write_image(join(wdir, data_dir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
+		fig.write_html(join(wdir, data_dir, outdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+			
+	print("done")
+	
+
+def plot_histogram_misclassifications_mfw(wdir, data_dir, subgenre_level, cl, mfw, norm, unit):
+	"""
+	For each subgenre constellation on a subgenre level: plot a histogram showing in how many cases (in percent) the novels
+	were classified correctly.
+	Also: produce a table collecting the absolute sums and relative numbers of correct and false classifications for each novel in the corpus.
+	The classifier and parameters for it are fixed beforehand.
+	
+	Arguments:
+	wdir (str): path to the working directory
+	data_dir (str): relative path to the directory containing all the classification results
+	subgenre_level (str): the kind of subgenre level to analyze ("themes", "currents", "novelas")
+	cl (str): the classifier to use
+	mfw (int): the number of mfw
+	norm (str): normalization technique, "tf", "tfidf", "zscore"
+	unit (str): token unit, e.g. "word", "2gram_words", "3gram_chars"
+	"""
+	
+	print("plot histogram misclassifications mfw...")
+	
+	# relative path to the output directory where the plots should be stored (relative to data_dir)
+	outdir_summaries = "../results_summaries"
+	outdir_visuals = "../visuals"
+	
+	# get results for each subgenre constellation
+	if subgenre_level == "themes":
+		subgenre_sets = subgenre_sets_theme
+	elif subgenre_level == "currents":
+		subgenre_sets = subgenre_sets_currents
+	elif subgenre_level == "novela":
+		subgenre_sets = subgenre_sets_novela
+	
+	# get label file, e.g. labels_SVM-mfw200_2gram_words_tf.csv
+	label_filename = "labels_" + cl + "-mfw" + str(mfw) + "_" + unit + "_" + norm + ".csv"
+	label_file = pd.read_csv(join(wdir, data_dir, label_filename), index_col=0)
+		
+	for const in subgenre_sets:
+		class1 = const["class 1"]
+		class2 = const["class 2"]
+		print(class1 + " vs. " + class2)
+		
+		# prepare frame for misclassification counts
+		# novel idno will be the index
+		# y_true: true label of the novel, true_abs: classified correctly how often? in absolute number, etc.
+		mis_fr = pd.DataFrame(columns=["y_true","true_abs","true_rel","false_abs","false_rel"])
+		
+		# get the relevant rows from the label file
+		label_file_rows = label_file.loc[(label_file["class1"] == class1) & (label_file["class2"] == class2)]
+		
+		for novel_idx in range(num_novels_corpus):
+			idno_number = '%04d' % (novel_idx + 1)
+			idno = "nh" + idno_number
+			
+			# get the rows for this novel
+			idno_rows = label_file_rows.loc[label_file_rows["idno"] == idno]
+			# only proceed if there are results for this novel
+			if not idno_rows.empty:
+					
+				y_true = idno_rows["y_true"].iloc[0]
+				# collect true and false values for this novel
+				trues = []
+				falses = []
+				
+				# collect results from each cv run
+				for cv_idx in range(cv):
+					cv_col = idno_rows["y_" + str(cv_idx)]
+					for idx, val in cv_col.items():
+						if val == y_true:
+							trues.append(val)
+						else:
+							falses.append(val)
+				
+				trues_abs = len(trues)
+				falses_abs = len(falses)
+				
+				pred_sum = trues_abs + falses_abs
+				
+				trues_rel = trues_abs / pred_sum
+				falses_rel = falses_abs / pred_sum
+				
+				mis_ser = pd.Series(name=idno, index=["y_true", "true_abs", "true_rel", "false_abs", "false_rel"], data=[y_true, trues_abs, trues_rel, falses_abs, falses_rel])
+				# append to overall summary
+				mis_fr = mis_fr.append(mis_ser) #ignore_index = True
+			else:
+				print("no results for " + idno + "...")
+		
+		# save misclassification-frame as csv file
+		outfile_name = "misclassifications_" + cl + "_" + str(mfw) + "mfw-" + norm + "_" + unit + "_" + re.sub(r"\s", r"_", class1) + "_" + re.sub(r"\s", r"_", class2)
+		mis_fr.to_csv(join(wdir, data_dir, outdir_summaries, outfile_name + ".csv"))
+		
+		# create histogram: how often was each novel classified correctly (in percent)?
+		outfile_hist = "hist_" + outfile_name
+		chart_title = "Classifications (relative) for " + class1 + " vs. " + class2
+		
+		true_pos = list(mis_fr.loc[(mis_fr["y_true"]==class1) & (mis_fr["true_rel"] > 0),"true_rel"])
+		false_pos = list(mis_fr.loc[(mis_fr["y_true"]==class2) & (mis_fr["false_rel"] > 0),"false_rel"])
+		false_neg = list(mis_fr.loc[(mis_fr["y_true"]==class1) & (mis_fr["false_rel"] > 0),"false_rel"])
+		
+		fig = go.Figure()
+		fig.add_trace(go.Histogram(x=true_pos, name="true positive",  autobinx=False, xbins=dict(start=0.0, end=1.1, size=0.1), marker_color='rgb(0, 204, 150)'))
+		fig.add_trace(go.Histogram(x=false_pos, name="false positive", autobinx=False, xbins=dict(start=0.0, end=1.1, size=0.1), marker_color='rgb(99, 110, 250)'))
+		fig.add_trace(go.Histogram(x=false_neg, name="false negative", autobinx=False, xbins=dict(start=0.0, end=1.1, size=0.1), marker_color='rgb(239, 85, 59)'))
+		fig.update_layout(autosize=False, width=700, height=500, title=chart_title, barmode="group",legend_font=dict(size=14))
+		fig.update_yaxes(title="number of novels",range=[0,120])
+		fig.update_xaxes(title="number of predictions (relative)",range=[0,1.1])
+		#fig.update_traces(opacity=0.75)
+		
+		fig.write_image(join(wdir, data_dir, outdir_visuals, outfile_hist + ".png")) # scale=2 (increase physical resolution)
+		fig.write_html(join(wdir, data_dir, outdir_visuals, outfile_hist + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	print("done")
+
+
+def plot_histogram_misclassifications_topics(wdir, data_dir, subgenre_level, cl, num_topics, oi, topic_rep):
+	"""
+	For each subgenre constellation on a subgenre level: plot a histogram showing in how many cases (in percent) the novels
+	were classified correctly.
+	Also: produce a table collecting the absolute sums and relative numbers of correct and false classifications for each novel in the corpus.
+	The classifier and parameters for it are fixed beforehand.
+	Also the topic repetitition to use is fixed.
+	
+	Arguments:
+	wdir (str): path to the working directory
+	data_dir (str): relative path to the directory containing all the classification results
+	subgenre_level (str): the kind of subgenre level to analyze ("themes", "currents", "novelas")
+	cl (str): the classifier to use
+	num_topics (int): the number of topics to use
+	oi (int): optimization interval parameter
+	topic_rep (int): which topic repetition to use
+	"""
+	print("plot histogram misclassifications topics...")
+	
+	# relative path to the output directory where the plots should be stored (relative to data_dir)
+	outdir_summaries = "../results_summaries"
+	outdir_visuals = "../visuals"
+	
+	# get results for each subgenre constellation
+	if subgenre_level == "themes":
+		subgenre_sets = subgenre_sets_theme
+	elif subgenre_level == "currents":
+		subgenre_sets = subgenre_sets_currents
+	elif subgenre_level == "novela":
+		subgenre_sets = subgenre_sets_novela
+	
+	# get label file
+	label_filename = "labels-" + cl + "-topics" + str(num_topics) + "_" + str(oi) + "in-topic-rep_" + str(topic_rep) + ".csv"
+	label_file = pd.read_csv(join(wdir, data_dir, label_filename), index_col=0)
+		
+	for const in subgenre_sets:
+		
+		class1 = const["class 1"]
+		class2 = const["class 2"]
+		print(class1 + " vs. " + class2)
+		
+		# prepare frame for misclassification counts
+		# novel idno will be the index
+		# y_true: true label of the novel, true_abs: classified correctly how often? in absolute number, etc.
+		mis_fr = pd.DataFrame(columns=["y_true","true_abs","true_rel","false_abs","false_rel"])
+		
+		# get the relevant rows from the label file
+		label_file_rows = label_file.loc[(label_file["class1"] == class1) & (label_file["class2"] == class2)]
+		
+		for novel_idx in range(num_novels_corpus):
+			idno_number = '%04d' % (novel_idx + 1)
+			idno = "nh" + idno_number
+			
+			# get the rows for this novel
+			idno_rows = label_file_rows.loc[label_file_rows["idno"] == idno]
+			# only proceed if there are results for this novel
+			if not idno_rows.empty:
+					
+				y_true = idno_rows["y_true"].iloc[0]
+				# collect true and false values for this novel
+				trues = []
+				falses = []
+				
+				# collect results from each cv run
+				for cv_idx in range(cv):
+					cv_col = idno_rows["y_" + str(cv_idx)]
+					for idx, val in cv_col.items():
+						if val == y_true:
+							trues.append(val)
+						else:
+							falses.append(val)
+				
+				trues_abs = len(trues)
+				falses_abs = len(falses)
+				
+				pred_sum = trues_abs + falses_abs
+				
+				trues_rel = trues_abs / pred_sum
+				falses_rel = falses_abs / pred_sum
+				
+				mis_ser = pd.Series(name=idno, index=["y_true", "true_abs", "true_rel", "false_abs", "false_rel"], data=[y_true, trues_abs, trues_rel, falses_abs, falses_rel])
+				# append to overall summary
+				mis_fr = mis_fr.append(mis_ser) #ignore_index = True
+			else:
+				print("no results for " + idno + "...")
+		
+		# save misclassification-frame as csv file
+		outfile_name = "misclassifications_" + cl + "_" + str(num_topics) + "t-" + str(oi) + "oi-topic_rep_" + str(topic_rep) + "_" + re.sub(r"\s", r"_", class1) + "_" + re.sub(r"\s", r"_", class2)
+		mis_fr.to_csv(join(wdir, data_dir, outdir_summaries, outfile_name + ".csv"))
+		
+		# create barchart: how often was each novel classified correctly (in percent)?
+		outfile_hist = "hist_" + outfile_name
+		chart_title = "Classifications (relative) for " + class1 + " vs. " + class2
+		
+		true_pos = list(mis_fr.loc[(mis_fr["y_true"]==class1) & (mis_fr["true_rel"] > 0),"true_rel"])
+		false_pos = list(mis_fr.loc[(mis_fr["y_true"]==class2) & (mis_fr["false_rel"] > 0),"false_rel"])
+		false_neg = list(mis_fr.loc[(mis_fr["y_true"]==class1) & (mis_fr["false_rel"] > 0),"false_rel"])
+		
+		fig = go.Figure()
+		fig.add_trace(go.Histogram(x=true_pos, name="true positive",  autobinx=False, xbins=dict(start=0.0, end=1.1, size=0.1), marker_color='rgb(0, 204, 150)'))
+		fig.add_trace(go.Histogram(x=false_pos, name="false positive", autobinx=False, xbins=dict(start=0.0, end=1.1, size=0.1), marker_color='rgb(99, 110, 250)'))
+		fig.add_trace(go.Histogram(x=false_neg, name="false negative", autobinx=False, xbins=dict(start=0.0, end=1.1, size=0.1), marker_color='rgb(239, 85, 59)'))
+		fig.update_layout(autosize=False, width=700, height=500, title=chart_title, barmode="group",legend_font=dict(size=14))
+		fig.update_yaxes(title="number of novels",range=[0,50])
+		fig.update_xaxes(title="number of predictions (relative)",range=[0,1.1])
+		#fig.update_traces(opacity=0.75)
+		
+		fig.write_image(join(wdir, data_dir, outdir_visuals, outfile_hist + ".png")) # scale=2 (increase physical resolution)
+		fig.write_html(join(wdir, data_dir, outdir_visuals, outfile_hist + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	print("done")
+	
+
+def plot_topic_distribution(wdir, feature_dir_topics, subgenre_level, cl, num_topics, oi, topic_rep, idno, top_topic_list):
+	"""
+	Create a bar plot showing which importance the top distinctive topics for a specific subgenre constellation have in an individual novel.
+	The goal is to see why certain novels are misclassified or why they are good representatives of a subgenre.
+	
+	Arguments:
+	wdir (str): path to the working directory
+	feature_dir_topics (str): relative path to the directory containing the aggregate topic modeling results
+	subgenre_level (str): for which subgenre level is this done? "themes", "currents", "novelas"
+	cl (str): which classifier was used ("KNN", "SVM", "RF")
+	num_topics (int): number of topics
+	oi (int): optimization interval
+	topic_rep (int): topic repetition
+	idno (str): identifier of the novel
+	top_topic_list (list): list of tuples with top topics (topic numbers) and if they are pos or neg coef
+	"""
+	print("plot topic distribution for " + idno + "...")
+	
+	# output path for the bar chart, relative to wdir
+	outdir = "data-nh/analysis/classification/" + subgenre_level + "/visuals/"
+	
+	# name of the folder in which the topic distributions in the novels are
+	topic_dist_folder = str(num_topics) + "tp-5000it-" + str(oi) + "in-" + str(topic_rep)
+	
+	if cl == "SVM":
+		topic_dist_filename = "avgtopicscores_by-idno_MinMax.csv"
+	else:
+		topic_dist_filename = "avgtopicscores_by-idno.csv"
+	topic_dist_fr = pd.read_csv(join(wdir, feature_dir_topics, topic_dist_folder, topic_dist_filename), index_col=0)
+	topic_dist_novel = topic_dist_fr.loc[idno]
+	
+	# get first words of the topics (e.g. folder name: 50tp-5000it-50in-2, file name: firstWords.csv, index=topic numbers)
+	fw_folder_name = str(num_topics) + "tp-5000it-" + str(oi) + "in-" + str(topic_rep)
+	first_words_file = pd.read_csv(join(wdir, "data-nh/analysis/features/topics/4_aggregates/", fw_folder_name, "firstWords.csv"), index_col=0, header=None)
+	
+	# get the topic probabilities for the selected topics
+	values_pos = []
+	values_neg = []
+	labels = []
+	
+	for idx,val in enumerate(top_topic_list):
+		# collect topic words from firstWords file
+		topic_words = first_words_file.loc[val[0]].values[0]
+		# add to labels
+		labels.append(topic_words)
+		# get topic probability in novel
+		prob = float(topic_dist_novel[val[0]])
+		
+		if val[1] == "pos":
+			values_pos.append(prob)
+			values_neg.append(0)
+		else:
+			values_neg.append(prob)
+			values_pos.append(0)
+			
+	
+	# create a bar plot
+	outfile = "topic-probabilities-" + idno
+	chart_title = "probabilities for top topics in " + idno
+	
+	fig = go.Figure(data=[
+		go.Bar(name="novela histórica", x=labels, y=values_pos),
+		go.Bar(name="other", x=labels, y=values_neg)
+	])
+	fig.update_layout(autosize=False, width=900, height=600, title=chart_title, barmode="group",legend_font=dict(size=14))
+	fig.update_yaxes(title="topic probability")
+	fig.update_xaxes(type="category",title="topics",tickfont=dict(size=14),automargin=True,tickangle=270)
+
+	fig.write_image(join(wdir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.write_html(join(wdir, outdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+	
+	
 	print("done")
 	
 
@@ -1314,9 +2002,8 @@ df.to_csv(join(wdir, "data-nh/analysis/features/feature_sets.csv"), index=False,
 ##################### main classification tasks #####################
 
 # parameters that are set for the classifiers based on the results in the preliminary parameter study:
-# KNN, mfw: n_neighbors = 3, weight = distance, metric = manhattan
-# KNN, topics: n_neighbors = 5, weight = distance, metric = manhattan
-# SVM, C: 1
+# KNN, n_neighbors = 7, weight = distance, metric = manhattan
+# SVM, topics: C: 1, mfw: C: 100
 # FR: max_features: sqrt
 
 #### primary literary currents ####
@@ -1361,8 +2048,8 @@ subgenre_sets_novela = [{"level": "subgenre-novela", "class 1": "novela", "class
 # how often was the data selection (with undersampling) repeated?
 repetitions = 10
 
-# chosen feature parameters # 400mfw, 4gram_chars_affix-punct, tf
-mfws = [500, 1000, 2000, 3000, 4000, 5000] #100, 200, 300, 400, 
+# chosen feature parameters
+mfws = [100, 200, 300, 400, 500, 1000, 2000, 3000, 4000, 5000] 
 token_units = ["word", "2gram_words", "3gram_words", "4gram_words", "3gram_chars", "4gram_chars", "5gram_chars", 
 "3gram_chars_word", "4gram_chars_word", "5gram_chars_word", "3gram_chars_affix-punct", "4gram_chars_affix-punct", "5gram_chars_affix-punct"]
 norms = ["tf", "tfidf", "zscore"]
@@ -1377,13 +2064,12 @@ classifiers = ["KNN", "SVM", "RF"]
 # number of cv folds
 cv = 10
 
-
-for level in ["themes", "literary-currents", "novelas"]:
+'''
+for level in ["themes", "literary-currents"]: # "novelas"
 	
 	print("doing level " + level + "...")
 	
 	outpath = join("data-nh/analysis/classification/", level, "results_data")
-	
 	
 	
 	
@@ -1411,7 +2097,7 @@ for level in ["themes", "literary-currents", "novelas"]:
 					
 					# prepare collection of feature importances
 					if cl == "SVM" or cl == "RF":
-						label_columns = ["subgenre_level", "class1", "class2", "mfw", "token_unit", "normalization", "data_repetition", "cv_call"]
+						label_columns = ["subgenre_level", "class1", "class2", "mfw", "token_unit", "normalization", "data_repetition", "cv_call", "class1_cl", "class2_cl"]
 						feature_names = get_feature_names_mfw(wdir, feature_dir_mfw, mfw, unit, no)
 						feature_names = list(feature_names)
 						columns = label_columns + feature_names
@@ -1477,7 +2163,7 @@ for level in ["themes", "literary-currents", "novelas"]:
 						features_filename = "features-" + cl + "-mfw" + feature_params + ".csv"
 						features_frame.to_csv(join(wdir, outpath, features_filename))
 						
-'''
+
 	###### TOPICS ######
 	print("doing topics...")
 	
@@ -1502,7 +2188,7 @@ for level in ["themes", "literary-currents", "novelas"]:
 					
 					# prepare collection of feature importances
 					if cl == "SVM" or cl == "RF":
-						label_columns = ["subgenre_level", "class1", "class2", "num_topics", "optimize_interval", "data_repetition", "topic_repetition", "call"]
+						label_columns = ["subgenre_level", "class1", "class2", "num_topics", "optimize_interval", "data_repetition", "topic_repetition", "cv_call", "class1_cl", "class2_cl"]
 						topic_numbers = list(range(t))
 						columns = label_columns + topic_numbers
 						features_frame = pd.DataFrame(columns=columns)
@@ -1516,8 +2202,11 @@ for level in ["themes", "literary-currents", "novelas"]:
 					for sb_set in subgenre_sets[level]:
 						class1 = re.sub(r"\s", r"-", sb_set["class 1"])
 						class2 = re.sub(r"\s", r"-", sb_set["class 2"])
+						
+						print(class1 + " vs. " + class2 + "...")
 					
 						for data_rep in range(repetitions):
+							#print("data-rep " + str(data_rep) + "...")
 						
 							# select data corresponding to the chosen features and classifier
 							X,y,idnos = select_data_topics(wdir, "data-nh/analysis/classification/data_selection/main/", feature_dir_topics, sb_set, t, oi, data_rep, topic_rep, cl)
@@ -1566,8 +2255,8 @@ for level in ["themes", "literary-currents", "novelas"]:
 					fr_knn_topics.to_csv(join(wdir, outpath, "results-KNN-topics" + feature_params + ".csv"))
 				elif cl == "RF":
 					fr_rf_topics.to_csv(join(wdir, outpath, "results-RF-topics" + feature_params + ".csv"))
-'''
 
+'''
 print("done!")
 
 
@@ -1575,6 +2264,7 @@ print("done!")
 data_dir_themes = "data-nh/analysis/classification/themes/results_data"
 data_dir_currents = "data-nh/analysis/classification/literary-currents/results_data"
 data_dir_novelas = "data-nh/analysis/classification/novelas/results_data"
+num_novels_corpus = 256
 
 ## CHOOSE CLASSIFIER:
 # get the top and mean results for the different classifier types, for certain subgenre levels
@@ -1584,24 +2274,6 @@ data_dir_novelas = "data-nh/analysis/classification/novelas/results_data"
 # THEME LEVEL:
 #get_result_table_classifier(wdir, data_dir_themes, "mfw")
 #get_result_table_classifier(wdir, data_dir_themes, "topics")
-
-# OLD:
-#get_results_classifier(wdir, data_dir_themes, "KNN", "MFW")
-#get_results_classifier(wdir, data_dir_themes, "KNN", "MFW word n-grams")
-#get_results_classifier(wdir, data_dir_themes, "KNN", "MFW character n-grams")
-
-#get_results_classifier(wdir, data_dir_themes, "SVM", "MFW")
-#get_results_classifier(wdir, data_dir_themes, "SVM", "MFW word n-grams")
-#get_results_classifier(wdir, data_dir_themes, "SVM", "MFW character n-grams")
-
-#get_results_classifier(wdir, data_dir_themes, "RF", "MFW")
-#get_results_classifier(wdir, data_dir_themes, "RF", "MFW word n-grams")
-#get_results_classifier(wdir, data_dir_themes, "RF", "MFW character n-grams")
-
-#get_results_classifier(wdir, data_dir_themes, "KNN", "topics")
-#get_results_classifier(wdir, data_dir_themes, "SVM", "topics")
-#get_results_classifier(wdir, data_dir_themes, "RF", "topics")
-
 
 
 # LITERARY CURRENT LEVEL:
@@ -1621,13 +2293,7 @@ data_dir_novelas = "data-nh/analysis/classification/novelas/results_data"
 # and how do the results vary for different feature sets?
 
 # THEME LEVEL:
-#plot_feature_set_results(wdir, data_dir_themes, "RF", "SVM") # OBS: das sind mit den neuen Ergebnissen vermutlich andere Classifier!!! Anpassen!!!
-
-# OLD:
-#plot_mfw_results(wdir, data_dir_themes, "RF") 
-#plot_mfw_ngram_results(wdir, data_dir_themes, "RF", "words")
-#plot_mfw_ngram_results(wdir, data_dir_themes, "RF", "chars")
-#plot_topic_results(wdir, data_dir_themes, "SVM")
+#plot_feature_set_results(wdir, data_dir_themes, "SVM", "SVM")
 
 # LITERARY CURRENT LEVEL:
 #plot_feature_set_results(wdir, data_dir_currents, "SVM", "SVM")
@@ -1641,20 +2307,28 @@ data_dir_novelas = "data-nh/analysis/classification/novelas/results_data"
 
 
 ## ANALYZE SUBGENRE CLASSIFICATIONS:
-# with the best classifier and feature sets for each subgenre label:
+# with the best classifier and feature sets for each subgenre level:
 # analyze the classification results for the different subgenre constellations
-# analyze feature importances and misclassifications
 
 # THEME LEVEL:
+#get_result_table_subgenres_topics(wdir, data_dir_themes, "themes", "SVM", 90, 250)
+#get_result_table_subgenres_mfw(wdir, data_dir_themes, "themes", "RF", 3000, "tfidf", "word")
+#get_result_table_subgenres_mfw(wdir, data_dir_themes, "themes", "SVM", 1000, "tfidf", "2gram_words")
+#get_result_table_subgenres_mfw(wdir, data_dir_themes, "themes", "SVM", 1000, "tfidf", "3gram_chars")
 
-# für jede der 6 Konstellationen: Tabelle mit Ergebnissen wie bei Cl.-Auswahl
-# topics: 100, oi: 250, SVM
-#get_results_subgenres_topics(wdir, data_dir_themes, "SVM", 100, 250, "novela histórica", "other")
 
 # LITERARY CURRENT LEVEL:
+#get_result_table_subgenres_topics(wdir, data_dir_currents, "currents", "SVM", 90, 2500)
+#get_result_table_subgenres_mfw(wdir, data_dir_currents, "currents", "SVM", 3000, "tfidf", "word")
+#get_result_table_subgenres_mfw(wdir, data_dir_currents, "currents", "SVM", 1000, "tfidf", "2gram_words")
+#get_result_table_subgenres_mfw(wdir, data_dir_currents, "currents", "SVM", 1000, "tfidf", "3gram_chars")
+
 
 # NOVELAS LEVEL:
-
+#get_result_table_subgenres_topics(wdir, data_dir_novelas, "novela", "SVM", 100, 250)
+#get_result_table_subgenres_mfw(wdir, data_dir_novelas, "novela", "SVM", 1000, "tfidf", "word")
+#get_result_table_subgenres_mfw(wdir, data_dir_novelas, "novela", "SVM", 1000, "tfidf", "2gram_words")
+#get_result_table_subgenres_mfw(wdir, data_dir_novelas, "novela", "SVM", 1000, "tfidf", "3gram_chars")
 
 
 ############################################
@@ -1662,20 +2336,193 @@ data_dir_novelas = "data-nh/analysis/classification/novelas/results_data"
 
 ## ANALYZE FEATURE IMPORTANCES:
 
+"""
+The goal of the feature importance analysis is to see which features are important for the text types that 
+are more or less congruent with the conventional genres (depending on the accuracy, but allready the mean 
+accuracies themselves indicate how congruent text type and conventional genre are).
+"""
+
+# THEME LEVEL:
+#plot_feature_importances_topics(wdir, data_dir_themes, "themes", "SVM", 90, 250, 0, 25)
+#plot_feature_importances_mfw(wdir, data_dir_themes, "themes", "SVM", 1000, "tfidf", "word", 25)
+#plot_feature_importances_mfw(wdir, data_dir_themes, "themes", "SVM", 1000, "tfidf", "2gram_words", 25)
+#plot_feature_importances_mfw(wdir, data_dir_themes, "themes", "SVM", 1000, "tfidf", "3gram_chars", 25)
+
+
+# LITERARY CURRENT LEVEL:
+#plot_feature_importances_topics(wdir, data_dir_currents, "currents", "SVM", 70, 1000, 0, 25)
+#plot_feature_importances_mfw(wdir, data_dir_currents, "currents", "SVM", 3000, "tfidf", "word", 25)
+#plot_feature_importances_mfw(wdir, data_dir_currents, "currents", "SVM", 1000, "tfidf", "2gram_words", 25)
+#plot_feature_importances_mfw(wdir, data_dir_currents, "currents", "SVM", 1000, "tfidf", "3gram_chars", 25)
+
+
+# NOVELAS LEVEL:
+#plot_feature_importances_topics(wdir, data_dir_novela, "novelas", "SVM", 100, 250, 0, 25)
+#plot_feature_importances_mfw(wdir, data_dir_novela, "novela", "SVM", 1000, "tfidf", "word", 25)
+#plot_feature_importances_mfw(wdir, data_dir_novela, "novela", "SVM", 1000, "tfidf", "2gram_words", 25)
+#plot_feature_importances_mfw(wdir, data_dir_novela, "novela", "SVM", 1000, "tfidf", "3gram_chars", 25)
 
 ############################################
 
 
 ## ANALYZE MISCLASSIFICATIONS:
 
+"""
+The goal is to check how sharply the limits of the textual genres can be drawn.
+Which novels have the genre label (or not) and are always classified correctly? (true positives and true negatives)
+Which ones have the label and are always classified wrong? (false negatives)
+Which ones do not have the label and are always classified wrong? (false positives)
+Also degrees of prototypicality can be analyzed by calculating how often each novel was classified correctly or wrong.
+The definitions of the text types are always relative (depending on the texts that are part of the overall corpus or contrastive set).
+Individual novels are checked regarding the feature values they have for the top distinctive features of the text types.
+"""
+
+# THEME LEVEL:
+#plot_histogram_misclassifications_topics(wdir, data_dir_themes, "themes", "SVM", 90, 250, 0)
+#plot_histogram_misclassifications_mfw(wdir, data_dir_themes, "themes", "SVM", 1000, "tfidf", "word")
+#plot_histogram_misclassifications_mfw(wdir, data_dir_themes, "themes", "SVM", 1000, "tfidf", "2gram_words")
+#plot_histogram_misclassifications_mfw(wdir, data_dir_themes, "themes", "SVM", 1000, "tfidf", "3gram_chars")
+
+# LITERARY CURRENT LEVEL:
+#plot_histogram_misclassifications_topics(wdir, data_dir_currents, "currents", "SVM", 100, 250, 0)
+#plot_histogram_misclassifications_mfw(wdir, data_dir_currents, "currents", "SVM", 3000, "tfidf", "word")
+#plot_histogram_misclassifications_mfw(wdir, data_dir_currents, "currents", "SVM", 1000, "tfidf", "2gram_words")
+#plot_histogram_misclassifications_mfw(wdir, data_dir_currents, "currents", "SVM", 1000, "tfidf", "3gram_chars")
+
+
+# NOVELAS LEVEL:
+#plot_histogram_misclassifications_topics(wdir, data_dir_novela, "novela", "SVM", 100, 250, 0)
+#plot_histogram_misclassifications_mfw(wdir, data_dir_novela, "novela", "SVM", 1000, "tfidf", "word")
+#plot_histogram_misclassifications_mfw(wdir, data_dir_novela, "novela", "SVM", 1000, "tfidf", "2gram_words")
+#plot_histogram_misclassifications_mfw(wdir, data_dir_novela, "novela", "SVM", 1000, "tfidf", "3gram_chars")
+
+
+# visualize the subgenres top features in individual novels
+#feature_dir_topics = "data-nh/analysis/features/topics/4_aggregates"
+# list of topics that were most important for the subgenre constellation that is analyzed
+# list for "novela histórica" vs. "other":
+#top_topic_list = [(50,"neg"),(72,"pos"),(64,"pos"),(66,"pos"),(89,"neg"),(24,"pos"),(1,"pos"),(76,"pos"),(8,"pos"),(37,"pos"),(87,"neg"),(57,"pos"),(73,"neg"),(9,"pos"),(40,"pos"),(67,"pos"),(82,"pos"),(2,"neg"),(7,"pos"),(86,"pos"),(17,"neg"),(21,"neg"),(4,"pos"),(48,"neg"),(56,"pos")]
+#plot_topic_distribution(wdir, feature_dir_topics, "themes", "SVM", 90, 250, 0, "nh0165", top_topic_list) 
+# nh0026: Cruz y espada
+# nh0141: Gentes que son así
+# nh0090: Bandidos del Río Frío
+# nh0150: Los esposos
+# nh0166: Vía Crucis
+# nh0165: Las ranas pidiendo rey
+
+############################################ AD HOC SOLUTIONS ########################################
 
 
 
-############################################
+'''
+# rename zscore files
+for infile in glob.glob(join(wdir, data_dir_novelas, "*_SVM*_zscore.csv")):
+	newfile = infile[:-4] + "_MinMax.csv"
+	rename(infile,newfile)
+'''
+
+'''
+# rename "call" column in feature files to "cv_call" (only if the feature files do not yet have a column "cv_call")
+for infile in glob.glob(join(wdir, data_dir_novelas, "features-*.csv")):
+	
+	fr = pd.read_csv(infile, index_col=0)
+	cols = list(fr.columns)
+	if "cv_call" not in cols and "call" in cols:
+		print("doing " + infile + "...")
+		fr = fr.rename(columns={"call":"cv_call"})
+		fr.to_csv(infile)
+'''
+
+'''
+# drop "call" column in feature files that also have "cv_call" (not in the ones with char 4grams, though!)
+for infile in glob.glob(join(wdir, data_dir_currents, "features-*.csv")):
+	
+	fr = pd.read_csv(infile, index_col=0)
+	cols = list(fr.columns)
+	if "cv_call" in cols and "call" in cols:
+		print("doing " + infile + "...")
+		fr = fr.drop(labels="call",axis=1)
+		fr.to_csv(infile)
+'''
+	
+
+
+
+
+
+# TESTS related to feature scaling for MFW-based-features and SVM:
+
+#results = pd.read_csv("/home/ulrike/Git/data-nh/analysis/classification/themes/results_data/results-KNN-mfw100_word_zscore.csv", index_col=0)
+#print(results["test_accuracy"].mean()) 
+
+# SVM without scaling, 100 MFW:
+# 0.73499666999667 für zscore
+# 0.6347835497835498 für tf
+# 0.5629936729936731 für tfidf
+
+# SVM without scaling, 1000 MFW:
+# 0.7903812853812855 für zscore
+# 0.644961704961705 für tf
+# 0.5757209457209458 für tfidf
+
+# SVM with scaling, 100 MFW:
+# 0.7266683316683318 für zscore und tf
+# 0.7257925407925409 für tfidf
+
+# SVM with scaling, 1000 MFW:
+# 0.785872460872461 für z-score und tf
+# 0.7910822510822512 für tfidf
+
+# RF without scaling, 100 MFW:
+# 0.7352897102897102 für tfidf
+# 0.7082117882117882 für tf und zscore
+
+# two aspects: variance of individual features; size of individual feature ranges
+
+
+'''
+# example: feature distribution "Amalia"
+
+feat_abs = pd.read_csv(join(wdir, "data-nh/analysis/features/mfw/bow_mfw100.csv"), index_col=0)
+# sort by frequency and get sorted mfw index
+mfw_sorted = feat_abs.sum(axis=0).sort_values(ascending=False).index
+
+feat_tf = pd.read_csv(join(wdir, "data-nh/analysis/features/mfw/bow_mfw100_tf.csv"), index_col=0)
+feat_tfidf = pd.read_csv(join(wdir, "data-nh/analysis/features/mfw/bow_mfw100_tfidf.csv"), index_col=0)
+feat_tfidf_MinMax = pd.read_csv(join(wdir, "data-nh/analysis/features/mfw/bow_mfw100_tfidf_MinMax.csv"), index_col=0)
+feat_zscore = pd.read_csv(join(wdir, "data-nh/analysis/features/mfw/bow_mfw100_zscore.csv"), index_col=0)
+feat_zscore_MinMax = pd.read_csv(join(wdir, "data-nh/analysis/features/mfw/bow_mfw100_zscore_MinMax.csv"), index_col=0)
+
+values = []
+labels = []
+
+for w in list(mfw_sorted):
+	labels.append(w)
+	# Wert in Amalia:
+	#value = feat_tfidf_MinMax.loc["nh0017",w]
+	#values.append(value)
+	# Wertebereich:
+	value_max = max(feat_tf[w])
+	value_min = min(feat_tf[w])
+	values.append(value_max - value_min)
+	
+
+
+fig = go.Figure(data=[go.Bar(x=labels, y=values)])
+fig.update_layout(autosize=False, width=800, height=400, title="Size of feature value ranges, tf")
+
+outdir = "data-nh/analysis/features/mfw/overviews"
+outfile = "feat_ranges_100MFW_tf"
+
+fig.write_image(join(wdir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
+fig.write_html(join(wdir, outdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
+
+#fig.show()
+'''
+
+
 # NOTES:
 
-# bei MFW features: am Ende die Spalten "call" umbennenen in "cv_call"!!! (überall, wo sie noch nicht so heißen) es gab da einen Konflikt, weil 
-# auch ein char-4gram "call" hieß
 
 # scores["estimator"][0].predict(X) : predicted labels
 # scores["estimator"][0].classes_ : which classes are there in general

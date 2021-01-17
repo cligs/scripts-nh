@@ -309,20 +309,20 @@ for RP in range(NumRepetitions):
 
 ########## EVALUATION and VISUALIZATION ##########
 
-# create word clouds for the topics of selected models
+# create word clouds or other visualizations for the topics of selected models
 
-'''
+
 ### Set parameters as used in the topic model
-NumTopics = [50,100]
+NumTopics = [90]
 NumIterations = 5000
-OptimizeIntervals = [50,1000,None]
+OptimizeIntervals = [2500]
 NumRepetitions = 1
 
 for RP in range(NumRepetitions):
 	for NT in NumTopics:
 		for OI in OptimizeIntervals:
 			param_settings = str(NT) + "tp-" + str(NumIterations) + "it-" + str(OI) + "in-" + str(RP)
-
+			
 			### make_wordle_from_mallet
 			### Creates a wordle for each topic.
 			word_weights_file = join(wdir, "data-nh/analysis/features/topics/", "3_models", "word-weights_" + param_settings + ".csv")
@@ -331,8 +331,24 @@ for RP in range(NumRepetitions):
 			font_path = join(wdir, "data-nh/analysis/features/topics/extras", "AlegreyaSans-Regular.otf")
 			dpi = 300
 			TopicRanksFile = join(wdir, "data-nh/analysis/features/topics/", "4_aggregates", param_settings, "topicRanks.csv")
-			visualize.make_wordle_from_mallet(word_weights_file, NT, words, TopicRanksFile, outfolder, dpi) # ggf. font_path
-'''
+			#visualize.make_wordle_from_mallet(word_weights_file, NT, words, TopicRanksFile, outfolder, dpi) # ggf. font_path
+			
+			
+			
+			### plot_topItems
+			### For each topic, creates a barchart with top items from a category. 
+			averageDatasets = join(wdir, "data-nh/analysis/features/topics/4_aggregates", param_settings, "avg*.csv") 
+			outfolder = join(wdir, "data-nh/analysis/features/topics/", "5_visuals", param_settings, "topItems")
+			firstWordsFile = join(wdir, "data-nh/analysis/features/topics/", "4_aggregates", param_settings, "firstWords.csv")
+			numberOfTopics = NT # must be actual number of topics modeled. 
+			targetCategories = ["idno"]
+			# choose one or several from: author-name, decade, subgenre, gender, idno, title, segmentID
+			topItemsShown = 20 
+			fontscale = 0.8
+			height = 0 # 0=automatic and flexible
+			dpi = 300
+			#visualize.plot_topItems(averageDatasets, outfolder, firstWordsFile, numberOfTopics, targetCategories, topItemsShown, fontscale, height, dpi)
+
 
 # analyze characteristics of the topic feature sets
 # are there zero values (at all?)
@@ -343,7 +359,5 @@ for RP in range(NumRepetitions):
 
 
 
-# how does the weight of individual topics in the whole corpus change with different optimize interval values?
-# (e.g. for a model with 70 topics)
-# how does it change inside of an individual example text?
+
 

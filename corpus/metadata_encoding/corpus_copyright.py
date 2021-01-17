@@ -29,7 +29,7 @@ def plot_copyright_status(wdir, md_file, outfile):
 	values = [md.get("general"), md.get("ancillary"), md.get("open domain")]
 
 	fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.4, direction="clockwise")])
-	fig.update_layout(autosize=False,width=500,height=500)
+	fig.update_layout(autosize=False,width=500,height=400,legend_font=dict(size=14))
 	
 	fig.write_html(join(wdir, outfile))
 	
@@ -81,9 +81,9 @@ def plot_edition_years(wdir, md_file, outfile, edition_type):
 			y.append(num)
 	
 	# ticks for the x axis (not possible to get this automatically), show the first ("unknown"), and then starting with 1860 and every fifth year
-	# first editions: 1840-1910, all values are known
+	# first editions: 1835-1910, all values are known
 	if edition_type == "first":
-		tick_values = list(range(0,71,5))
+		tick_values = list(range(1,72,5))
 		tick_texts = list(range(1840,1911,5))
 	# base editions: 1841-2018, also unknown values
 	else:
