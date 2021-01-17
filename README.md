@@ -1,5 +1,5 @@
 # scripts-nh
-Scripts accompanying the dissertation __Genre analysis and corpus design: 19th century Spanish American novels (1830-1910)__ by Ulrike Henny-Krahmer
+Scripts accompanying the dissertation __Genre analysis and corpus design: 19th century Spanish American novels (1830-1910)__ by Ulrike Henny-Krahmer. The dissertation was written in the context of the project [Computational Literary Genre Stylistics (CLiGS)](https://cligs.hypotheses.org/) at the University of Würzburg and has been submitted in January 2021.
 
 The scripts in this repository served to perform a variety of tasks related to the creation of a corpus of 19th century Spanish American novels and the analysis of these novels in terms of subgenres.
 
