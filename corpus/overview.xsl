@@ -78,7 +78,7 @@
         
         <!-- ##### WORKS ##### -->
         <!--<xsl:call-template name="plot-works-per-year"/>-->
-        <!--<xsl:call-template name="plot-works-per-decade"/>-->
+        <xsl:call-template name="plot-works-per-decade"/>
         <!--<xsl:call-template name="plot-works-1880"/>-->
         
         <!--<xsl:call-template name="plot-works-by-country"/>-->
@@ -150,7 +150,7 @@
         <!--<xsl:call-template name="plot-subgenres-labels-amount-litHist-bib"/>-->
         <!--<xsl:call-template name="plot-subgenres-labels-amount-litHist-corp"/>-->
         
-        <xsl:call-template name="plot-subgenres-theme"/>
+        <!--<xsl:call-template name="plot-subgenres-theme"/>-->
         <!--<xsl:call-template name="plot-subgenres-theme-bib-sources"/>-->
         <!--<xsl:call-template name="plot-subgenres-num-thematic-labels-work"/>-->
         <!--<xsl:call-template name="plot-subgenres-thematic-primary"/>-->
@@ -861,7 +861,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 900px; height: 600px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 500px;"></div>
                     <script>
                         var x1 = [<xsl:value-of select="string-join($num-works-per-author-bib,',')"/>];
                         var trace1 = {
@@ -879,16 +879,30 @@
                         };
                         var data = [trace1, trace2];
                         var layout = {
-                        xaxis: {title: "number of works"}, 
-                        yaxis: {title: "number of authors"},
+                        
+                            title: "Number of works per author",
+                            font: {
+                                    family: "Libertine, serif",
+                                    color: "#000000",
+                                    size: 14
+                                    },
+                        
+                            xaxis: {
+                                title: { text: "number of works", font: {size: 14}},
+                                tickfont: {size: 14}
+                            },
+                            yaxis: {
+                                title: { text: 'number of authors', font: {size: 14}},
+                                tickfont: {size: 14}
+                                },
                         barmode: "overlay",
                         legend: {
                         x: 1,
                         xanchor: 'right',
                         y: 1,
-                        font: {size: 16}
+                        font: {size: 14}
                         },
-                        font: {size: 14},
+                        /*
                         annotations: [
                         <xsl:for-each select="1 to 5">{
                             <xsl:variable name="num-authors-per-work-num-bib" select="count(index-of($num-works-per-author-bib,string(.)))"/>
@@ -899,9 +913,10 @@
                             showarrow: false,
                             xanchor: "center",
                             yanchor: "top",
-                            font: {size: 12}
+                            font: {size: 14}
                             }<xsl:if test="position() != last()">,</xsl:if>
                         </xsl:for-each>]
+                        */
                         };
                         
                         Plotly.newPlot('myDiv', data, layout);
@@ -962,7 +977,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 1000px; height: 600px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 550px;"></div>
                     <script>
                         var x1 = [<xsl:value-of select="string-join($num-editions-per-author-bib,',')"/>];
                         var trace1 = {
@@ -982,16 +997,30 @@
                         };
                         var data = [trace1, trace2];
                         var layout = {
-                        xaxis: {title: "number of editions"}, 
-                        yaxis: {title: "number of authors"},
-                        barmode: "overlay",
-                        legend: {
-                        x: 1,
-                        xanchor: 'right',
-                        y: 1,
-                        font: {size: 16}
-                        },
-                        font: {size: 14},
+                            title: "Number of editions per author",
+                            font: {
+                                family: "Libertine, serif",
+                                color: "#000000",
+                                size: 14
+                            },
+                            margin: {r:20,l:70},
+                            xaxis: {
+                                title: {text: "number of editions", font: {size: 14}},
+                                tickfont: {size: 14}
+                                }, 
+                            yaxis: {
+                                title: {text: "number of authors", font: {size: 14}},
+                                tickfont: {size: 14}
+                                },
+                            
+                            barmode: "overlay",
+                            legend: {
+                                x: 1,
+                                xanchor: 'right',
+                                y: 1,
+                                font: {size: 14}
+                                },
+                        /*
                         annotations: [
                         <xsl:for-each select="1 to 5">{
                             <xsl:variable name="num-authors-per-edition-num-bib" select="count(index-of($num-editions-per-author-bib,string(.)))"/>
@@ -1005,6 +1034,7 @@
                             font: {size: 10}
                             }<xsl:if test="position() != last()">,</xsl:if>
                         </xsl:for-each>]
+                        */
                         };
                         
                         Plotly.newPlot('myDiv', data, layout);
@@ -1064,7 +1094,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 400px;"></div>
                     <script>
                         var labels = ["male","female","unknown"]
                         var values_bib = [<xsl:value-of select="cligs:get-author-gender-bib('masculino')"/>,<xsl:value-of select="cligs:get-author-gender-bib('femenino')"/>,<xsl:value-of select="cligs:get-author-gender-bib('desconocido')"/>]
@@ -1086,6 +1116,13 @@
                         }];
                         
                         var layout = {
+                        margin: {r:80,l:110},
+                        title: "Author gender",
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
                         grid: {rows: 1, columns: 2},
                         legend: {font: {size: 14}},
                         annotations: [
@@ -1129,7 +1166,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 400px;"></div>
                     <script>
                         var labels = ["life dates known","only birth date known","only death date known", "life dates unknown"]
                         var values_bib = [<xsl:value-of select="cligs:get-author-dates-known('both', 'bib')"/>,
@@ -1159,6 +1196,13 @@
                         }];
                         
                         var layout = {
+                        margin: {r:50,l:80,t:100},
+                        title: "Knowledge of the authors' life dates",
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
                         grid: {rows: 1, columns: 2},
                         legend: {font: {size: 14}},
                         annotations: [
@@ -1288,7 +1332,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 900px; height: 500px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 450px;"></div>
                     <script>
                         var trace1 = {
                         x: [<xsl:value-of select="string-join($labels-x,',')"/>],
@@ -1324,16 +1368,31 @@
                         
                         var data = [trace1, trace2, trace3, trace4];
                         var layout = {
-                        barmode: "group",
-                        xaxis: {tickmode: "linear", dtick: 10, title: "decades"},
-                        yaxis: {title: "number of authors"},
-                        legend: {
-                        x: 1,
-                        xanchor: 'left',
-                        y: 1,
-                        font: {size: 16}
-                        },
-                        font: {size: 16}
+                            title: "Births and deaths of authors by decade",
+                            //margin: {b: 100},
+                            font: {
+                                family: "Libertine, serif",
+                                color: "#000000",
+                                size: 14
+                                },
+                            barmode: "group",
+                            xaxis: {
+                                tickmode: "linear", 
+                                dtick: 10, 
+                                title: {text: "decades", font: {size: 14}},
+                                tickfont: {size: 14},
+                                tickangle: 270
+                                },
+                            yaxis: {
+                                title: {text: "number of authors", font: {size: 14}},
+                                tickfont: {size: 14}
+                                },
+                            legend: {
+                                x: 1,
+                                xanchor: 'left',
+                                y: 1,
+                                font: {size: 14}
+                                }
                         };
                         Plotly.newPlot("myDiv", data, layout);
                     </script>
@@ -1363,7 +1422,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 900px; height: 600px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 600px;"></div>
                     <script>
                         var trace1 = {
                         x: [<xsl:value-of select="string-join($labels-x,',')"/>],
@@ -1417,13 +1476,33 @@
                         var data = [trace5, trace1, trace3, trace6, trace2, trace4];
                         
                         var layout = {
+                        title: "Authors alive per year",
+                        margin: {l: 80, r: 30},
                         barmode: "group",
-                        xaxis: {tickmode: "linear", dtick: 10, title: "years", titlefont: {size: 14}},
-                        yaxis: {title: "number of authors", titlefont: {size: 14}},
-                        legend: {
-                        font: {size: 14}
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
                         },
-                        font: {size: 14}
+                        xaxis: {
+                            tickmode: "linear", 
+                            dtick: 10, 
+                            title: "years", 
+                            titlefont: {size: 14},
+                            tickfont: {size: 14},
+                            tickangle: 270,
+                            automargin: true
+                            },
+                        yaxis: {
+                            title: "number of authors", 
+                            titlefont: {size: 14},
+                            tickfont: {size: 14}
+                            },
+                        legend: {
+                        font: {size: 14},
+                        orientation: "h",
+                        y: -0.2
+                        }
                         };
                         Plotly.newPlot("myDiv", data, layout);
                     </script>
@@ -1451,7 +1530,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 900px; height: 600px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 450px;"></div>
                     <script>
                         var trace1 = {
                         x: [<xsl:value-of select="string-join($labels-x,',')"/>],
@@ -1470,13 +1549,29 @@
                         var data = [trace1, trace2];
                         
                         var layout = {
-                        xaxis: {tickmode: "linear", dtick: 10, title: "years", titlefont: {size: 16}},
-                        yaxis: {title: "number of authors", titlefont: {size: 16}},
+                        title: "Number of active authors per year",
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
+                        xaxis: {
+                            tickmode: "linear", 
+                            dtick: 10, 
+                            title: "years", 
+                            titlefont: {size: 14},
+                            tickfont: {size: 14}
+                            },
+                        yaxis: {
+                            title: "number of authors", 
+                            titlefont: {size: 14},
+                            tickfont: {size: 14}
+                            },
                         legend: {
                         orientation: "h",
-                        font: {size: 16}
-                        },
-                        font: {size: 16}
+                        font: {size: 14},
+                        y: -0.2
+                        }
                         };
                         Plotly.newPlot("myDiv", data, layout);
                     </script>
@@ -1574,7 +1669,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 400px; height: 500px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 500px;"></div>
                     <script>
                         var trace1 = {
                         y: [<xsl:value-of select="string-join($author-ages-bib,',')"/>],
@@ -1590,8 +1685,22 @@
                         
                         var data = [trace1, trace2];
                         var layout = {
+                            margin: {l: 180, r: 180},
+                            title: "Author ages when publishing novels.",
+                            font: {
+                            family: "Libertine, serif",
+                            color: "#000000",
+                            size: 14
+                            },
                             showlegend: false,
-                            yaxis: {title: "age", tickfont: {size: 14}}
+                            yaxis: {
+                                title: "age",
+                                tickfont: {size: 14},
+                                titlefont: {size: 14}
+                                },
+                            xaxis: {
+                                tickfont: {size: 14}
+                            }
                         };
                         
                         Plotly.newPlot('myDiv', data, layout);
@@ -1777,7 +1886,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 400px; height: 500px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 500px;"></div>
                     <script>
                         var trace1 = {
                         y: [<xsl:value-of select="string-join($author-ages-bib,',')"/>],
@@ -1794,8 +1903,22 @@
                         var data = [trace1, trace2];
                         
                         var layout = {
-                            yaxis: {title: "age at death"},
-                            showlegend: false
+                        margin: {l: 180, r: 180},
+                        title: "Authors' age at death.",
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
+                        showlegend: false,
+                        yaxis: {
+                        title: "age at death",
+                        tickfont: {size: 14},
+                        titlefont: {size: 14}
+                        },
+                        xaxis: {
+                        tickfont: {size: 14}
+                        }
                         };
                         
                         Plotly.newPlot('myDiv', data, layout);
@@ -1823,7 +1946,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 700px; height: 400px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 400px;"></div>
                     <script>
                         var labels = ["Argentina","Mexico","Cuba"]
                         var values_bib = [<xsl:value-of select="$authors-AR-bib"/>,<xsl:value-of select="$authors-MX-bib"/>,<xsl:value-of select="$authors-CU-bib"/>]
@@ -1847,8 +1970,14 @@
                         }];
                         
                         var layout = {
-                        grid: {rows: 1, columns: 2},
-                        legend: {font: {size: 14}},
+                            title: "Authors by country",
+                            grid: {rows: 1, columns: 2},
+                            legend: {font: {size: 14}},
+                            font: {
+                            family: "Libertine, serif",
+                            color: "#000000",
+                            size: 14
+                            },
                         annotations: [
                         {
                         font: {
@@ -1889,7 +2018,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 800px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 800px;"></div>
                     <script>
                         var labels = ["<xsl:value-of select="string-join(cligs:map-nationalities(),'&quot;,&quot;')"/>"]
                         var values_bib = [<xsl:value-of select="string-join(cligs:get-nationalities-bib(),',')"/>]
@@ -1913,12 +2042,19 @@
                         }];
                         
                         var layout = {
+                        margin: {r:80,l:50},
+                        title: "Authors by nationality",
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
                         grid: {rows: 1, columns: 2},
                         legend: {font: {size: 14}},
                         annotations: [
                         {
                         font: {
-                        size: 18
+                        size: 14
                         },
                         showarrow: false,
                         text: 'Bib-ACMé',
@@ -1927,7 +2063,7 @@
                         },
                         {
                         font: {
-                        size: 18
+                        size: 14
                         },
                         showarrow: false,
                         text: 'Conha19',
@@ -1955,7 +2091,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 800px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 800px;"></div>
                     <script>
                         var labels = ["<xsl:value-of select="string-join(cligs:map-birth-places(),'&quot;,&quot;')"/>"]
                         var values_bib = [<xsl:value-of select="string-join(cligs:get-birth-places-bib(),',')"/>]
@@ -1979,12 +2115,19 @@
                         }];
                         
                         var layout = {
+                        margin: {r:20,l:70},
+                        title: "Authors by country of birth",
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
                         grid: {rows: 1, columns: 2},
                         legend: {font: {size: 14}},
                         annotations: [
                         {
                         font: {
-                        size: 18
+                        size: 14
                         },
                         showarrow: false,
                         text: 'Bib-ACMé',
@@ -1993,7 +2136,7 @@
                         },
                         {
                         font: {
-                        size: 18
+                        size: 14
                         },
                         showarrow: false,
                         text: 'Conha19',
@@ -2021,7 +2164,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 800px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 800px;"></div>
                     <script>
                         var labels = ["<xsl:value-of select="string-join(cligs:map-death-places(),'&quot;,&quot;')"/>"]
                         var values_bib = [<xsl:value-of select="string-join(cligs:get-death-places-bib(),',')"/>]
@@ -2045,12 +2188,19 @@
                         }];
                         
                         var layout = {
+                        margin: {r:20,l:70},
+                        title: "Authors by country of death",
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
                         grid: {rows: 1, columns: 2},
                         legend: {font: {size: 14}},
                         annotations: [
                         {
                         font: {
-                        size: 18
+                        size: 14
                         },
                         showarrow: false,
                         text: 'Bib-ACMé',
@@ -2059,7 +2209,7 @@
                         },
                         {
                         font: {
-                        size: 18
+                        size: 14
                         },
                         showarrow: false,
                         text: 'Conha19',
@@ -2091,7 +2241,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 900px; height: 700px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 600px;"></div>
                     <script>
                         var trace1 = {
                         x: [<xsl:value-of select="string-join($labels-x,',')"/>],
@@ -2109,11 +2259,27 @@
                         
                         var data = [trace1, trace2];
                         var layout = {
+                        title: "Number of works per year in Bib-ACMé and Conha19",
+                        font: {
+                            family: "Libertine, serif",
+                            color: "#000000",
+                            size: 14
+                        },
                         barmode: "group",
-                        xaxis: {tickmode: "linear", dtick: 10, title: "years", tickangle: 270, tickfont: {size: 14}},
-                        yaxis: {title: "number of works"},
-                        legend: {orientation: "h", font: {size: 16}},
-                        font: {size: 16}
+                        xaxis: {
+                            tickmode: "linear", 
+                            dtick: 10, 
+                            title: "years", 
+                            titlefont: {size: 14},
+                            tickangle: 270, 
+                            tickfont: {size: 14}
+                            },
+                        yaxis: {
+                            title: "number of works",
+                            titlefont: {size: 14},
+                            tickfont: {size: 14}
+                            },
+                        legend: {orientation: "h", font: {size: 14}, y: -0.2}
                         };
                         Plotly.newPlot("myDiv", data, layout);
                     </script>
@@ -2136,7 +2302,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 900px; height: 700px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 500px;"></div>
                     <script>
                         var trace1 = {
                         x: [<xsl:value-of select="string-join($decades,',')"/>],
@@ -2154,11 +2320,26 @@
                         
                         var data = [trace1, trace2];
                         var layout = {
+                            title: "Works by decade in Bib-ACMé and Conha19",
+                            font: {
+                                family: "Libertine, serif",
+                                color: "#000000",
+                                size: 14
+                            },
                             barmode: "group",
-                            xaxis: {tickmode: "linear", dtick: 10, title: "decades", tickfont: {size: 16}},
-                            yaxis: {title: "number of works"},
-                            legend: {orientation: "h", font: {size: 18}},
-                            font: {size: 16},
+                            xaxis: {
+                                tickmode: "linear", 
+                                dtick: 10, 
+                                title: "decades", 
+                                tickfont: {size: 14},
+                                titlefont: {size: 14}
+                                },
+                            yaxis: {
+                                title: "number of works",
+                                tickfont: {size: 14},
+                                titlefont: {size: 14}
+                            },
+                            legend: {orientation: "h", font: {size: 14}, y: -0.2},
                             annotations: [
                             <xsl:for-each select="$decades">{
                                 <xsl:variable name="num-decade-bib" select="cligs:get-num-decades(.,$work-publication-years-bib)"/>
@@ -2169,7 +2350,7 @@
                                 showarrow: false,
                                 xanchor: "left",
                                 yanchor: "bottom",
-                                font: {size: 16}
+                                font: {size: 14}
                                 }<xsl:if test="position() != last()">,</xsl:if>
                             </xsl:for-each>]
                         };

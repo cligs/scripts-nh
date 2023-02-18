@@ -69,7 +69,7 @@ wdir = "/home/ulrike/Git/data-nh/corpus/metadata-encoding/"
 #corpus_copyright.plot_author_death_years(wdir, "../metadata_copyright.csv", "authors-death-years.html")
 #corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "first-publication-years.html", "first")
 #corpus_copyright.plot_edition_years(wdir, "../metadata_copyright.csv", "base-publication-years.html", "base")
-#corpus_copyright.plot_copyright_status(wdir, "../metadata_copyright.csv", "copyright-status.html")
+corpus_copyright.plot_copyright_status(wdir, "../metadata_copyright.csv", "copyright-status.html")
 
 
 ### validation ###

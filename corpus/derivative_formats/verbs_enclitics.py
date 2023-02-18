@@ -178,9 +178,12 @@ def visualize_enclitics_freeling(wdir, md, infile, outfile):
 	
 	
 	fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.4, direction="clockwise")])
-	fig.update_layout(autosize=False, width=600, height=400, title="FreeLing POS of verb forms with enclitic pronouns")
+	fig.update_layout(autosize=False, width=709, height=400)
+	fig.update_layout(title=dict(text="FreeLing POS of verb forms with enclitic pronouns",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=90, l=120, r=290),font=dict(family="Libertine, serif",color="#000000",size=14))
 	
-	fig.write_image(join(wdir, outfile + "_pie.png")) # scale=2 (increase physical resolution)
+	
+	#fig.write_image(join(wdir, outfile + "_pie.png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + "_pie.html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
 	#fig.show()
@@ -200,11 +203,15 @@ def visualize_enclitics_freeling(wdir, md, infile, outfile):
 		jitter=0.3, # add some jitter for a better separation between points
 		pointpos=-1.8)) # relative position of points wrt box
 	
-	fig.update_layout(autosize=False, width=1000, height=600, title="FreeLing POS of verb forms with enclitic pronouns", yaxis_title="number of POS assignments (relative)", legend_font=dict(size=16))
-	fig.update_xaxes(tickfont=dict(size=16))
-	fig.update_yaxes(tickfont=dict(size=16))
+	fig.update_layout(autosize=False, width=709, height=600, yaxis_title="number of POS assignments (relative)",showlegend=False)
+	fig.update_layout(title=dict(text="FreeLing POS of verb forms with enclitic pronouns",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=90, l=100, r=30),font=dict(family="Libertine, serif",color="#000000",size=14))
 	
-	fig.write_image(join(wdir, outfile + "_box.png")) # scale=2 (increase physical resolution)
+	fig.update_xaxes(tickfont=dict(size=14),tickangle=270)
+	fig.update_yaxes(tickfont=dict(size=14),title_font_size=14)
+	
+	
+	#fig.write_image(join(wdir, outfile + "_box.png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + "_box.html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
 	#fig.show()
@@ -301,9 +308,14 @@ def plot_enclitics(wdir, data, outfile):
             pointpos=-1.8 # relative position of points wrt box
               )])
 	
-	fig.update_layout(autosize=False, width=600, height=700, title="Verb forms with enclitic pronouns in the novels", yaxis_title="verb forms with enclitic pronouns (relative)")
+	fig.update_layout(autosize=False, width=709, height=600, yaxis_title="verb forms with enclitic pronouns (relative)")
+	fig.update_layout(title=dict(text="Verb forms with enclitic pronouns in the novels",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=90, l=180, r=150),font=dict(family="Libertine, serif",color="#000000",size=14))
 	
-	fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	fig.update_xaxes(tickfont=dict(size=14),title_font_size=14)
+	fig.update_yaxes(tickfont=dict(size=14),title_font_size=14)
+	
+	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 
 	#fig.show()
@@ -409,7 +421,7 @@ def correct_enclitics_freeling(wdir, inpath, patterns, exceptions, accents, outp
 
 #analyze_enclitics_freeling("/home/ulrike/Git", "conha19/metadata.csv", "data-nh/corpus/derivative-formats/verbs-enclitics-freeling-matches.xml", "data-nh/corpus/derivative-formats/verbs-enclitics-freeling.csv")
 
-visualize_enclitics_freeling("/home/ulrike/Git", "conha19/metadata.csv", "data-nh/corpus/derivative-formats/verbs-enclitics-freeling.csv", "data-nh/corpus/derivative-formats/plot-verbs-enclitics-freeling")
+visualize_enclitics_freeling("/home/ulrike/Git", "conha19/metadata_all.csv", "data-nh/corpus/derivative-formats/verbs-enclitics-freeling.csv", "data-nh/corpus/derivative-formats/plot-verbs-enclitics-freeling")
 
 #correct_enclitics_freeling("/home/ulrike/Git", "conha19/annotated/", "data-nh/corpus/derivative-formats/verb-form-patterns-es-detail.txt", "data-nh/corpus/derivative-formats/verbs-enclitics-exceptions.txt", "data-nh/corpus/derivative-formats/verb-form-endings-accents.txt", "conha19/annotated_corr")
 

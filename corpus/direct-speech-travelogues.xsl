@@ -26,10 +26,13 @@
             </head>
             <body>
                 <!-- Plotly chart will be drawn inside this DIV -->
-                <div id="myDiv" style="width: 700px; height: 500px;"></div>
+                <div id="myDiv" style="width: 709px; height: 390px;"></div> 
+                <!-- web-html: width: 709px; height: 480px; 
+                print: width: 1417px; height: 1000px; -->
                 <!-- Plotly chart will be exported to this tag -->
                 <img id="png-export"/>
                 <script>
+                    
                     var d3 = Plotly.d3;
                     var img_png= d3.select('#png-export');
                     
@@ -69,15 +72,31 @@
                     ];
                     
                     var layout = {
-                    legend: {font: {size: 14}},
+                    /*
+                    title: {
+                        text: "Proportion of paragraphs containing direct speech, travelogues vs. novels",
+                        font: {size: 14}},
+                    */
+                    font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
+                    showlegend: false,
+                    //legend: {font: {size: 14}},
+                    margin: {t: 30, b: 40, l: 100, r: 80},
                     yaxis: {
                         range: [0,1],
-                        title: "paragraphs with direct speech (relative)"
+                        tickfont: {size: 14},
+                        title: {
+                            text: "paragraphs with direct speech (relative)",
+                            font: {size: 14}
+                            }
                     },
                     xaxis: {tickfont: {size: 14}}
                     };
                     
-                    Plotly.newPlot('myDiv', data, layout)<!--.then(
+                    Plotly.newPlot('myDiv', data, layout);<!--.then(
                         function(gd)
                         {
                         Plotly.toImage(gd,{width:1654,height:1034}) 

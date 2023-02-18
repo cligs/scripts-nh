@@ -49,7 +49,7 @@ def sources_shares():
 	values_rest = [TR_rest.count()[0], LB_rest.count()[0], DLC_rest.count(0)[0], len(sources_other_rest)]
 
 
-	fig = make_subplots(rows=2, cols=2, specs=[[{"type" : "domain"}, {"type" : "domain"}],[{"type" : "xy"}, {"type" : "xy"}]])
+	fig = make_subplots(vertical_spacing=0.02,horizontal_spacing=0.2,rows=2, cols=2, specs=[[{"type" : "domain"}, {"type" : "domain"}],[{"type" : "xy"}, {"type" : "xy"}]])
 
 	fig.add_trace(
 		go.Pie(labels=labels, values=values_all, marker=dict(colors = colors),  direction="clockwise", hole=.4),
@@ -70,13 +70,13 @@ def sources_shares():
 		go.Bar(x=labels, y=values_rest, marker_color = colors, text=values_rest, textposition="auto", showlegend=False),
 		row=2, col=2
 	)
-
-	fig.update_layout(autosize=False,width=700,height=700,legend=dict(font=dict(size=14)))
-	fig.update_yaxes(range=[0,600])
+	#title=dict(text="Works by source. Left: candidates, right: entries in the bibliography",font=dict(size=14)),
+	fig.update_layout(autosize=False,width=709,height=650,margin=dict(t=0, b=70, l=70),font=dict(family="Libertine, serif",color="#000000",size=14),legend=dict(font=dict(size=14)))
+	fig.update_yaxes(range=[0,600],tickfont=dict(size=14))
 	fig.update_xaxes(tickfont=dict(size=14))
 
 	outfile = "sources-shares"
-	fig.write_image(join(wdir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	#fig.write_image(join(wdir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
 	#fig.show()
@@ -104,10 +104,12 @@ def sources_inclusion():
 	values = [len(included), len(excluded_missing_info), len(excluded_short), len(excluded_other)]
 	
 	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise", hole=.4)])
-	fig.update_layout(autosize=False,width=600,height=400,legend=dict(font=dict(size=14)))
+	# title=dict(text="Inclusion and reasons for exclusion of works.",font=dict(size=14)),
+	fig.update_layout(margin=dict(t=0, b=0, l=220, r=240),font=dict(family="Libertine, serif",color="#000000",size=14),autosize=False,width=709,height=300,legend=dict(font=dict(size=14)))
+	fig.update_traces(textfont_size=14)
 	
 	outfile = "sources-inclusion"
-	fig.write_image(join(wdir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
+	#fig.write_image(join(wdir, outdir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
 	#fig.show()
@@ -116,4 +118,4 @@ def sources_inclusion():
 
 
 #sources_shares()
-#sources_inclusion()
+sources_inclusion()

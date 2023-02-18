@@ -29,7 +29,10 @@ def plot_copyright_status(wdir, md_file, outfile):
 	values = [md.get("general"), md.get("ancillary"), md.get("open domain")]
 
 	fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.4, direction="clockwise")])
-	fig.update_layout(autosize=False,width=500,height=400,legend_font=dict(size=14))
+	fig.update_layout(autosize=False,width=709,height=400,legend_font=dict(size=14))
+	fig.update_layout(title=dict(text="Copyright statuses of the novels in the corpus.",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=90, l=200, r=200),font=dict(family="Libertine, serif",color="#000000",size=14))
+	
 	
 	fig.write_html(join(wdir, outfile))
 	
@@ -95,8 +98,12 @@ def plot_edition_years(wdir, md_file, outfile, edition_type):
 	tick_texts = [str(i) for i in tick_texts]
 
 	fig = go.Figure([go.Bar(x=years_list, y=y)])
-	fig.update_layout(autosize=False,width=800,height=500,xaxis_type="category",xaxis_title="years",yaxis_title="number of novels")
-	fig.update_xaxes(tickangle=270,tickmode="array",tickvals=tick_values,ticktext=tick_texts) # tickfont=dict(size=10)
+	fig.update_layout(autosize=False,width=709,height=600,xaxis_type="category",xaxis_title="years",yaxis_title="number of novels")
+	fig.update_xaxes(tickangle=270,tickmode="array",tickvals=tick_values,ticktext=tick_texts,tickfont=dict(size=14),title_font_size=14)
+	fig.update_layout(title=dict(text="Publication years of basis editions",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16))) # other titles: Years of the novels' first publications
+	fig.update_layout(margin=dict(t=120, b=90, l=60, r=20),font=dict(family="Libertine, serif",color="#000000",size=14))
+	fig.update_yaxes(tickfont=dict(size=14),title_font_size=14)
+	
 	fig.write_html(join(wdir, outfile))
 	
 	print("done: saved figure")
@@ -145,8 +152,13 @@ def plot_author_death_years(wdir, md_file, outfile):
 	tick_texts = [str(i) for i in tick_texts]
 
 	fig = go.Figure([go.Bar(x=years_list, y=y)])
-	fig.update_layout(autosize=False,width=800,height=600,xaxis_type="category",xaxis_title="years",yaxis_title="number of authors")
-	fig.update_xaxes(tickangle=270,tickmode="array",tickvals=tick_values,ticktext=tick_texts,tickfont=dict(size=12))
+	fig.update_layout(autosize=False,width=709,height=600,xaxis_type="category",xaxis_title="years",yaxis_title="number of authors")
+	fig.update_xaxes(tickangle=270,tickmode="array",tickvals=tick_values,ticktext=tick_texts,tickfont=dict(size=14),title_font_size=14)
+	fig.update_layout(title=dict(text="Death years of authors",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=90, l=70, r=30),font=dict(family="Libertine, serif",color="#000000",size=14))
+	fig.update_yaxes(tickfont=dict(size=14),title_font_size=14)
+	
+	
 	fig.write_html(join(wdir, outfile))
 	
 	print("done: saved figure")

@@ -178,7 +178,12 @@ def plot_error_distribution(wdir, spellcheck_file, outfile, **kwargs):
 		xaxis_type="linear"
 		xaxis_title="number of errors"
 		
-	fig.update_layout(autosize=False,width=800,height=500,xaxis_type=xaxis_type,xaxis_title=xaxis_title,yaxis_title="error frequency")
+	fig.update_layout(autosize=False,width=709,height=500,xaxis_type=xaxis_type,xaxis_title=xaxis_title,yaxis_title="error frequency")
+	fig.update_layout(title=dict(text="Distribution of spelling errors with exception words.",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=80, l=100, r=100),font=dict(family="Libertine, serif",color="#000000",size=14))
+	fig.update_yaxes(title_font_size=14)
+	fig.update_xaxes(title_font_size=14)
+	
 	
 	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
@@ -209,9 +214,12 @@ def plot_top_errors(wdir, spellcheck_file, outfile, num_errors):
 	y = list(data["sum"])
 
 	fig = go.Figure([go.Bar(x=x, y=y)])
-	fig.update_layout(autosize=False,width=800,height=500)
-	fig.update_xaxes(tickangle=270,tickfont=dict(size=14),title="error word")
-	fig.update_yaxes(title="error frequency")
+	fig.update_layout(autosize=False,width=709,height=500)
+	fig.update_xaxes(tickangle=270,tickfont=dict(size=14),title="error word",title_font_size=14)
+	fig.update_yaxes(title="error frequency",title_font_size=14)
+	fig.update_layout(title=dict(text="Top 30 spelling errors.",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=80, b=80, l=80, r=80),font=dict(family="Libertine, serif",color="#000000",size=14))
+	
 	
 	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
@@ -272,7 +280,13 @@ def plot_errors_per_file(wdir, spellcheck_file, outfile, mode, norm):
 	else:
 		yaxis_title="number of tokens/types"
 	
-	fig.update_layout(autosize=False,width=800,height=500,yaxis_title=yaxis_title,xaxis_tickfont=dict(size=14),legend_font=dict(size=14))
+	fig.update_layout(autosize=False,width=709,height=500,yaxis_title=yaxis_title,xaxis_tickfont=dict(size=14),yaxis_tickfont=dict(size=14),legend_font=dict(size=14))
+	fig.update_layout(title=dict(text="Distribution of error tokens and types for the corpus files (relative)",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=80, l=100, r=100),font=dict(family="Libertine, serif",color="#000000",size=14))
+	fig.update_yaxes(title_font_size=14)
+	fig.update_xaxes(title_font_size=14)
+	
+	
 	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
@@ -332,13 +346,24 @@ def plot_errors_per_file_grouped(wdir, spellcheck_file, outfile, md_file, md_cat
 
 	fig.update_traces(box_visible=True, meanline_visible=True)
 	fig.update_layout(violinmode='group',yaxis_title="number of tokens/types (relative)")
-	fig.update_layout(autosize=False,width=900,height=1000,legend_font=dict(size=14)) 
-	# source edition type: 900/700, file type: 700/600, institution: 900/900
-	fig.update_layout(margin=dict(b=300))
+	fig.update_layout(autosize=False,width=709,height=1000,legend_font=dict(size=14)) 
+	fig.update_layout(title=dict(text="Distribution of error tokens and types for the corpus files (by source institution)",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=80, l=50, r=20),font=dict(family="Libertine, serif",color="#000000",size=14))
 	
-	fig.update_xaxes(tickfont=dict(size=13),title="source institution")
+	# source edition type: 900/700, file type: 700/600, institution: 900/900
+	
+	fig.update_xaxes(tickfont=dict(size=13),title="source edition type",title_font_size=14) # titles: source edition type, source file type, source institution
+	fig.update_yaxes(tickfont=dict(size=14),title_font_size=14)
 	fig.update_xaxes(tickangle=270) # if there are many values on the x axis: tickangle=270
-	# titles: source edition type, source file type
+	
+	#  to position the legend inside, top left
+	fig.update_layout(legend=dict(
+    yanchor="top",
+    y=0.99,
+    xanchor="left",
+    x=0.01
+))
+	
 	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
@@ -399,7 +424,12 @@ def plot_errors_covered_exceptions(wdir, spellcheck_file, outfile, exc_lists, ex
 		go.Bar(name='types', x=exc_labels, y=y_types)
 	])
 	# Change the bar mode
-	fig.update_layout(barmode='group',autosize=False,width=800,height=500,yaxis_title="number of tokens/types",xaxis_tickfont=dict(size=14),legend_font=dict(size=14))
+	fig.update_layout(barmode='group',autosize=False,width=709,height=500,legend_font=dict(size=14))
+	fig.update_layout(title=dict(text="Number of error tokens and types covered by exception lists",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=80, b=80, l=80, r=80),font=dict(family="Libertine, serif",color="#000000",size=14))
+	fig.update_xaxes(tickfont=dict(size=14))
+	fig.update_yaxes(title="number of tokens/types",tickfont=dict(size=14),title_font_size=14)
+	
 	
 	#fig.write_image(join(wdir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(wdir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)

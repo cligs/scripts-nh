@@ -80,7 +80,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 800px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 800px;"></div>
                     <script>
                         var trace1 = 
                         {
@@ -138,10 +138,23 @@
                         
                         
                         var layout = {
+                        title: {
+                        text: "F1 scores for direct speech recognition by kind of edition",
+                        font: {size: 14}},
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
+                        showlegend: false,
+                        margin: {l: 100, r: 100},
+                        //legend: {font: {size: 14}},
                         yaxis: {
                         range: [0,1],
-                        title: { text: 'F1 score'}
-                        }
+                        title: { text: 'F1 score', font: {size: 14}},
+                        tickfont: {size: 14}
+                        },
+                        xaxis: {tickfont: {size: 14}}
                         };
                         
                         var data = [trace1,trace2,trace3];
@@ -167,7 +180,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 600px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 800px;"></div>
                     <script>
                         var trace1 = 
                         {
@@ -206,10 +219,23 @@
                         };
                         
                         var layout = {
+                        title: {
+                        text: "F1 scores for direct speech recognition by type of speech sign",
+                        font: {size: 14}},
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
+                        showlegend: false,
+                        margin: {l: 100, r: 100},
+                        //legend: {font: {size: 14}},
                         yaxis: {
                         range: [0,1],
-                        title: { text: 'F1 score'}
-                        }
+                        title: { text: 'F1 score', font: {size: 14}},
+                        tickfont: {size: 14}
+                        },
+                        xaxis: {tickfont: {size: 14}}
                         };
                         
                         var data = [trace1, trace2];
@@ -233,7 +259,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 800px; height: 800px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 800px;"></div>
                     <script>
                         var data = [
                         {
@@ -295,11 +321,23 @@
                         ];
                         
                         var layout = {
+                            title: {
+                                text: "Scores for direct speech recognition (gold standard vs. regular expression approach).",
+                                font: {size: 14}},
+                            font: {
+                                family: "Libertine, serif",
+                                color: "#000000",
+                                size: 14
+                            },
+                            showlegend: false,
+                            margin: {l: 100, r: 100},
+                            //legend: {font: {size: 14}},
                             yaxis: {
                                 range: [0,1],
-                                title: { text: 'score'}
+                                title: { text: 'score', font: {size: 14}},
+                                tickfont: {size: 14}
                             },
-                            font: {size: 16}
+                            xaxis: {tickfont: {size: 14}}
                         };
                         
                         Plotly.newPlot('myDiv', data, layout);

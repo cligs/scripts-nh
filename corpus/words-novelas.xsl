@@ -50,7 +50,7 @@
         
         <!-- create a box plot showing the number of words and pages of "novelas" for the bibliographic entries;
         Output file: bibls-page-count.html -->
-        <!--<xsl:call-template name="plot-bibls-pages"/>-->
+        <xsl:call-template name="plot-bibls-pages"/>
         
         <!-- create a box plot combining the number of words of "novelas" for full texts and bibliographic entries;
         Output files: fulltexts-bibls-word-count.csv, fulltexts-bibls-word-count.html -->
@@ -66,7 +66,7 @@
         
         <!-- create a box plot combining the number of words of "novelas cortas" for full texts and bibliographic entries;
         Output files: fulltexts-bibls-short-word-count.csv -->
-        <xsl:call-template name="plot-fulltexts-bibls-short-words"/>
+        <!--<xsl:call-template name="plot-fulltexts-bibls-short-words"/>-->
         
         <!-- for the purpose of documentation: generate a table containing an overview of the 
         novels used in this analysis -->
@@ -116,7 +116,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 600px; height: 600px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 450px;"></div>
                     <script>
                         var data = [
                         {
@@ -135,6 +135,17 @@
                         ];
                         
                         layout = {
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000"
+                        },
+                        margin: {t: 0, b: 40, l: 190, r: 160},
+                        /*
+                        title: {
+                        text: "Number of words for the full texts of 129 works carrying the label “novela”",
+                        font: {size: 14}
+                        },
+                        */
                         yaxis: {
                         dtick: 50000,
                         title: 'number of words',
@@ -248,7 +259,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 600px; height: 1000px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 900px;"></div>
                     <script>
                         var trace1 = {
                         y: [
@@ -308,23 +319,47 @@
                         pointpos: -2,
                         type: 'box',
                         name: 'novelas',
+                        marker: {
+                            color: "rgb(31, 119, 180)"
+                        },
                         yaxis: 'y2'
                         };
                         var data = [trace1, trace2];
                         
                         layout = {
+                        /*
+                        title: {
+                        text: "Number of pages and words for the bibliographic entries of 252 works carrying the label “novela”",
+                        font: {size: 14}
+                        },
+                        */
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
+                        legend: {font: {size: 14}},
+                        margin: {t: 30, b: 40, l: 90, r: 90},
                         yaxis: {
-                        dtick: 100,
-                        title: 'pages',
-                        range: [0,1800],
-                        showgrid: false
+                            dtick: 100,
+                            title: {
+                                text: 'pages',
+                                font: {size: 14}
+                                },
+                            range: [0,1800],
+                            showgrid: false,
+                            font: {size: 14}
                         },
                         yaxis2: {
-                        dtick: 10000,
-                        title: 'words',
-                        side: 'right',
-                        overlaying: 'y',
-                        range: [0,340000]
+                            dtick: 10000,
+                            title: {
+                                text: 'words',
+                                font: {size: 14}
+                                },
+                            side: 'right',
+                            overlaying: 'y',
+                            range: [0,340000],
+                            font: {size: 14}
                         },
                         xaxis: {
                         tickfont: {size: 14}
@@ -377,7 +412,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 600px; height: 1000px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 800px;"></div>
                     <script>
                         var data = [
                         {
@@ -416,10 +451,27 @@
                         ];
                         
                         layout = {
+                        /*
+                        title: {
+                        text: "Number of words for 381 works carrying the label “novela”",
+                        font: {size: 14}
+                        },
+                        */
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
+                        legend: {font: {size: 14}},
+                        margin: {t: 30, b: 40, l: 100, r: 80},
                         yaxis: {
-                        dtick: 10000,
-                        title: 'number of words',
-                        range: [0,350000]
+                            dtick: 10000,
+                            title: {
+                                text: 'number of words',
+                                font: {size: 14}
+                                },
+                            range: [0,350000],
+                            font: {size: 14}
                         },
                         xaxis: {tickfont: {size: 14}}
                         };
@@ -520,7 +572,7 @@
                 </head>
                 <body>
                     <!-- Plotly chart will be drawn inside this DIV -->
-                    <div id="myDiv" style="width: 600px; height: 700px;"></div>
+                    <div id="myDiv" style="width: 709px; height: 450px;"></div>
                     <script>
                         var data = [
                         {
@@ -559,9 +611,26 @@
                         ];
                         
                         layout = {
+                        /*
+                        title: {
+                        text: "Number of words for 65 works carrying the label “novela corta”",
+                        font: {size: 14}
+                        },
+                        */
+                        font: {
+                        family: "Libertine, serif",
+                        color: "#000000",
+                        size: 14
+                        },
+                        legend: {font: {size: 14}},
+                        margin: {t: 0, b: 40, l: 180, r: 140},
                         yaxis: {
-                        dtick: 10000,
-                        title: 'number of words'
+                            dtick: 10000,
+                            tickfont: {size: 14},
+                            title: {
+                            text: 'number of words',
+                            font: {size: 14}
+                            }
                         },
                         xaxis: {tickfont: {size: 14}}
                         };

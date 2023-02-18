@@ -98,7 +98,7 @@ def get_words_per_page(wdir, infile):
 		</head>
 		<body>
 			<!-- Plotly chart will be drawn inside this DIV -->
-			<div id="myDiv" style="width: 500px; height: 500px;"></div>
+			<div id="myDiv" style="width: 709px; height: 420px;"></div>
 			<script>
 				var data = [
 				{
@@ -116,9 +116,24 @@ def get_words_per_page(wdir, infile):
 				];
 				
 				layout = {
+				font: {
+					family: "Libertine, serif",
+					color: "#000000"
+					},
+				margin: {t: 0, b: 40, l: 220, r: 190},
+				/*
+				title: {
+					text: "Number of words per page for a sample of 100 pages",
+					font: {size: 14}
+				},
+				*/
 				yaxis: {
-				dtick: 50,
-				title: 'number of words'
+					dtick: 50,
+					tickfont: {size: 14},
+					title: {
+						text: 'number of words',
+						font: {size: 14}
+					},
 				},
 				xaxis: {tickfont: {size: 14}}
 				};
@@ -140,6 +155,6 @@ def get_words_per_page(wdir, infile):
 
 
 #get_page_numbers("/home/ulrike/Git/bibacme/app/data/", 50, 2)
-#get_words_per_page("/home/ulrike/Git/data-nh/corpus/", "pages-text.xml")
+get_words_per_page("/home/ulrike/Git/data-nh/corpus/", "pages-text.xml")
 
 

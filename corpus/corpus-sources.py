@@ -125,10 +125,11 @@ def plot_sources(source_info, width, height):
 	
 	labels, values = get_data_to_plot(data, source_info)
 
-	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors),  direction="clockwise", hole=.4)])
-	fig.update_layout(autosize=False,width=width,height=height,legend=dict(font=dict(size=14)))
-	
-	fig.write_image(join(data_dir, source_info + ".png")) # scale=2 (increase physical resolution)
+	fig = go.Figure(data=[go.Pie(labels=labels, values=values, marker=dict(colors = colors), direction="clockwise", hole=.4)])
+	fig.update_layout(title=dict(text="Sources by institution.",xanchor="center",yanchor="top",y=0.9,x=0.5,font=dict(size=14)))
+	fig.update_layout(margin=dict(t=0, b=350, l=50, r=0),font=dict(family="Libertine, serif",color="#000000",size=13),autosize=False,width=width,height=height)
+	fig.update_layout(legend=dict(yanchor="top",y=1.6,font=dict(size=13)))
+	#fig.write_image(join(data_dir, source_info + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(data_dir, source_info + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
 	#fig.show()
@@ -157,13 +158,19 @@ def plot_sources_scalegroup(source_info, drop_source_info, drop_group_1, drop_gr
 	labels_1, values_1 = get_data_to_plot(data, source_info, drop_source_info=drop_source_info, drop_value=drop_group_1)
 	labels_2, values_2 = get_data_to_plot(data, source_info, drop_source_info=drop_source_info, drop_value=drop_group_2)
 	
-	fig = make_subplots(2, 1, specs=[[{'type':'domain'}], [{'type':'domain'}]], subplot_titles=[drop_group_2, drop_group_1], vertical_spacing=0.05)
-	fig.add_trace(go.Pie(labels=labels_1, values=values_1, scalegroup='one', name=drop_group_2, direction="clockwise", hole=.4), 1, 1)
-	fig.add_trace(go.Pie(labels=labels_2, values=values_2, scalegroup='one', name=drop_group_1, direction="clockwise", hole=.4), 2, 1)
-	fig.update_layout(autosize=False,width=1000,height=900,legend=dict(font=dict(size=14)))
+	fig = make_subplots(2, 1, specs=[[{'type':'domain'}], [{'type':'domain'}]], subplot_titles=[drop_group_2, drop_group_1], vertical_spacing=0, row_heights=[0.6,0.4])
+	fig.add_trace(go.Pie(labels=labels_1, values=values_1, scalegroup='one', name=drop_group_2, direction="clockwise", hole=.4,marker=dict(colors = colors)), 1, 1)
+	fig.add_trace(go.Pie(labels=labels_2, values=values_2, scalegroup='one', name=drop_group_1, direction="clockwise", hole=.4,marker=dict(colors = colors)), 2, 1)
+	
+	fig.update_layout(title=dict(text="Sources by file type and institution.",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(autosize=False,width=709,height=850)
+	fig.update_layout(margin=dict(t=120, b=80, l=30, r=30),font=dict(family="Libertine, serif",color="#000000",size=13))
+	fig.update_layout(legend=dict(yanchor="bottom",y=0.05,font=dict(size=13)))
 	fig.update_traces(textposition="inside")
 	
-	fig.write_image(join(data_dir, outfile + ".png")) # scale=2 (increase physical resolution)
+	
+	
+	#fig.write_image(join(data_dir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(data_dir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
 	#fig.show()
@@ -210,10 +217,14 @@ def plot_sources_hierarchical(source_info_1, source_info_2):
 	textfont=dict(size = 16)
 	))
 	
-	fig.update_layout(autosize=False,width=800,height=800)
+	fig.update_layout(autosize=False,width=709,height=800)
+	
+	fig.update_layout(title=dict(text="Sources by type of edition and type of institution.",xanchor="center",yanchor="top",y=0.95,x=0.5,font=dict(size=16)))
+	fig.update_layout(margin=dict(t=120, b=80, l=100, r=100),font=dict(family="Libertine, serif",color="#000000",size=14))
+	
 	
 	outfile = source_info_1 + "_" + source_info_2
-	fig.write_image(join(data_dir, outfile + ".png")) # scale=2 (increase physical resolution)
+	#fig.write_image(join(data_dir, outfile + ".png")) # scale=2 (increase physical resolution)
 	fig.write_html(join(data_dir, outfile + ".html")) # include_plotlyjs="cdn" (don't include whole plotly library)
 	
 	#fig.show()
@@ -225,7 +236,7 @@ def plot_sources_hierarchical(source_info_1, source_info_2):
 
 #plot_sources("sources_medium", 450, 350)
 #plot_sources("sources_filetype", 450, 350)
-#plot_sources("sources_institution", 1000, 1000)
+#plot_sources("sources_institution", 709, 1200)
 #plot_sources("institution_type", 450, 350)
 #plot_sources("sources_edition", 450, 350)
 
